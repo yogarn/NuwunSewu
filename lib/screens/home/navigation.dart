@@ -30,6 +30,16 @@ class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+
+        // Define the default brightness and colors.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          // ···
+          brightness: Brightness.light,
+        ),
+      ),
       // ilangin debug
       debugShowCheckedModeBanner: false,
       home: Scaffold(
