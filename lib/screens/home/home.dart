@@ -6,6 +6,16 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+
+        // Define the default brightness and colors.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          // ···
+          brightness: Brightness.light,
+        ),
+      ),
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -17,8 +27,8 @@ class Home extends StatelessWidget {
                 Tab(icon: Icon(Icons.directions_bike)),
               ],
             ),
-            title: const Text('Tabs Demo'),
-            backgroundColor: Colors.brown[400],
+            title: const Text('NuwunSewu'),
+            backgroundColor: Colors.purple[100],
           ),
           body: const TabBarView(
             children: [
