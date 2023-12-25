@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nuwunsewu/models/pengguna.dart';
+import 'package:nuwunsewu/services/database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,6 +17,8 @@ class AuthService {
         .map(_userFromFirebaseUser);
   }
 
+
+
   // sign in anonymous
   Future signInAnon() async {
     try {
@@ -31,8 +34,8 @@ class AuthService {
   // sign in dengan email/password
   Future SignInWithEmailAndPassword(String email, String pass) async {
     try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email, password: pass);
+      UserCredential result =
+          await _auth.signInWithEmailAndPassword(email: email, password: pass);
       User? firebaseUser = result.user;
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {
@@ -42,11 +45,21 @@ class AuthService {
   }
 
   // register dengan email/password
-  Future registerWithEmailAndPassword(String email, String pass) async {
+  Future registerWithEmailAndPassword(
+      String email,
+      String pass,
+      String namaLengkap,
+      String username,
+      int gender,
+      int tanggalLahir,
+      int bulanLahir,
+      int tahunLahir) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: pass);
       User? firebaseUser = result.user;
+      await DatabaseService(uid: firebaseUser!.uid).updateUserData(
+          namaLengkap, username, gender, tanggalLahir, bulanLahir, tahunLahir);
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {
       print(e.toString());

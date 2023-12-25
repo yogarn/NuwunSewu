@@ -51,11 +51,14 @@ class Home extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // gambar post
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              'https://th.bing.com/th/id/R.252de9410dba461a7f27d9b7eebad0e2?rik=xR%2f3Tlyx0QKUyQ&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2fc%2fc%2ff%2f51119.jpg&ehk=xYhwnT%2bHB8xDVMHOa0rPrMnWOQ1cpdLg1GTRUEoBFfU%3d&risl=&pid=ImgRaw&r=0',
-                              fit: BoxFit.fill,
+                          Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                'https://th.bing.com/th/id/R.252de9410dba461a7f27d9b7eebad0e2?rik=xR%2f3Tlyx0QKUyQ&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2fc%2fc%2ff%2f51119.jpg&ehk=xYhwnT%2bHB8xDVMHOa0rPrMnWOQ1cpdLg1GTRUEoBFfU%3d&risl=&pid=ImgRaw&r=0',
+                                // 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain',
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
                           // tombol like, share, etc.
