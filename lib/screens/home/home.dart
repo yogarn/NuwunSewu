@@ -38,12 +38,15 @@ class Home extends StatelessWidget {
                   ),
                   // ini seharusnya return a widget
                   Container(
-                    height: 350,
-                    width: 300,
-                    decoration: const BoxDecoration(
+                    // start post
+                    margin: EdgeInsets.all(20),
+                    // height: 350,
+                    // width: 300,
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.vertical(
-                          bottom: Radius.elliptical(20, 20)),
-                      color: Colors.deepOrangeAccent,
+                          bottom: Radius.elliptical(20, 20),
+                          top: Radius.elliptical(20, 20)),
+                      color: Colors.purple[100],
                     ),
                     child: Container(
                       margin: const EdgeInsets.all(15),
@@ -64,7 +67,7 @@ class Home extends StatelessWidget {
                             children: [
                               IconButton(
                                   onPressed: () {},
-                                  icon: const Icon(Icons.heart_broken)),
+                                  icon: const Icon(Icons.favorite)),
                               IconButton(
                                   onPressed: () {},
                                   icon: const Icon(Icons.chat_bubble_rounded)),
@@ -76,26 +79,42 @@ class Home extends StatelessWidget {
                           Row(
                             children: [
                               // gambar profile, bisa langusng CircleAvatar(Image)
-                              const CircleAvatar(),
+                              Flexible(flex: 1, child: const CircleAvatar()),
                               // konteks
-                              Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: const Column(
-                                  children: [
-                                    Text("Account"),
-                                    Text(
-                                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra sit amet aliquam id diam. Pulvinar neque laoreet suspendisse interdum. Nulla porttitor massa id neque aliquam vestibulum morbi. Orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt.",
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
+                              Flexible(
+                                flex: 10,
+                                child: Container(
+                                  margin: const EdgeInsets.only(left: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Nama Akun",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Container(
+                                        // color: Colors.amber,
+                                        child: Text(
+                                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra sit amet aliquam id diam. Pulvinar neque laoreet suspendisse interdum. Nulla porttitor massa id neque aliquam vestibulum morbi. Orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt.",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          '2 jam yang lalu',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              color: Colors.black),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
-                          ),
-                          // masih bingung biar langsung taruh paling bawah
-                          const Row(
-                            children: [Text("Hours")],
                           ),
                         ],
                       ),
