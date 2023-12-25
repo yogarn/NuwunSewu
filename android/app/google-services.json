@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572296227153",
+    "project_id": "loremipsum-29e20",
+    "storage_bucket": "loremipsum-29e20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572296227153:android:ea2d69344a3b66ebcf4b70",
+        "android_client_info": {
+          "package_name": "com.example.nuwunsewu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwXjz5W4m5Xrro1YdUufuC-CmM41ElFZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
