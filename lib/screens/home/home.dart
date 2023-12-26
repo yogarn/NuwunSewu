@@ -23,9 +23,9 @@ class Home extends StatelessWidget {
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.directions_car)),
-                Tab(icon: Icon(Icons.directions_transit)),
-                Tab(icon: Icon(Icons.directions_bike)),
+                Tab(text: 'For You',),
+                Tab(text: 'Following',),
+                Tab(text: 'Trending',),
               ],
             ),
             title: const Text('NuwunSewu'),
