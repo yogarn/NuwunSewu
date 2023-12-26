@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nuwunsewu/screens/home/profile_picture.dart';
 import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
@@ -54,6 +55,59 @@ class _ProfileState extends State<Profile> {
               ),
               body: ListView(
                 children: [
+                  Container(
+                      margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                      child: Center(
+                        child: StreamBuilder<DocumentSnapshot>(
+                              stream: userCollection
+                                  .doc(FirebaseAuth.instance.currentUser?.uid)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator(); // or some loading indicator
+                                } else {
+                                  if (snapshot.hasData && snapshot.data!.exists) {
+                                    Map<String, dynamic> userData = snapshot.data!
+                                        .data() as Map<String, dynamic>;
+                        
+                                    // Check if the 'profilePicture' field is not empty
+                                    if (userData['profilePicture'] != null) {
+                                      return CircleAvatar(
+                                        radius: 64,
+                                        backgroundImage: NetworkImage(
+                                          userData['profilePicture'],
+                                        ),
+                                      );
+                                    } else {
+                                      // Use a default image if 'profilePicture' is empty
+                                      return CircleAvatar(
+                                        radius: 64,
+                                        backgroundImage: NetworkImage(
+                                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    return Text('Dokumen tidak ditemukan');
+                                  }
+                                }
+                              },
+                            ),
+                      ),),
+                  Center(
+                    child: ElevatedButton(
+                      child: const Text('Edit Profile Picture'),
+                      onPressed: () {
+                        // Navigate to second route when tapped.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ProfilePicture()),
+                        );
+                      },
+                    ),
+                  ),
                   Row(
                     children: [
                       // Text('Login Sebagai : '),
@@ -62,7 +116,7 @@ class _ProfileState extends State<Profile> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Text('Loading...');
+                            return Text('');
                           } else {
                             User? user = snapshot.data;
                             return Container(
@@ -100,7 +154,7 @@ class _ProfileState extends State<Profile> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text('Loading...');
+                        return Text('');
                       } else {
                         if (snapshot.hasData && snapshot.data!.exists) {
                           Map<String, dynamic> userData =
