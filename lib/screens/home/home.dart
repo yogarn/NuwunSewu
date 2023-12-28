@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nuwunsewu/screens/home/post.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
 class Home extends StatelessWidget {
@@ -74,6 +75,8 @@ class _FirstTabHomeState extends State<FirstTabHome> {
             var dateTime = post['dateTime'];
             DateTime parsedDateTime = dateTime.toDate();
 
+            var postID = (snapshot.data!.docs[index].id);
+
             return FutureBuilder<String>(
               future: getNamaLengkap(uidSender),
               builder: (context, namaLengkapSnapshot) {
@@ -82,8 +85,7 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                       'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                 }
 
-                var namaLengkap =
-                    namaLengkapSnapshot.data ?? 'null';
+                var namaLengkap = namaLengkapSnapshot.data ?? 'null';
 
                 return FutureBuilder<String>(
                   future: getProfilePicture(uidSender),
@@ -104,6 +106,7 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                       dateTime: parsedDateTime,
                       namaLengkap: namaLengkap,
                       profilePicture: profilePicture,
+                      postID: postID,
                     );
                   },
                 );
@@ -125,6 +128,7 @@ class PostWidget extends StatelessWidget {
     required this.dateTime,
     required this.namaLengkap,
     required this.profilePicture,
+    required this.postID,
   });
 
   final String title;
@@ -134,100 +138,109 @@ class PostWidget extends StatelessWidget {
   final DateTime dateTime;
   final String namaLengkap;
   final String profilePicture;
+  final postID;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.purple[100],
-      ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ExpandPost(postID: postID)),
+        );
+      },
       child: Container(
-        margin: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: imagePath != null
-                    ? Image.network(
-                        imagePath!,
-                        fit: BoxFit.fill,
-                      )
-                    : Container(),
-              ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.chat_bubble_rounded),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.share),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: CircleAvatar(
-                    radius: 21,
-                    backgroundImage: NetworkImage(profilePicture),
-                  ),
-                ),
-                Flexible(
-                  flex: 10,
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          body,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              namaLengkap,
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              _formatTimeDifference(dateTime),
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+        margin: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.purple[100],
+        ),
+        child: Container(
+          margin: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: imagePath != null
+                      ? Image.network(
+                          imagePath!,
+                          fit: BoxFit.fill,
                         )
-                      ],
+                      : Container(),
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.favorite),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.chat_bubble_rounded),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.share),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 1,
+                    child: CircleAvatar(
+                      radius: 21,
+                      backgroundImage: NetworkImage(profilePicture),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Flexible(
+                    flex: 10,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            body,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                namaLengkap,
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                _formatTimeDifference(dateTime),
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
