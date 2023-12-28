@@ -4,7 +4,6 @@ import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
 class ExpandPost extends StatefulWidget {
-  // const ExpandPost({super.key});
 
   final String postID;
   final CollectionReference userCollection =
@@ -99,23 +98,6 @@ class _ExpandPostState extends State<ExpandPost> {
                           );
                         },
                       );
-
-                      // if (userData['profilePicture'] != null) {
-                      //   return CircleAvatar(
-                      //     radius: 64,
-                      //     backgroundImage: NetworkImage(
-                      //       userData['profilePicture'],
-                      //     ),
-                      //   );
-                      // } else {
-                      //   // Use a default image if 'profilePicture' is empty
-                      //   return CircleAvatar(
-                      //     radius: 64,
-                      //     backgroundImage: NetworkImage(
-                      //       'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
-                      //     ),
-                      //   );
-                      // }
                     } else {
                       return Text('Dokumen tidak ditemukan');
                     }
