@@ -305,8 +305,16 @@ class _RegisterState extends State<Register> {
                               setState(() {
                                 loading = true;
                               });
-                              dynamic result = await _auth
-                                  .registerWithEmailAndPassword(email, pass, namaLengkap, username, gender, tanggalLahir, bulanLahir, tahunLahir);
+                              dynamic result =
+                                  await _auth.registerWithEmailAndPassword(
+                                      email,
+                                      pass,
+                                      namaLengkap,
+                                      username,
+                                      gender,
+                                      tanggalLahir,
+                                      bulanLahir,
+                                      tahunLahir);
                               if (result == null) {
                                 setState(() {
                                   error =

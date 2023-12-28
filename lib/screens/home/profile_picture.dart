@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
@@ -20,17 +19,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('userData');
 
-
-  void selectImage() async {
-    Uint8List img = await pickImage(ImageSource.gallery);
-    setState(() {
-      _image = img;
-      isSelected = true;
-    });
-  }
-
   void saveProfile() async {
-    String resp = await StoreData().saveData(file: _image!);
+    String resp = await StoreData().saveProfilePicture(file: _image!);
     print(resp);
     Navigator.pop(context);
   }
@@ -100,21 +90,26 @@ class _ProfilePictureState extends State<ProfilePicture> {
                           ),
                     Positioned(
                       child: IconButton(
-                        onPressed: () {
-                          selectImage();
+                        onPressed: () async {
+                          Uint8List? img = await selectImage();
+                          setState(() {
+                            _image = img;
+                              isSelected = true;
+                          });
                         },
                         icon: Icon(Icons.add_a_photo),
                       ),
                       bottom: -10,
                       left: 80,
-                    )
+                    ),
                   ],
                 ),
                 SizedBox(
                   height: 30,
                 ),
                 ElevatedButton(
-                    onPressed: (isSelected) ? saveProfile : null, child: Text('Save Profile Picture'))
+                    onPressed: (isSelected) ? saveProfile : null,
+                    child: Text('Save Profile Picture'))
               ],
             ),
           )),

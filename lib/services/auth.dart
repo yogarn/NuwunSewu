@@ -58,7 +58,7 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: pass);
       User? firebaseUser = result.user;
-      await DatabaseService(uid: firebaseUser!.uid).updateUserData(
+      await DatabaseService().updateUserData(
           namaLengkap, username, gender, tanggalLahir, bulanLahir, tahunLahir);
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {
