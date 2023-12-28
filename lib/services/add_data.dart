@@ -18,14 +18,56 @@ class StoreData {
     return downloadUrl;
   }
 
-  Future<String> saveData({required Uint8List file}) async {
+  Future<String> saveProfilePicture({required Uint8List file}) async {
+    //ignore this func
     String resp = 'some error occured';
     try {
-      String imagePath = 'profilePicture/${Uri.encodeComponent(FirebaseAuth.instance.currentUser!.uid)}';
+      String imagePath =
+          'profilePicture/${Uri.encodeComponent(FirebaseAuth.instance.currentUser!.uid)}';
       String imageUrl = await uploadImageToStorage(imagePath, file);
-      await _firestore.collection('userData').doc(FirebaseAuth.instance.currentUser!.uid).update({
+      await _firestore
+          .collection('userData')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
         'profilePicture': imageUrl,
       });
+    } catch (e) {
+      resp = e.toString();
+    }
+    return resp;
+  }
+
+  Future<String> savePostImage(
+      {Uint8List? file, required String title, required String body}) async {
+    String resp = 'some error occurred';
+    try {
+      String docId = _firestore.collection('postingan').doc().id;
+
+      if (file != null) {
+        // Upload the image to storage if file is provided
+        String imagePath = 'postImage/${Uri.encodeComponent(docId)}';
+        String imageUrl = await uploadImageToStorage(imagePath, file);
+
+        // Save post data to Firestore with image
+        await _firestore.collection('postingan').doc(docId).set({
+          'title': title,
+          'body': body,
+          'imagePath': imageUrl,
+          'uidSender': FirebaseAuth.instance.currentUser?.uid,
+          'dateTime': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Save post data to Firestore without image
+        await _firestore.collection('postingan').doc(docId).set({
+          'title': title,
+          'body': body,
+          'imagePath': null,
+          'uidSender': FirebaseAuth.instance.currentUser?.uid,
+          'dateTime': FieldValue.serverTimestamp(),
+        });
+      }
+
+      resp = 'success';
     } catch (e) {
       resp = e.toString();
     }

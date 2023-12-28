@@ -47,7 +47,10 @@ class _NavigationState extends State<Navigation> {
         body: _pages[_selectedPageIndex],
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const Upload()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Upload()),
+            );
           },
           tooltip: "Post",
           child: const Icon(Icons.add),
