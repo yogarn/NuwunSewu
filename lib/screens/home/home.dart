@@ -95,7 +95,7 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                           'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                     }
 
-                    var profilePicture = profilePictureSnapshot.data ??
+                    var profilePicture = (profilePictureSnapshot.data == 'defaultProfilePict' ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain' : profilePictureSnapshot.data) ??
                         'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
                     return PostWidget(
@@ -253,11 +253,11 @@ class PostWidget extends StatelessWidget {
     int minuteDifference = difference.inMinutes;
 
     if (daysDifference > 0) {
-      return '${daysDifference} ${daysDifference == 1 ? 'day' : 'days'} ago';
+      return '${daysDifference} hari yang lalu';
     } else if (hoursDifference > 0) {
-      return '${hoursDifference} ${hoursDifference == 1 ? 'hour' : 'hours'} ago';
+      return '${hoursDifference} jam yang lalu';
     } else {
-      return '${minuteDifference} ${minuteDifference == 1 ? 'minute' : 'minutes'} ago';
+      return '${minuteDifference} menit yang lalu';
     }
   }
 }
