@@ -4,7 +4,6 @@ import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
 class ExpandPost extends StatefulWidget {
-
   final String postID;
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('postingan');
@@ -86,7 +85,20 @@ class _ExpandPostState extends State<ExpandPost> {
                                     fontFamily: "Times New Roman",
                                     fontWeight: FontWeight.w300),
                               ),
-                              SizedBox(height: 30),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              postingan['imagePath'] != null
+                                  ? Container(
+                                    margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image.network(
+                                          postingan['imagePath'],
+                                          fit: BoxFit.fill,
+                                        )),
+                                  )
+                                  : Container(),
                               Text(
                                 postingan['body'],
                                 style: TextStyle(
