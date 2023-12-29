@@ -247,7 +247,7 @@ class CommentWidget extends StatelessWidget {
         }
 
         if (snapshot.data?.docs.isEmpty ?? true) {
-          return Text('No comments available.');
+          return Text('Belum ada komentar.');
         }
 
         return Column(
@@ -316,6 +316,19 @@ class CommentWidget extends StatelessWidget {
                           commentText,
                           style: TextStyle(fontSize: 12.0),
                         ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          _formatTimeDifference(
+                              commentData['timestamp'].toDate()),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -326,5 +339,20 @@ class CommentWidget extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _formatTimeDifference(DateTime postDateTime) {
+    Duration difference = DateTime.now().difference(postDateTime);
+    int daysDifference = difference.inDays;
+    int hoursDifference = difference.inHours;
+    int minuteDifference = difference.inMinutes;
+
+    if (daysDifference > 0) {
+      return '${daysDifference} hari yang lalu';
+    } else if (hoursDifference > 0) {
+      return '${hoursDifference} jam yang lalu';
+    } else {
+      return '${minuteDifference} menit yang lalu';
+    }
   }
 }
