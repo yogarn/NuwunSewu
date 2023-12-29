@@ -73,4 +73,25 @@ class StoreData {
     }
     return resp;
   }
+
+  // Fungsi untuk menambahkan komentar
+  Future<void> tambahKomentar(
+      String postID, String uidSender, String teksKomentar) async {
+    try {
+      // Mendapatkan referensi dokumen postingan
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('postingan').doc(postID);
+
+      // Menambahkan komentar ke dalam subkoleksi 'comments'
+      await postRef.collection('comments').add({
+        'user': uidSender,
+        'text': teksKomentar,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      print('Komentar berhasil ditambahkan.');
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 }

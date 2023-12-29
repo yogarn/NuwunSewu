@@ -29,10 +29,6 @@ class _UploadState extends State<Upload> {
 
   String error = "";
 
-  void kirimData() {
-    // uji coba
-  }
-
   @override
   Widget build(BuildContext context) {
     return loading
@@ -70,6 +66,7 @@ class _UploadState extends State<Upload> {
                       height: 20,
                     ),
                     TextFormField(
+                      maxLines: null,
                       decoration: InputDecoration(
                         hintText: 'Masukkan judul postingan',
                         label: Text('Judul'),
@@ -87,6 +84,7 @@ class _UploadState extends State<Upload> {
                       height: 20,
                     ),
                     TextFormField(
+                      maxLines: null,
                       decoration: InputDecoration(
                         hintText: 'Masukkan isi postingan',
                         label: Text('Isi'),
