@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
-import 'package:nuwunsewu/screens/home/upload.dart';
+import 'package:nuwunsewu/screens/post/upload.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});

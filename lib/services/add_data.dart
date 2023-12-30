@@ -94,4 +94,24 @@ class StoreData {
       print('Error: $error');
     }
   }
+
+  Future<void> balasKomentar(
+      String postID, String commentID, String uidSender, String teksKomentar) async {
+    try {
+      // Mendapatkan referensi dokumen postingan
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('postingan').doc(postID);
+
+      // Menambahkan komentar ke dalam subkoleksi 'comments'
+      await postRef.collection('comments').doc(commentID).collection('replyComments').add({
+        'user': uidSender,
+        'text': teksKomentar,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      print('Komentar berhasil ditambahkan.');
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 }

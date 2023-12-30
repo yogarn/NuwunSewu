@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nuwunsewu/screens/post/expand_comment.dart';
 import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 import 'package:nuwunsewu/services/add_data.dart';
@@ -136,60 +137,87 @@ class _ExpandPostState extends State<ExpandPost> {
                                           fontSize: 16.0,
                                           fontFamily: "Times New Roman",
                                         )),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
                                     Form(
                                       key: _formKey,
                                       child: Column(
                                         children: [
                                           TextFormField(
-                                            controller:
-                                                widget.commentController,
-                                            maxLines: null,
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  'Masukkan komentar anda',
-                                              label: Text('Tambah Komentar'),
-                                            ),
                                             validator: (val) => val!.isEmpty
                                                 ? 'Komentar tidak boleh kosong!'
                                                 : null,
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              if (_formKey.currentState !=
-                                                  null) {
-                                                if (_formKey.currentState!
-                                                    .validate()) {
-                                                  setState(() {
-                                                    loading = true;
-                                                  });
-                                                  try {
-                                                    // print(widget.commentController.text);
-                                                    await db.tambahKomentar(
-                                                        widget.postID,
-                                                        FirebaseAuth.instance
-                                                            .currentUser!.uid,
-                                                        widget.commentController
-                                                            .text);
-                                                    widget.commentController
-                                                        .text = '';
-                                                    setState(() {
-                                                      loading = false;
-                                                    });
-                                                    // Navigator.pop(context);
-                                                  } catch (e) {
-                                                    setState(() {
-                                                      error =
-                                                          "Mohon maaf, periksa detail komentar dan coba lagi nanti.";
-                                                      loading = false;
-                                                    });
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            child: Text('Kirim'),
+                                            maxLines: null,
+                                            controller:
+                                                widget.commentController,
+                                            decoration: InputDecoration(
+                                              hintText: "Tulis Komentar",
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                                borderSide: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1,
+                                                  style: BorderStyle.solid,
+                                                ),
+                                              ),
+                                              suffixIcon: Container(
+                                                margin: EdgeInsets.all(8),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    minimumSize: Size(50, 50),
+                                                    side: BorderSide.none,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    // shape:
+                                                    //     new RoundedRectangleBorder(
+                                                    //   borderRadius:
+                                                    //       new BorderRadius
+                                                    //           .circular(12.0),
+                                                    // ),
+                                                  ),
+                                                  child: Icon(Icons.send),
+                                                  onPressed: () async {
+                                                    if (_formKey.currentState !=
+                                                        null) {
+                                                      if (_formKey.currentState!
+                                                          .validate()) {
+                                                        setState(() {
+                                                          loading = true;
+                                                        });
+                                                        try {
+                                                          // print(widget.commentController.text);
+                                                          await db.tambahKomentar(
+                                                              widget.postID,
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid,
+                                                              widget
+                                                                  .commentController
+                                                                  .text);
+                                                          widget
+                                                              .commentController
+                                                              .text = '';
+                                                          setState(() {
+                                                            loading = false;
+                                                          });
+                                                          // Navigator.pop(context);
+                                                        } catch (e) {
+                                                          setState(() {
+                                                            error =
+                                                                "Mohon maaf, periksa detail komentar dan coba lagi nanti.";
+                                                            loading = false;
+                                                          });
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                           Text(
                                             error,
@@ -257,83 +285,93 @@ class CommentWidget extends StatelessWidget {
                 document.data() as Map<String, dynamic>;
 
             String commentText = commentData['text'] ?? '';
+            var commentID = document.id;
 
-            return Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.all(8.0),
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FutureBuilder<String>(
-                          future: getNamaLengkap(commentData['user']),
-                          builder: (context, namaLengkapSnapshot) {
-                            if (namaLengkapSnapshot.hasError) {
-                              return Text('Error fetching data');
-                            }
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ExpandComment(commentID: commentID, postID: postId,)),
+                );
+              },
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FutureBuilder<String>(
+                            future: getNamaLengkap(commentData['user']),
+                            builder: (context, namaLengkapSnapshot) {
+                              if (namaLengkapSnapshot.hasError) {
+                                return Text('Error fetching data');
+                              }
 
-                            var namaLengkap =
-                                namaLengkapSnapshot.data ?? 'null';
+                              var namaLengkap =
+                                  namaLengkapSnapshot.data ?? 'null';
 
-                            return FutureBuilder<String>(
-                              future: getProfilePicture(commentData['user']),
-                              builder: (context, profilePictureSnapshot) {
-                                if (profilePictureSnapshot.hasError) {
-                                  return Text('Error fetching data');
-                                }
+                              return FutureBuilder<String>(
+                                future: getProfilePicture(commentData['user']),
+                                builder: (context, profilePictureSnapshot) {
+                                  if (profilePictureSnapshot.hasError) {
+                                    return Text('Error fetching data');
+                                  }
 
-                                var profilePicture = profilePictureSnapshot
-                                        .data ??
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                  var profilePicture = profilePictureSnapshot
+                                          .data ??
+                                      'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
-                                return Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 21,
-                                      backgroundImage:
-                                          NetworkImage(profilePicture),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(namaLengkap),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          commentText,
-                          style: TextStyle(fontSize: 12.0),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          _formatTimeDifference(
-                              commentData['timestamp'].toDate()),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.black,
+                                  return Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 21,
+                                        backgroundImage:
+                                            NetworkImage(profilePicture),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(namaLengkap),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            commentText,
+                            style: TextStyle(fontSize: 12.0),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            _formatTimeDifference(
+                                commentData['timestamp'].toDate()),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }).toList(),
         );
