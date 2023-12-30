@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nuwunsewu/screens/home/post.dart';
+import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
 class Home extends StatelessWidget {
