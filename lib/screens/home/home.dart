@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
+import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
 class Home extends StatelessWidget {
@@ -95,7 +97,10 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                           'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                     }
 
-                    var profilePicture = (profilePictureSnapshot.data == 'defaultProfilePict' ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain' : profilePictureSnapshot.data) ??
+                    var profilePicture = (profilePictureSnapshot.data ==
+                                'defaultProfilePict'
+                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                            : profilePictureSnapshot.data) ??
                         'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
                     return PostWidget(
@@ -119,8 +124,8 @@ class _FirstTabHomeState extends State<FirstTabHome> {
   }
 }
 
-class PostWidget extends StatelessWidget {
-  const PostWidget({
+class PostWidget extends StatefulWidget {
+  PostWidget({
     required this.title,
     required this.body,
     required this.imagePath,
@@ -141,12 +146,56 @@ class PostWidget extends StatelessWidget {
   final postID;
 
   @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  StoreData db = StoreData();
+  int likeCount = 0;
+  int commentCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getLikeCount(widget.postID).then((count) {
+      setState(() {
+        likeCount = count;
+      });
+    });
+
+    getCommentCount(widget.postID).then((count) {
+      setState(() {
+        commentCount = count;
+      });
+    });
+  }
+
+  Future<void> toggleLikePost() async {
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    final liked = await db.hasUserLikedPost(widget.postID, currentUserID);
+
+    if (liked) {
+      await db.deleteLikePost(widget.postID, currentUserID);
+      setState(() {
+        likeCount -= 1;
+      });
+    } else {
+      await db.likePost(widget.postID, currentUserID);
+      setState(() {
+        likeCount += 1;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ExpandPost(postID: postID)),
+          MaterialPageRoute(
+              builder: (context) => ExpandPost(postID: widget.postID)),
         );
       },
       child: Container(
@@ -163,9 +212,9 @@ class PostWidget extends StatelessWidget {
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: imagePath != null
+                  child: widget.imagePath != null
                       ? Image.network(
-                          imagePath!,
+                          widget.imagePath!,
                           fit: BoxFit.fill,
                         )
                       : Container(),
@@ -173,13 +222,27 @@ class PostWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite),
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          await toggleLikePost();
+
+                          // Update likeCount directly without triggering a full rebuild
+                        },
+                        icon: const Icon(Icons.favorite),
+                      ),
+                      Text(likeCount.toString()),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.chat_bubble_rounded),
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.chat_bubble_rounded),
+                      ),
+                      Text(commentCount.toString()),
+                    ],
                   ),
                   IconButton(
                     onPressed: () {},
@@ -193,7 +256,7 @@ class PostWidget extends StatelessWidget {
                     flex: 1,
                     child: CircleAvatar(
                       radius: 21,
-                      backgroundImage: NetworkImage(profilePicture),
+                      backgroundImage: NetworkImage(widget.profilePicture),
                     ),
                   ),
                   Flexible(
@@ -204,11 +267,11 @@ class PostWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            widget.title,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            body,
+                            widget.body,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -216,7 +279,7 @@ class PostWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                namaLengkap,
+                                widget.namaLengkap,
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,
@@ -224,7 +287,7 @@ class PostWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                _formatTimeDifference(dateTime),
+                                _formatTimeDifference(widget.dateTime),
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,

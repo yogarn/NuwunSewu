@@ -36,16 +36,46 @@ Future<String> getProfilePicture(var uidSender) async {
 }
 
 String formatTimeDifference(DateTime postDateTime) {
-    Duration difference = DateTime.now().difference(postDateTime);
-    int daysDifference = difference.inDays;
-    int hoursDifference = difference.inHours;
-    int minuteDifference = difference.inMinutes;
+  Duration difference = DateTime.now().difference(postDateTime);
+  int daysDifference = difference.inDays;
+  int hoursDifference = difference.inHours;
+  int minuteDifference = difference.inMinutes;
 
-    if (daysDifference > 0) {
-      return '${daysDifference} hari yang lalu';
-    } else if (hoursDifference > 0) {
-      return '${hoursDifference} jam yang lalu';
-    } else {
-      return '${minuteDifference} menit yang lalu';
-    }
+  if (daysDifference > 0) {
+    return '${daysDifference} hari yang lalu';
+  } else if (hoursDifference > 0) {
+    return '${hoursDifference} jam yang lalu';
+  } else {
+    return '${minuteDifference} menit yang lalu';
   }
+}
+
+Future<int> getLikeCount(String postID) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('postingan')
+        .doc(postID)
+        .collection('likes')
+        .get();
+
+    return querySnapshot.size;
+  } catch (error) {
+    print('Error getting like count: $error');
+    return 0; // Handle the error as needed
+  }
+}
+
+Future<int> getCommentCount(String postID) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('postingan')
+        .doc(postID)
+        .collection('comments')
+        .get();
+
+    return querySnapshot.size;
+  } catch (error) {
+    print('Error getting like count: $error');
+    return 0; // Handle the error as needed
+  }
+}

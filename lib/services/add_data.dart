@@ -95,15 +95,19 @@ class StoreData {
     }
   }
 
-  Future<void> balasKomentar(
-      String postID, String commentID, String uidSender, String teksKomentar) async {
+  Future<void> balasKomentar(String postID, String commentID, String uidSender,
+      String teksKomentar) async {
     try {
       // Mendapatkan referensi dokumen postingan
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('postingan').doc(postID);
 
       // Menambahkan komentar ke dalam subkoleksi 'comments'
-      await postRef.collection('comments').doc(commentID).collection('replyComments').add({
+      await postRef
+          .collection('comments')
+          .doc(commentID)
+          .collection('replyComments')
+          .add({
         'user': uidSender,
         'text': teksKomentar,
         'timestamp': FieldValue.serverTimestamp(),
@@ -113,5 +117,35 @@ class StoreData {
     } catch (error) {
       print('Error: $error');
     }
+  }
+
+  Future<void> likePost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('likes')
+        .doc(userID)
+        .set({
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteLikePost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('likes')
+        .doc(userID)
+        .delete();
+  }
+
+  Future<bool> hasUserLikedPost(String postID, String userID) async {
+    final likeSnapshot = await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('likes')
+        .doc(userID)
+        .get();
+    return likeSnapshot.exists;
   }
 }
