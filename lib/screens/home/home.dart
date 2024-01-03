@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
+import '../post/upload.dart';
+
 class Home extends StatelessWidget {
   const Home({Key? key});
 
@@ -29,6 +31,16 @@ class Home extends StatelessWidget {
             ),
             title: const Text('NuwunSewu'),
             backgroundColor: Colors.purple[100],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Upload()),
+              );
+            },
+            tooltip: "Post",
+            child: const Icon(Icons.add),
           ),
           body: const TabBarView(
             children: [

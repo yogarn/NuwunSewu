@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
-import 'package:nuwunsewu/screens/post/upload.dart';
+import 'package:nuwunsewu/screens/home/search.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -23,6 +23,7 @@ class _NavigationState extends State<Navigation> {
   // list untuk _navigateHomePage
   final List _pages = [
     const Home(),
+    const Search(),
     Profile(),
   ];
 
@@ -45,16 +46,6 @@ class _NavigationState extends State<Navigation> {
         // background
         backgroundColor: Colors.blueGrey[800],
         body: _pages[_selectedPageIndex],
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Upload()),
-            );
-          },
-          tooltip: "Post",
-          child: const Icon(Icons.add),
-        ),
         // Bar bawah
         bottomNavigationBar: BottomNavigationBar(
           // List index ke 0 = HomePage()
@@ -64,6 +55,7 @@ class _NavigationState extends State<Navigation> {
           // Isi yg ad di bar bawah
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
           ],
         ),
