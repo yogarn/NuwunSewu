@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Update with the correct import
+import 'package:nuwunsewu/screens/home/other_profile.dart';
+import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/services/add_data.dart'; // Update with the correct import
 import 'package:nuwunsewu/services/utils.dart'; // Update with the correct import
@@ -274,9 +276,20 @@ class _PostWidgetState extends State<PostWidget> {
                 children: [
                   Flexible(
                     flex: 1,
-                    child: CircleAvatar(
-                      radius: 21,
-                      backgroundImage: NetworkImage(widget.profilePicture),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OtherProfile(uidSender: widget.uidSender),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 21,
+                        backgroundImage: NetworkImage(widget.profilePicture),
+                      ),
                     ),
                   ),
                   Flexible(
