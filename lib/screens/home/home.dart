@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Update with the correct import
 import 'package:nuwunsewu/screens/post/post.dart';
-import 'package:nuwunsewu/services/add_data.dart';
-import 'package:nuwunsewu/services/utils.dart';
+import 'package:nuwunsewu/services/add_data.dart'; // Update with the correct import
+import 'package:nuwunsewu/services/utils.dart'; // Update with the correct import
 
 class Home extends StatelessWidget {
   const Home({Key? key});
@@ -153,6 +154,10 @@ class _PostWidgetState extends State<PostWidget> {
   StoreData db = StoreData();
   int likeCount = 0;
   int commentCount = 0;
+  bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
+
+  final Duration _debounceDuration = Duration(milliseconds: 500);
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -169,23 +174,35 @@ class _PostWidgetState extends State<PostWidget> {
         commentCount = count;
       });
     });
+
+    // Inisialisasi status like berdasarkan hasil dari hasUserLikedPost
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
+      setState(() {
+        isLiked = liked;
+      });
+    });
   }
 
-  Future<void> toggleLikePost() async {
-    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
-    final liked = await db.hasUserLikedPost(widget.postID, currentUserID);
+  Future<void> _toggleLikePost() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
 
-    if (liked) {
-      await db.deleteLikePost(widget.postID, currentUserID);
-      setState(() {
-        likeCount -= 1;
-      });
-    } else {
-      await db.likePost(widget.postID, currentUserID);
-      setState(() {
-        likeCount += 1;
-      });
-    }
+      if (isLiked) {
+        setState(() {
+          likeCount -= 1;
+          isLiked = false; // Perbarui status like secara lokal
+        });
+        await db.deleteLikePost(widget.postID, currentUserID);
+      } else {
+        setState(() {
+          likeCount += 1;
+          isLiked = true; // Perbarui status like secara lokal
+        });
+        await db.likePost(widget.postID, currentUserID);
+      }
+    });
   }
 
   @override
@@ -195,7 +212,8 @@ class _PostWidgetState extends State<PostWidget> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ExpandPost(postID: widget.postID)),
+            builder: (context) => ExpandPost(postID: widget.postID),
+          ),
         );
       },
       child: Container(
@@ -226,11 +244,13 @@ class _PostWidgetState extends State<PostWidget> {
                     children: [
                       IconButton(
                         onPressed: () async {
-                          await toggleLikePost();
-
-                          // Update likeCount directly without triggering a full rebuild
+                          await _toggleLikePost();
                         },
-                        icon: const Icon(Icons.favorite),
+                        icon: isLiked
+                            ? const Icon(Icons.favorite,
+                                color: Colors.red) // Icon untuk sudah di like
+                            : const Icon(Icons
+                                .favorite_border), // Icon untuk belum di like
                       ),
                       Text(likeCount.toString()),
                     ],
@@ -341,4 +361,8 @@ class ThirdTabHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Icon(Icons.directions_bike);
   }
+}
+
+void main() {
+  runApp(Home());
 }
