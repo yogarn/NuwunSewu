@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,58 @@ class _ExpandPostState extends State<ExpandPost> {
   bool loading = false;
 
   StoreData db = StoreData();
+  int likeCount = 0;
+  int commentCount = 0;
+  bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
+
+  final Duration _debounceDuration = Duration(milliseconds: 500);
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getLikeCount(widget.postID).then((count) {
+      setState(() {
+        likeCount = count;
+      });
+    });
+
+    getCommentCount(widget.postID).then((count) {
+      setState(() {
+        commentCount = count;
+      });
+    });
+
+    // Inisialisasi status like berdasarkan hasil dari hasUserLikedPost
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
+      setState(() {
+        isLiked = liked;
+      });
+    });
+  }
+
+  Future<void> _toggleLikePost() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isLiked) {
+        setState(() {
+          likeCount -= 1;
+          isLiked = false; // Perbarui status like secara lokal
+        });
+        await db.deleteLikePost(widget.postID, currentUserID);
+      } else {
+        setState(() {
+          likeCount += 1;
+          isLiked = true; // Perbarui status like secara lokal
+        });
+        await db.likePost(widget.postID, currentUserID);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +181,55 @@ class _ExpandPostState extends State<ExpandPost> {
                                     ),
                                     SizedBox(
                                       height: 20,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () async {
+                                                await _toggleLikePost();
+                                              },
+                                              icon: isLiked
+                                                  ? const Icon(Icons.thumb_up,
+                                                      color: Colors
+                                                          .purple) // Icon untuk sudah di like
+                                                  : const Icon(Icons
+                                                      .thumb_up_outlined), // Icon untuk belum di like
+                                            ),
+                                            Text(likeCount.toString()),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ExpandPost(
+                                                            postID:
+                                                                widget.postID),
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(
+                                                  Icons.chat_bubble_rounded),
+                                            ),
+                                            Text(commentCount.toString()),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(Icons.share),
+                                            ),
+                                            Text('Share'),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                     Divider(),
                                     SizedBox(
@@ -292,7 +395,10 @@ class CommentWidget extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ExpandComment(commentID: commentID, postID: postId,)),
+                      builder: (context) => ExpandComment(
+                            commentID: commentID,
+                            postID: postId,
+                          )),
                 );
               },
               child: Row(

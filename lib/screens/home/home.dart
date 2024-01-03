@@ -5,6 +5,7 @@ import 'package:flutter/material.dart'; // Update with the correct import
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
+import 'package:nuwunsewu/screens/post/upload.dart';
 import 'package:nuwunsewu/services/add_data.dart'; // Update with the correct import
 import 'package:nuwunsewu/services/utils.dart'; // Update with the correct import
 
@@ -24,6 +25,16 @@ class Home extends StatelessWidget {
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Upload()),
+              );
+            },
+            tooltip: "Post",
+            child: const Icon(Icons.add),
+          ),
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
@@ -240,38 +251,52 @@ class _PostWidgetState extends State<PostWidget> {
                       : Container(),
                 ),
               ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      IconButton(
-                        onPressed: () async {
-                          await _toggleLikePost();
-                        },
-                        icon: isLiked
-                            ? const Icon(Icons.favorite,
-                                color: Colors.red) // Icon untuk sudah di like
-                            : const Icon(Icons
-                                .favorite_border), // Icon untuk belum di like
-                      ),
-                      Text(likeCount.toString()),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.chat_bubble_rounded),
-                      ),
-                      Text(commentCount.toString()),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.share),
-                  ),
-                ],
-              ),
+              SizedBox(height: 20,),
+              // Row(
+              //   children: [
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () async {
+              //             await _toggleLikePost();
+              //           },
+              //           icon: isLiked
+              //               ? const Icon(Icons.thumb_up,
+              //                   color: Colors.purple) // Icon untuk sudah di like
+              //               : const Icon(Icons
+              //                   .thumb_up_outlined), // Icon untuk belum di like
+              //         ),
+              //         Text(likeCount.toString()),
+              //       ],
+              //     ),
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) =>
+              //                     ExpandPost(postID: widget.postID),
+              //               ),
+              //             );
+              //           },
+              //           icon: const Icon(Icons.chat_bubble_rounded),
+              //         ),
+              //         Text(commentCount.toString()),
+              //       ],
+              //     ),
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () {},
+              //           icon: const Icon(Icons.share),
+              //         ),
+              //         Text('Share'),
+              //       ],
+              //     ),
+              //   ],
+              // ),
               Row(
                 children: [
                   Flexible(

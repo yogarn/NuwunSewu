@@ -45,16 +45,7 @@ class _NavigationState extends State<Navigation> {
         // background
         backgroundColor: Colors.blueGrey[800],
         body: _pages[_selectedPageIndex],
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Upload()),
-            );
-          },
-          tooltip: "Post",
-          child: const Icon(Icons.add),
-        ),
+
         // Bar bawah
         bottomNavigationBar: BottomNavigationBar(
           // List index ke 0 = HomePage()
