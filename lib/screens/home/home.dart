@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
+import 'package:nuwunsewu/screens/post/upload.dart';
 import 'package:nuwunsewu/services/utils.dart';
-
-import '../post/upload.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key});
