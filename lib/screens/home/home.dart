@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nuwunsewu/screens/home/other_profile.dart';
+import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/screens/post/upload.dart';
+import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
 class Home extends StatelessWidget {
@@ -20,6 +25,16 @@ class Home extends StatelessWidget {
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Upload()),
+              );
+            },
+            tooltip: "Post",
+            child: const Icon(Icons.add),
+          ),
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
@@ -106,7 +121,10 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                           'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                     }
 
-                    var profilePicture = (profilePictureSnapshot.data == 'defaultProfilePict' ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain' : profilePictureSnapshot.data) ??
+                    var profilePicture = (profilePictureSnapshot.data ==
+                                'defaultProfilePict'
+                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                            : profilePictureSnapshot.data) ??
                         'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
                     return PostWidget(
@@ -130,8 +148,8 @@ class _FirstTabHomeState extends State<FirstTabHome> {
   }
 }
 
-class PostWidget extends StatelessWidget {
-  const PostWidget({
+class PostWidget extends StatefulWidget {
+  PostWidget({
     required this.title,
     required this.body,
     required this.imagePath,
@@ -152,12 +170,73 @@ class PostWidget extends StatelessWidget {
   final postID;
 
   @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  StoreData db = StoreData();
+  int likeCount = 0;
+  int commentCount = 0;
+  bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
+
+  final Duration _debounceDuration = Duration(milliseconds: 500);
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getLikeCount(widget.postID).then((count) {
+      setState(() {
+        likeCount = count;
+      });
+    });
+
+    getCommentCount(widget.postID).then((count) {
+      setState(() {
+        commentCount = count;
+      });
+    });
+
+    // Inisialisasi status like berdasarkan hasil dari hasUserLikedPost
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
+      setState(() {
+        isLiked = liked;
+      });
+    });
+  }
+
+  Future<void> _toggleLikePost() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isLiked) {
+        setState(() {
+          likeCount -= 1;
+          isLiked = false; // Perbarui status like secara lokal
+        });
+        await db.deleteLikePost(widget.postID, currentUserID);
+      } else {
+        setState(() {
+          likeCount += 1;
+          isLiked = true; // Perbarui status like secara lokal
+        });
+        await db.likePost(widget.postID, currentUserID);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ExpandPost(postID: postID)),
+          MaterialPageRoute(
+            builder: (context) => ExpandPost(postID: widget.postID),
+          ),
         );
       },
       child: Container(
@@ -174,37 +253,78 @@ class PostWidget extends StatelessWidget {
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: imagePath != null
+                  child: widget.imagePath != null
                       ? Image.network(
-                          imagePath!,
+                          widget.imagePath!,
                           fit: BoxFit.fill,
                         )
                       : Container(),
                 ),
               ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.chat_bubble_rounded),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.share),
-                  ),
-                ],
-              ),
+              SizedBox(height: 20,),
+              // Row(
+              //   children: [
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () async {
+              //             await _toggleLikePost();
+              //           },
+              //           icon: isLiked
+              //               ? const Icon(Icons.thumb_up,
+              //                   color: Colors.purple) // Icon untuk sudah di like
+              //               : const Icon(Icons
+              //                   .thumb_up_outlined), // Icon untuk belum di like
+              //         ),
+              //         Text(likeCount.toString()),
+              //       ],
+              //     ),
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) =>
+              //                     ExpandPost(postID: widget.postID),
+              //               ),
+              //             );
+              //           },
+              //           icon: const Icon(Icons.chat_bubble_rounded),
+              //         ),
+              //         Text(commentCount.toString()),
+              //       ],
+              //     ),
+              //     Column(
+              //       children: [
+              //         IconButton(
+              //           onPressed: () {},
+              //           icon: const Icon(Icons.share),
+              //         ),
+              //         Text('Share'),
+              //       ],
+              //     ),
+              //   ],
+              // ),
               Row(
                 children: [
                   Flexible(
                     flex: 1,
-                    child: CircleAvatar(
-                      radius: 21,
-                      backgroundImage: NetworkImage(profilePicture),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OtherProfile(uidSender: widget.uidSender),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 21,
+                        backgroundImage: NetworkImage(widget.profilePicture),
+                      ),
                     ),
                   ),
                   Flexible(
@@ -215,11 +335,11 @@ class PostWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            widget.title,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            body,
+                            widget.body,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -227,7 +347,7 @@ class PostWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                namaLengkap,
+                                widget.namaLengkap,
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,
@@ -235,7 +355,7 @@ class PostWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                _formatTimeDifference(dateTime),
+                                _formatTimeDifference(widget.dateTime),
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,
@@ -289,4 +409,8 @@ class ThirdTabHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Icon(Icons.directions_bike);
   }
+}
+
+void main() {
+  runApp(Home());
 }
