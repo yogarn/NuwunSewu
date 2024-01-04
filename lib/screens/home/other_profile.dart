@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nuwunsewu/screens/home/profile_picture.dart';
+import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/auth.dart';
+import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
 class OtherProfile extends StatefulWidget {
@@ -18,8 +21,67 @@ class _OtherProfileState extends State<OtherProfile> {
       FirebaseFirestore.instance.collection('userData');
   bool loading = false;
 
+  StoreData db = StoreData();
+
   String gender = "";
   num umur = 0;
+
+  bool isFollowing = false;
+  int followerCount = 0;
+  int followingCount = 0;
+
+  final Duration _debounceDuration = Duration(milliseconds: 500);
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getFollowingCount(widget.uidSender).then((count) {
+      setState(() {
+        followingCount = count;
+      });
+    });
+
+    getFollowerCount(widget.uidSender).then((count) {
+      setState(() {
+        // print(count);
+        followerCount = count;
+      });
+    });
+
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    db.hasUserFollowAccount(widget.uidSender, currentUserID).then((following) {
+      setState(() {
+        print(following);
+        isFollowing = following;
+      });
+    });
+  }
+
+  Future<void> _toggleFollowAccount() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isFollowing) {
+        setState(() {
+          followerCount -= 1;
+          isFollowing = false; // Perbarui status like secara lokal
+        });
+        await db.unfollowAccount(widget.uidSender, currentUserID);
+      } else {
+        setState(() {
+          followerCount += 1;
+          isFollowing = true; // Perbarui status like secara lokal
+        });
+        await db.followAccount(widget.uidSender, currentUserID);
+      }
+
+      print(isFollowing);
+      print(followerCount);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +153,13 @@ class _OtherProfileState extends State<OtherProfile> {
                       ),
                     ),
                   ),
+                  Text('${followerCount} Follower'),
+                  Text('${followingCount} Following'),
+                  Container(
+                      margin: EdgeInsets.all(20),
+                      child: ElevatedButton(
+                          onPressed: _toggleFollowAccount,
+                          child: isFollowing ? Text('Following') : Text('Follow'))),
                   StreamBuilder<DocumentSnapshot>(
                     stream: userCollection.doc(widget.uidSender).snapshots(),
                     builder: (context, snapshot) {

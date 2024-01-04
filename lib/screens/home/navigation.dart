@@ -26,7 +26,7 @@ class _NavigationState extends State<Navigation> {
   final List _pages = [
     const Home(),
     const Search(),
-    Profile(),
+    Profile(isRedirected: false,),
   ];
 
   @override

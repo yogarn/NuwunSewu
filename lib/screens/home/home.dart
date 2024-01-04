@@ -251,7 +251,9 @@ class _PostWidgetState extends State<PostWidget> {
                       : Container(),
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               // Row(
               //   children: [
               //     Column(
@@ -306,8 +308,12 @@ class _PostWidgetState extends State<PostWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                OtherProfile(uidSender: widget.uidSender),
+                            builder: (context) => widget.uidSender ==
+                                    FirebaseAuth.instance.currentUser?.uid
+                                ? Profile(
+                                    isRedirected: true,
+                                  )
+                                : OtherProfile(uidSender: widget.uidSender),
                           ),
                         );
                       },

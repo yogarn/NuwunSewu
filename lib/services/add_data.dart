@@ -178,4 +178,34 @@ class StoreData {
         .doc(userID)
         .delete();
   }
+
+  Future<void> followAccount(String targetUserID, String userID) async {
+    await _firestore
+        .collection('userData')
+        .doc(userID)
+        .collection('following')
+        .doc(targetUserID)
+        .set({
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> unfollowAccount(String targetUserID, String userID) async {
+    await _firestore
+        .collection('userData')
+        .doc(userID)
+        .collection('following')
+        .doc(targetUserID)
+        .delete();
+  }
+
+  Future<bool> hasUserFollowAccount(String targetUserID, String userID) async {
+    final likeSnapshot = await _firestore
+        .collection('userData')
+        .doc(userID)
+        .collection('following')
+        .doc(targetUserID)
+        .get();
+    return likeSnapshot.exists;
+  }
 }

@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nuwunsewu/screens/home/profile_picture.dart';
 import 'package:nuwunsewu/services/auth.dart';
+import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
 class Profile extends StatefulWidget {
+  final bool isRedirected;
+  Profile({required this.isRedirected});
+
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -18,6 +22,28 @@ class _ProfileState extends State<Profile> {
 
   String gender = "";
   num umur = 0;
+
+  int followingCount = 0;
+  int followerCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+    getFollowingCount(currentUserID).then((count) {
+      setState(() {
+        followingCount = count;
+      });
+    });
+
+    getFollowerCount(currentUserID).then((count) {
+      setState(() {
+        followerCount = count;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +60,16 @@ class _ProfileState extends State<Profile> {
             home: Scaffold(
               backgroundColor: Colors.brown[50],
               appBar: AppBar(
+                leading: widget.isRedirected
+                    ? IconButton(
+                        icon: Icon(Icons.arrow_back),
+                        tooltip: 'Back',
+                        onPressed: () {
+                          // handle the press
+                          Navigator.pop(context);
+                        },
+                      )
+                    : null,
                 title: Text('Profile'),
                 backgroundColor: Colors.purple[100],
                 elevation: 0.0,
@@ -56,45 +92,49 @@ class _ProfileState extends State<Profile> {
               body: ListView(
                 children: [
                   Container(
-                      margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                      child: Center(
-                        child: StreamBuilder<DocumentSnapshot>(
-                              stream: userCollection
-                                  .doc(FirebaseAuth.instance.currentUser?.uid)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return CircularProgressIndicator(); // or some loading indicator
-                                } else {
-                                  if (snapshot.hasData && snapshot.data!.exists) {
-                                    Map<String, dynamic> userData = snapshot.data!
-                                        .data() as Map<String, dynamic>;
-                        
-                                    // Check if the 'profilePicture' field is not empty
-                                    if (userData['profilePicture'] != "defaultProfilePict") {
-                                      return CircleAvatar(
-                                        radius: 64,
-                                        backgroundImage: NetworkImage(
-                                          userData['profilePicture'],
-                                        ),
-                                      );
-                                    } else {
-                                      // Use a default image if 'profilePicture' is empty
-                                      return CircleAvatar(
-                                        radius: 64,
-                                        backgroundImage: NetworkImage(
-                                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
-                                        ),
-                                      );
-                                    }
-                                  } else {
-                                    return Text('Dokumen tidak ditemukan');
-                                  }
-                                }
-                              },
-                            ),
-                      ),),
+                    margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                    child: Center(
+                      child: StreamBuilder<DocumentSnapshot>(
+                        stream: userCollection
+                            .doc(FirebaseAuth.instance.currentUser?.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator(); // or some loading indicator
+                          } else {
+                            if (snapshot.hasData && snapshot.data!.exists) {
+                              Map<String, dynamic> userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+
+                              // Check if the 'profilePicture' field is not empty
+                              if (userData['profilePicture'] !=
+                                  "defaultProfilePict") {
+                                return CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: NetworkImage(
+                                    userData['profilePicture'],
+                                  ),
+                                );
+                              } else {
+                                // Use a default image if 'profilePicture' is empty
+                                return CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: NetworkImage(
+                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
+                                  ),
+                                );
+                              }
+                            } else {
+                              return Text('Dokumen tidak ditemukan');
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('${followerCount} Follower'),
+                  Text('${followingCount} Following'),
                   Center(
                     child: ElevatedButton(
                       child: const Text('Edit Profile Picture'),

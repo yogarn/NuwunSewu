@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nuwunsewu/services/add_data.dart';
 
 pickImage(ImageSource source) async {
   final ImagePicker _imagePicker = ImagePicker();
@@ -93,4 +94,43 @@ Future<int> getCommentCount(String postID) async {
     print('Error getting like count: $error');
     return 0; // Handle the error as needed
   }
+}
+
+Future<int> getFollowingCount(String targetUserID) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('userData')
+        .doc(targetUserID)
+        .collection('following')
+        .get();
+
+    return querySnapshot.size;
+  } catch (error) {
+    print('Error getting like count: $error');
+    return 0; // Handle the error as needed
+  }
+}
+
+Future<int> getFollowerCount(String uidSaya) async {
+  int jumlahFollower = 0;
+
+  // Dapatkan referensi ke Firestore
+  final firestore = FirebaseFirestore.instance;
+
+  // Dapatkan semua dokumen dari koleksi 'userData'
+  final users = await firestore.collection('userData').get();
+
+  // Loop pada setiap dokumen user
+  for (final user in users.docs) {
+    // Dapatkan subkoleksi 'following' dari user ini
+    final following = await user.reference.collection('following').get();
+
+    // Periksa apakah user ini mengikuti Anda
+    if (following.docs.any((doc) => doc.id == uidSaya)) {
+      // Jika ya, tambahkan counter follower
+      jumlahFollower++;
+    }
+  }
+
+  return jumlahFollower;
 }
