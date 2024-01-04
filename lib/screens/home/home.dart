@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart'; // Update with the correct import
+import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/screens/post/upload.dart';
-import 'package:nuwunsewu/services/add_data.dart'; // Update with the correct import
-import 'package:nuwunsewu/services/utils.dart'; // Update with the correct import
+import 'package:nuwunsewu/services/add_data.dart';
+import 'package:nuwunsewu/services/utils.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key});
@@ -45,6 +45,16 @@ class Home extends StatelessWidget {
             ),
             title: const Text('NuwunSewu'),
             backgroundColor: Colors.purple[100],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Upload()),
+              );
+            },
+            tooltip: "Post",
+            child: const Icon(Icons.add),
           ),
           body: const TabBarView(
             children: [
