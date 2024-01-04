@@ -46,16 +46,6 @@ class Home extends StatelessWidget {
             title: const Text('NuwunSewu'),
             backgroundColor: Colors.purple[100],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Upload()),
-              );
-            },
-            tooltip: "Post",
-            child: const Icon(Icons.add),
-          ),
           body: const TabBarView(
             children: [
               FirstTabHome(),
