@@ -29,8 +29,10 @@ class _ExpandPostState extends State<ExpandPost> {
 
   StoreData db = StoreData();
   int likeCount = 0;
+  int dislikeCount = 0;
   int commentCount = 0;
   bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
+  bool isDisliked = false;
 
   final Duration _debounceDuration = Duration(milliseconds: 500);
   Timer? _debounceTimer;
@@ -45,6 +47,12 @@ class _ExpandPostState extends State<ExpandPost> {
       });
     });
 
+    getDislikeCount(widget.postID).then((count) {
+      setState(() {
+        dislikeCount = count;
+      });
+    });
+
     getCommentCount(widget.postID).then((count) {
       setState(() {
         commentCount = count;
@@ -56,6 +64,12 @@ class _ExpandPostState extends State<ExpandPost> {
     db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
       setState(() {
         isLiked = liked;
+      });
+    });
+
+    db.hasUserDislikedPost(widget.postID, currentUserID).then((disliked) {
+      setState(() {
+        isDisliked = disliked;
       });
     });
   }
@@ -73,10 +87,37 @@ class _ExpandPostState extends State<ExpandPost> {
         await db.deleteLikePost(widget.postID, currentUserID);
       } else {
         setState(() {
+          if (isDisliked) {
+            _toggleDislikePost();
+          }
           likeCount += 1;
           isLiked = true; // Perbarui status like secara lokal
         });
         await db.likePost(widget.postID, currentUserID);
+      }
+    });
+  }
+
+  Future<void> _toggleDislikePost() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isDisliked) {
+        setState(() {
+          dislikeCount -= 1;
+          isDisliked = false; // Perbarui status like secara lokal
+        });
+        await db.deleteDislikePost(widget.postID, currentUserID);
+      } else {
+        setState(() {
+          if (isLiked) {
+            _toggleLikePost();
+          }
+          dislikeCount += 1;
+          isDisliked = true; // Perbarui status like secara lokal
+        });
+        await db.dislikePost(widget.postID, currentUserID);
       }
     });
   }
@@ -203,21 +244,17 @@ class _ExpandPostState extends State<ExpandPost> {
                                         Column(
                                           children: [
                                             IconButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ExpandPost(
-                                                            postID:
-                                                                widget.postID),
-                                                  ),
-                                                );
+                                              onPressed: () async {
+                                                await _toggleDislikePost();
                                               },
-                                              icon: const Icon(
-                                                  Icons.chat_bubble_rounded),
+                                              icon: isDisliked
+                                                  ? const Icon(Icons.thumb_down,
+                                                      color: Colors
+                                                          .purple) // Icon untuk sudah di like
+                                                  : const Icon(Icons
+                                                      .thumb_down_outlined), // Icon untuk belum di like
                                             ),
-                                            Text(commentCount.toString()),
+                                            Text(dislikeCount.toString()),
                                           ],
                                         ),
                                         Column(
@@ -235,11 +272,25 @@ class _ExpandPostState extends State<ExpandPost> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text('Komentar',
-                                        style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontFamily: "Times New Roman",
-                                        )),
+                                    Row(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(commentCount.toString()),
+                                            IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(
+                                                  Icons.chat_bubble_rounded),
+                                            ),
+                                          ],
+                                        ),
+                                        Text('Komentar',
+                                            style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontFamily: "Times New Roman",
+                                            )),
+                                      ],
+                                    ),
                                     SizedBox(
                                       height: 15,
                                     ),

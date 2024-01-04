@@ -148,4 +148,34 @@ class StoreData {
         .get();
     return likeSnapshot.exists;
   }
+
+  Future<bool> hasUserDislikedPost(String postID, String userID) async {
+    final likeSnapshot = await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('dislikes')
+        .doc(userID)
+        .get();
+    return likeSnapshot.exists;
+  }
+
+  Future<void> dislikePost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('dislikes')
+        .doc(userID)
+        .set({
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteDislikePost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('dislikes')
+        .doc(userID)
+        .delete();
+  }
 }

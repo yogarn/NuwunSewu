@@ -65,6 +65,21 @@ Future<int> getLikeCount(String postID) async {
   }
 }
 
+Future<int> getDislikeCount(String postID) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('postingan')
+        .doc(postID)
+        .collection('dislikes')
+        .get();
+
+    return querySnapshot.size;
+  } catch (error) {
+    print('Error getting like count: $error');
+    return 0; // Handle the error as needed
+  }
+}
+
 Future<int> getCommentCount(String postID) async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
