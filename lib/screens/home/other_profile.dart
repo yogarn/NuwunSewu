@@ -5,12 +5,14 @@ import 'package:nuwunsewu/screens/home/profile_picture.dart';
 import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
-class Profile extends StatefulWidget {
+class OtherProfile extends StatefulWidget {
+  final uidSender;
+  OtherProfile({required this.uidSender});
   @override
-  State<Profile> createState() => _ProfileState();
+  State<OtherProfile> createState() => _OtherProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _OtherProfileState extends State<OtherProfile> {
   final AuthService _auth = AuthService();
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('userData');
@@ -34,124 +36,63 @@ class _ProfileState extends State<Profile> {
             home: Scaffold(
               backgroundColor: Colors.brown[50],
               appBar: AppBar(
-                title: Text('Profile'),
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  tooltip: 'Back',
+                  onPressed: () {
+                    // handle the press
+                    Navigator.pop(context);
+                  },
+                ),
+                title: Text('Detail Profile'),
                 backgroundColor: Colors.purple[100],
                 elevation: 0.0,
-                actions: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () async {
-                      setState(() {
-                        loading = true;
-                      });
-                      await _auth.signOut();
-                    },
-                    icon: Icon(Icons.person),
-                    label: Text('Logout'),
-                  ),
-                ],
               ),
               body: ListView(
                 children: [
                   Container(
-                      margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                      child: Center(
-                        child: StreamBuilder<DocumentSnapshot>(
-                              stream: userCollection
-                                  .doc(FirebaseAuth.instance.currentUser?.uid)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return CircularProgressIndicator(); // or some loading indicator
-                                } else {
-                                  if (snapshot.hasData && snapshot.data!.exists) {
-                                    Map<String, dynamic> userData = snapshot.data!
-                                        .data() as Map<String, dynamic>;
-                        
-                                    // Check if the 'profilePicture' field is not empty
-                                    if (userData['profilePicture'] != "defaultProfilePict") {
-                                      return CircleAvatar(
-                                        radius: 64,
-                                        backgroundImage: NetworkImage(
-                                          userData['profilePicture'],
-                                        ),
-                                      );
-                                    } else {
-                                      // Use a default image if 'profilePicture' is empty
-                                      return CircleAvatar(
-                                        radius: 64,
-                                        backgroundImage: NetworkImage(
-                                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
-                                        ),
-                                      );
-                                    }
-                                  } else {
-                                    return Text('Dokumen tidak ditemukan');
-                                  }
-                                }
-                              },
-                            ),
-                      ),),
-                  Center(
-                    child: ElevatedButton(
-                      child: const Text('Edit Profile Picture'),
-                      onPressed: () {
-                        // Navigate to second route when tapped.
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ProfilePicture()),
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      // Text('Login Sebagai : '),
-                      StreamBuilder<User?>(
-                        stream: FirebaseAuth.instance.authStateChanges(),
+                    margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                    child: Center(
+                      child: StreamBuilder<DocumentSnapshot>(
+                        stream:
+                            userCollection.doc(widget.uidSender).snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Text('');
+                            return CircularProgressIndicator(); // or some loading indicator
                           } else {
-                            User? user = snapshot.data;
-                            return Container(
-                              margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                              child:
-                                  // Text(user?.uid ?? 'Not logged in'),
-                                  Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Alamat Email',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                            if (snapshot.hasData && snapshot.data!.exists) {
+                              Map<String, dynamic> userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+
+                              // Check if the 'profilePicture' field is not empty
+                              if (userData['profilePicture'] !=
+                                  "defaultProfilePict") {
+                                return CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: NetworkImage(
+                                    userData['profilePicture'],
                                   ),
-                                  Container(
-                                    width: 10,
-                                    child: Text(':'),
+                                );
+                              } else {
+                                // Use a default image if 'profilePicture' is empty
+                                return CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: NetworkImage(
+                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
                                   ),
-                                  Container(
-                                      child: Text(user?.email ??
-                                          'Error: Email tidak ada!')),
-                                ],
-                              ), //berhasil
-                            );
+                                );
+                              }
+                            } else {
+                              return Text('Dokumen tidak ditemukan');
+                            }
                           }
                         },
                       ),
-                    ],
+                    ),
                   ),
                   StreamBuilder<DocumentSnapshot>(
-                    stream: userCollection
-                        .doc(FirebaseAuth.instance.currentUser?.uid)
-                        .snapshots(),
+                    stream: userCollection.doc(widget.uidSender).snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text('');
