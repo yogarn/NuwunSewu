@@ -52,7 +52,7 @@ class Search extends StatelessWidget {
             child: TextField(
               onChanged: (context) {},
               decoration: const InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+                contentPadding: EdgeInsets.fromLTRB(15, 30, 15, 10),
                 hintStyle: TextStyle(color: Colors.black),
                 border: InputBorder.none,
                 hintText: 'Search',
