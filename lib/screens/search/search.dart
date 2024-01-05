@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
+import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 
 class Search extends StatefulWidget {
@@ -30,9 +32,8 @@ class _SearchState extends State<Search> {
               // text field
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(30)
-              ),
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(30)),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -95,8 +96,14 @@ class _SearchState extends State<Search> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => OtherProfile(
-                                        uidSender: results[index].id),
+                                    builder: (context) => results[index].id ==
+                                            FirebaseAuth
+                                                .instance.currentUser?.uid
+                                        ? Profile(
+                                            isRedirected: true,
+                                          )
+                                        : OtherProfile(
+                                            uidSender: results[index].id),
                                   ),
                                 );
                               },
