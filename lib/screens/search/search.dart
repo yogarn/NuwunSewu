@@ -16,21 +16,35 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.purple[100],
         title: Text('Cari Postingan'),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Cari...',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    _startSearch();
-                  },
+          // Area tertutup untuk menampung text field
+          Container(
+            height: 48,
+            color: Colors.purple[100],
+            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+            child: Container(
+              // text field
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(30)
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
+                  hintText: 'Cari...',
+                  border: InputBorder.none,
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      _startSearch();
+                    },
+                  ),
                 ),
               ),
             ),
