@@ -230,7 +230,7 @@ class _PostWidgetState extends State<PostWidget> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.purple[100],
@@ -241,18 +241,18 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: widget.imagePath != null
-                      ? Image.network(
-                          widget.imagePath!,
-                          fit: BoxFit.fill,
-                        )
-                      : Container(),
-                ),
-              ),
-              SizedBox(
-                height: 20,
+                child: widget.imagePath != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            widget.imagePath!,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      )
+                    : Container(),
               ),
               // Row(
               //   children: [
