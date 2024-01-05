@@ -254,51 +254,6 @@ class _PostWidgetState extends State<PostWidget> {
                       )
                     : Container(),
               ),
-              // Row(
-              //   children: [
-              //     Column(
-              //       children: [
-              //         IconButton(
-              //           onPressed: () async {
-              //             await _toggleLikePost();
-              //           },
-              //           icon: isLiked
-              //               ? const Icon(Icons.thumb_up,
-              //                   color: Colors.purple) // Icon untuk sudah di like
-              //               : const Icon(Icons
-              //                   .thumb_up_outlined), // Icon untuk belum di like
-              //         ),
-              //         Text(likeCount.toString()),
-              //       ],
-              //     ),
-              //     Column(
-              //       children: [
-              //         IconButton(
-              //           onPressed: () {
-              //             Navigator.push(
-              //               context,
-              //               MaterialPageRoute(
-              //                 builder: (context) =>
-              //                     ExpandPost(postID: widget.postID),
-              //               ),
-              //             );
-              //           },
-              //           icon: const Icon(Icons.chat_bubble_rounded),
-              //         ),
-              //         Text(commentCount.toString()),
-              //       ],
-              //     ),
-              //     Column(
-              //       children: [
-              //         IconButton(
-              //           onPressed: () {},
-              //           icon: const Icon(Icons.share),
-              //         ),
-              //         Text('Share'),
-              //       ],
-              //     ),
-              //   ],
-              // ),
               Row(
                 children: [
                   Flexible(
@@ -398,7 +353,7 @@ class SecondTabHome extends StatefulWidget {
 
 class _SecondTabHomeState extends State<SecondTabHome> {
   String uidSender =
-      FirebaseAuth.instance.currentUser!.uid; // Gantilah sesuai kebutuhan
+      FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
