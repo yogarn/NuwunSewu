@@ -389,12 +389,116 @@ class _PostWidgetState extends State<PostWidget> {
   }
 }
 
-class SecondTabHome extends StatelessWidget {
-  const SecondTabHome({Key? key});
+class SecondTabHome extends StatefulWidget {
+  const SecondTabHome({Key? key}) : super(key: key);
+
+  @override
+  _SecondTabHomeState createState() => _SecondTabHomeState();
+}
+
+class _SecondTabHomeState extends State<SecondTabHome> {
+  String uidSender =
+      FirebaseAuth.instance.currentUser!.uid; // Gantilah sesuai kebutuhan
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.directions_transit);
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<DocumentSnapshot>>(
+              future:
+                  getFollowingList(uidSender).then((uids) => searchPosts(uids)),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  List<DocumentSnapshot> results = snapshot.data ?? [];
+                  return ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> resultData =
+                          results[index].data() as Map<String, dynamic>;
+
+                      // Periksa apakah ini hasil pencarian dari postingan atau user
+                      if (resultData.containsKey('title') &&
+                          resultData.containsKey('body')) {
+                        // Ini hasil pencarian postingan
+                        return InkWell(
+                          onTap: () {
+                            // Navigasi ke halaman profil berdasarkan nama dokumen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ExpandPost(postID: results[index].id),
+                              ),
+                            );
+                          },
+                          child: ListTile(
+                            title: Text(resultData['title']),
+                            subtitle: Text(resultData['body']),
+                            // Tambahkan widget lain sesuai kebutuhan
+                          ),
+                        );
+                      } else {
+                        // Handle jenis data lain jika diperlukan
+                        return SizedBox.shrink();
+                      }
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<List<String>> getFollowingList(String uidSender) async {
+    try {
+      // Get a reference to the 'following' subcollection in the document with uidSender
+      CollectionReference followingCollection = FirebaseFirestore.instance
+          .collection('userData')
+          .doc(uidSender)
+          .collection('following');
+
+      // Get documents from the 'following' subcollection
+      QuerySnapshot followingSnapshot = await followingCollection.get();
+
+      // Get the list of uidTarget from the documents in the 'following' subcollection
+      List<String> followingList =
+          followingSnapshot.docs.map((doc) => doc.id).toList();
+
+      return followingList;
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+
+  Future<List<DocumentSnapshot>> searchPosts(List<String> uids) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> postResults =
+          await FirebaseFirestore.instance.collection('postingan').get();
+
+      List<DocumentSnapshot> filteredPostsResults =
+          postResults.docs.where((doc) {
+        String uid = (doc['uidSender'] as String);
+
+        // Menggunakan contains untuk memeriksa apakah uid ada dalam list uids
+        return uids.contains(uid);
+      }).toList();
+
+      // Gabungkan kedua list
+      return filteredPostsResults;
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
   }
 }
 
