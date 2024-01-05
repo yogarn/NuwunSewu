@@ -1,73 +1,158 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:nuwunsewu/screens/post/upload.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nuwunsewu/screens/home/other_profile.dart';
+import 'package:nuwunsewu/screens/post/post.dart';
 
-class Search extends StatelessWidget {
-  const Search({super.key});
+class Search extends StatefulWidget {
+  @override
+  _SearchState createState() => _SearchState();
+}
+
+class _SearchState extends State<Search> {
+  final TextEditingController _searchController = TextEditingController();
+  late Future<List<DocumentSnapshot>> _searchResults = Future.value([]);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          brightness: Brightness.light,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Cari Postingan'),
       ),
-      home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Upload()),
-            );
-          },
-          tooltip: "Post",
-          child: const Icon(Icons.add),
-        ),
-        appBar: AppBar(
-          backgroundColor: Colors.purple[100],
-          // S E A R C H   B U T T O N
-          actions: [
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                "Search",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 16,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Cari...',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    _startSearch();
+                  },
                 ),
               ),
             ),
-          ],
-          // T E X T   F I E L D
-          title: Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: TextField(
-              onChanged: (context) {},
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(15, 30, 15, 10),
-                hintStyle: TextStyle(color: Colors.black),
-                border: InputBorder.none,
-                hintText: 'Search',
-              ),
-            ),
           ),
-        ),
-        // S U G G E S T I O N   S E A R C H
-        body: ListView.builder(
-          itemCount: 0,
-          itemBuilder: (context, index) => ListTile(
+          Expanded(
+            child: FutureBuilder<List<DocumentSnapshot>>(
+              future: _searchResults,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  List<DocumentSnapshot> results = snapshot.data ?? [];
+                  return ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> resultData =
+                          results[index].data() as Map<String, dynamic>;
 
+                      // Periksa apakah ini hasil pencarian dari postingan atau user
+                      if (resultData.containsKey('title') &&
+                          resultData.containsKey('body')) {
+                        // Ini hasil pencarian postingan
+                        return InkWell(
+                          onTap: () {
+                            // Navigasi ke halaman profil berdasarkan nama dokumen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ExpandPost(postID: results[index].id),
+                              ),
+                            );
+                          },
+                          child: ListTile(
+                            title: Text(resultData['title']),
+                            subtitle: Text(resultData['body']),
+                            // Tambahkan widget lain sesuai kebutuhan
+                          ),
+                        );
+                      } else if (resultData.containsKey('namaLengkap')) {
+                        // Ini hasil pencarian user
+                        return ListTile(
+                          title: InkWell(
+                              onTap: () {
+                                // Navigasi ke halaman profil berdasarkan nama dokumen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OtherProfile(
+                                        uidSender: results[index].id),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                  '${resultData['namaLengkap']} (${resultData['username']})')),
+                          // Tambahkan widget lain sesuai kebutuhan
+                        );
+                      } else {
+                        // Handle jenis data lain jika diperlukan
+                        return SizedBox.shrink();
+                      }
+                    },
+                  );
+                }
+              },
+            ),
           ),
-        ),
+        ],
       ),
     );
+  }
+
+  void _startSearch() {
+    String query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      setState(() {
+        _searchResults = searchPosts(query);
+      });
+    }
+  }
+
+  Future<List<DocumentSnapshot>> searchPosts(String query) async {
+    query = query.toLowerCase();
+    List<String> queryWords = query.split(' ');
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> postResults =
+          await FirebaseFirestore.instance.collection('postingan').get();
+
+      QuerySnapshot<Map<String, dynamic>> userResults =
+          await FirebaseFirestore.instance.collection('userData').get();
+
+      List<DocumentSnapshot> filteredUserResults =
+          userResults.docs.where((doc) {
+        String namaLengkap =
+            (doc['namaLengkap'] as String?)?.toLowerCase() ?? '';
+        String uid = doc.id;
+
+        return queryWords
+            .any((word) => namaLengkap.contains(word) || uid.contains(word));
+      }).toList();
+
+      List<DocumentSnapshot> filteredPostsResults =
+          postResults.docs.where((doc) {
+        String title = (doc['title'] as String?)?.toLowerCase() ?? '';
+        String body = (doc['body'] as String?)?.toLowerCase() ?? '';
+
+        return queryWords
+            .any((word) => title.contains(word) || body.contains(word));
+      }).toList();
+
+      // Gabungkan kedua list
+      List<DocumentSnapshot> combinedResults = [];
+      combinedResults.addAll(filteredPostsResults);
+      combinedResults.addAll(filteredUserResults);
+      print(combinedResults);
+      return combinedResults;
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
   }
 }

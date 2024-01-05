@@ -25,7 +25,7 @@ class _NavigationState extends State<Navigation> {
   // list untuk _navigateHomePage
   final List _pages = [
     const Home(),
-    const Search(),
+    Search(),
     Profile(isRedirected: false,),
   ];
 

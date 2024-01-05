@@ -134,3 +134,14 @@ Future<int> getFollowerCount(String uidSaya) async {
 
   return jumlahFollower;
 }
+
+Future<List<DocumentSnapshot>> searchPosts(String query) async {
+  QuerySnapshot<Map<String, dynamic>> searchResults = await FirebaseFirestore
+      .instance
+      .collection(
+          'postingan') // Gantilah 'nama_koleksi' dengan nama koleksi Anda
+      .where('title', isGreaterThanOrEqualTo: query)
+      .get();
+
+  return searchResults.docs;
+}
