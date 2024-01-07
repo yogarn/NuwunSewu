@@ -23,7 +23,6 @@ class ExpandComment extends StatefulWidget {
 }
 
 class _ExpandCommentState extends State<ExpandComment> {
-
   final _formKey = GlobalKey<FormState>();
   String? textKomentar;
   String error = '';
@@ -117,10 +116,13 @@ class _ExpandCommentState extends State<ExpandComment> {
                                                           'Error fetching data');
                                                     }
 
-                                                    var profilePicture =
-                                                        profilePictureSnapshot
-                                                                .data ??
-                                                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                                    var profilePicture = (profilePictureSnapshot
+                                                                    .data ==
+                                                                'defaultProfilePict'
+                                                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                                            : profilePictureSnapshot
+                                                                .data) ??
+                                                        'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
                                                     return Row(
                                                       children: [
@@ -309,7 +311,8 @@ class ExpandCommentWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 FutureBuilder<String>(
-                                  future: getNamaLengkap(replyCommentData['user']),
+                                  future:
+                                      getNamaLengkap(replyCommentData['user']),
                                   builder: (context, namaLengkapSnapshot) {
                                     if (namaLengkapSnapshot.hasError) {
                                       return Text('Error fetching data');
