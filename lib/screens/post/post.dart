@@ -85,6 +85,12 @@ class _ExpandPostState extends State<ExpandPost> {
           isLiked = false; // Perbarui status like secara lokal
         });
         await db.deleteLikePost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'likesCount': FieldValue.increment(-1),
+        });
       } else {
         setState(() {
           if (isDisliked) {
@@ -94,6 +100,12 @@ class _ExpandPostState extends State<ExpandPost> {
           isLiked = true; // Perbarui status like secara lokal
         });
         await db.likePost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'likesCount': FieldValue.increment(1),
+        });
       }
     });
   }
@@ -109,6 +121,12 @@ class _ExpandPostState extends State<ExpandPost> {
           isDisliked = false; // Perbarui status like secara lokal
         });
         await db.deleteDislikePost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'dislikesCount': FieldValue.increment(-1),
+        });
       } else {
         setState(() {
           if (isLiked) {
@@ -118,6 +136,12 @@ class _ExpandPostState extends State<ExpandPost> {
           isDisliked = true; // Perbarui status like secara lokal
         });
         await db.dislikePost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'dislikesCount': FieldValue.increment(1),
+        });
       }
     });
   }
@@ -363,6 +387,18 @@ class _ExpandPostState extends State<ExpandPost> {
                                                               widget
                                                                   .commentController
                                                                   .text);
+                                                          FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'postingan')
+                                                              .doc(
+                                                                  widget.postID)
+                                                              .update({
+                                                            'commentsCount':
+                                                                FieldValue
+                                                                    .increment(
+                                                                        1),
+                                                          });
                                                           widget
                                                               .commentController
                                                               .text = '';

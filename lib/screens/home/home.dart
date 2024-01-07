@@ -306,63 +306,87 @@ class _SecondTabHomeState extends State<SecondTabHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<DocumentSnapshot>>(
-              future:
-                  getFollowingList(uidSender).then((uids) => searchPosts(uids)),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  List<DocumentSnapshot> results = snapshot.data ?? [];
-                  return ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> resultData =
-                          results[index].data() as Map<String, dynamic>;
+    return StreamBuilder<List<String>>(
+      stream: getFollowingListStream(uidSender),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          List<String> uids = snapshot.data ?? [];
 
-                      // Periksa apakah ini hasil pencarian dari postingan atau user
-                      if (resultData.containsKey('title') &&
-                          resultData.containsKey('body')) {
-                        // Ini hasil pencarian postingan
-                        return InkWell(
-                          onTap: () {
-                            // Navigasi ke halaman profil berdasarkan nama dokumen
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ExpandPost(postID: results[index].id),
-                              ),
-                            );
-                          },
-                          child: ListTile(
-                            title: Text(resultData['title']),
-                            subtitle: Text(resultData['body']),
-                            // Tambahkan widget lain sesuai kebutuhan
-                          ),
-                        );
-                      } else {
-                        // Handle jenis data lain jika diperlukan
-                        return SizedBox.shrink();
-                      }
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
+          return StreamBuilder<List<DocumentSnapshot>>(
+            stream: searchPostsStream(uids),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                List<DocumentSnapshot> results = snapshot.data ?? [];
+
+                return ListView.builder(
+                  itemCount: results.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> resultData =
+                        results[index].data() as Map<String, dynamic>;
+                    if (resultData.containsKey('title') &&
+                        resultData.containsKey('body')) {
+                      return FutureBuilder<String>(
+                        future: getNamaLengkap(resultData['uidSender']),
+                        builder: (context, namaLengkapSnapshot) {
+                          if (namaLengkapSnapshot.hasError) {
+                            return Text(
+                                'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                          }
+
+                          var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+
+                          return FutureBuilder<String>(
+                            future: getProfilePicture(resultData['uidSender']),
+                            builder: (context, profilePictureSnapshot) {
+                              if (profilePictureSnapshot.hasError) {
+                                return Text(
+                                    'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                              }
+
+                              var profilePicture = (profilePictureSnapshot
+                                              .data ==
+                                          'defaultProfilePict'
+                                      ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                      : profilePictureSnapshot.data) ??
+                                  'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                              return PostWidget(
+                                title: resultData['title'],
+                                body: resultData['body'],
+                                uidSender: resultData['uidSender'],
+                                dateTime: resultData['dateTime'].toDate(),
+                                // Assuming 'dateTime' is a Timestamp, convert it to a DateTime object
+                                namaLengkap: namaLengkap,
+                                imagePaths: (resultData['imagePaths'] as List<dynamic>).cast<String>(),
+                                profilePicture: profilePicture,
+                                postID: results[index].id,
+                              );
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  },
+                );
+              }
+            },
+          );
+        }
+      },
     );
   }
 
-  Future<List<String>> getFollowingList(String uidSender) async {
+  Stream<List<String>> getFollowingListStream(String uidSender) async* {
     try {
       // Get a reference to the 'following' subcollection in the document with uidSender
       CollectionReference followingCollection = FirebaseFirestore.instance
@@ -377,14 +401,14 @@ class _SecondTabHomeState extends State<SecondTabHome> {
       List<String> followingList =
           followingSnapshot.docs.map((doc) => doc.id).toList();
 
-      return followingList;
+      yield followingList;
     } catch (e) {
       print("Error: $e");
-      return [];
+      yield [];
     }
   }
 
-  Future<List<DocumentSnapshot>> searchPosts(List<String> uids) async {
+  Stream<List<DocumentSnapshot>> searchPostsStream(List<String> uids) async* {
     try {
       QuerySnapshot<Map<String, dynamic>> postResults =
           await FirebaseFirestore.instance.collection('postingan').get();
@@ -398,20 +422,95 @@ class _SecondTabHomeState extends State<SecondTabHome> {
       }).toList();
 
       // Gabungkan kedua list
-      return filteredPostsResults;
+      yield filteredPostsResults;
     } catch (e) {
       print("Error: $e");
-      return [];
+      yield [];
     }
   }
 }
 
-class ThirdTabHome extends StatelessWidget {
-  const ThirdTabHome({Key? key});
+class ThirdTabHome extends StatefulWidget {
+  const ThirdTabHome({Key? key}) : super(key: key);
 
   @override
+  _ThirdTabHomeState createState() => _ThirdTabHomeState();
+}
+
+class _ThirdTabHomeState extends State<ThirdTabHome> {
+  @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.directions_bike);
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('postingan')
+          .orderBy('likesCount', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container();
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var post = snapshot.data!.docs[index];
+            var title = post['title'];
+            var body = post['body'];
+            List<String>? imagePaths =
+                (post['imagePaths'] as List<dynamic>).cast<String>();
+            var uidSender = post['uidSender'];
+            var dateTime = post['dateTime'];
+            DateTime parsedDateTime =
+                dateTime != null ? dateTime.toDate() : DateTime.now();
+
+            var postID = (snapshot.data!.docs[index].id);
+
+            return FutureBuilder<String>(
+              future: getNamaLengkap(uidSender),
+              builder: (context, namaLengkapSnapshot) {
+                if (namaLengkapSnapshot.hasError) {
+                  return Text(
+                      'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                }
+
+                var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+
+                return FutureBuilder<String>(
+                  future: getProfilePicture(uidSender),
+                  builder: (context, profilePictureSnapshot) {
+                    if (profilePictureSnapshot.hasError) {
+                      return Text(
+                          'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                    }
+
+                    var profilePicture = (profilePictureSnapshot.data ==
+                                'defaultProfilePict'
+                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                            : profilePictureSnapshot.data) ??
+                        'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                    // print(title);
+                    return PostWidget(
+                      title: title,
+                      body: body,
+                      imagePaths: imagePaths,
+                      uidSender: uidSender,
+                      dateTime: parsedDateTime,
+                      namaLengkap: namaLengkap,
+                      profilePicture: profilePicture,
+                      postID: postID,
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
 

@@ -67,6 +67,9 @@ class StoreData {
         'imagePaths': imageUrls,
         'uidSender': FirebaseAuth.instance.currentUser?.uid,
         'dateTime': FieldValue.serverTimestamp(),
+        'likesCount': 0,
+        'dislikesCount': 0,
+        'commentsCount': 0,
       });
 
       resp = 'success';
