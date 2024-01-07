@@ -200,17 +200,27 @@ class _ExpandPostState extends State<ExpandPost> {
                                     SizedBox(
                                       height: 20,
                                     ),
-                                    postingan['imagePath'] != null
-                                        ? Container(
-                                            margin: EdgeInsets.fromLTRB(
-                                                0, 0, 0, 20),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                child: Image.network(
-                                                  postingan['imagePath'],
-                                                  fit: BoxFit.fill,
-                                                )),
+                                    postingan['imagePaths'] != null &&
+                                            postingan['imagePaths'].isNotEmpty
+                                        ? Column(
+                                            children: (postingan['imagePaths']
+                                                    as List<dynamic>)
+                                                .cast<
+                                                    String>() // Explicitly cast the elements to String
+                                                .map((imagePath) {
+                                              return Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0, 0, 0, 20),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  child: Image.network(
+                                                    imagePath,
+                                                    fit: BoxFit.fill,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
                                           )
                                         : Container(),
                                     Text(
@@ -340,6 +350,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                                           .validate()) {
                                                         setState(() {
                                                           loading = true;
+                                                          commentCount += 1;
                                                         });
                                                         try {
                                                           // print(widget.commentController.text);
@@ -482,8 +493,11 @@ class CommentWidget extends StatelessWidget {
                                     return Text('Error fetching data');
                                   }
 
-                                  var profilePicture = profilePictureSnapshot
-                                          .data ??
+                                  var profilePicture = (profilePictureSnapshot
+                                                  .data ==
+                                              'defaultProfilePict'
+                                          ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                          : profilePictureSnapshot.data) ??
                                       'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
                                   return Row(

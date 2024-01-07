@@ -1,17 +1,12 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:nuwunsewu/services/add_data.dart';
-// import 'package:nuwunsewu/services/database.dart';
-import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
 class Upload extends StatefulWidget {
-  const Upload({super.key});
+  const Upload({Key? key});
 
   @override
   State<Upload> createState() => _UploadState();
@@ -25,12 +20,6 @@ class _UploadState extends State<Upload> {
 
   TextEditingController nameController = TextEditingController();
 
-  // void saveProfile() async {
-  //   String resp = await StoreData().savePostImage(file: _file!); // save image
-  //   print(resp);
-  //   Navigator.pop(context);
-  // }
-
   String title = "";
   String body = "";
 
@@ -41,25 +30,15 @@ class _UploadState extends State<Upload> {
     return loading
         ? const Loading()
         : MaterialApp(
-            theme: ThemeData(
-              useMaterial3: true,
-
-              // Define the default brightness and colors.
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.purple,
-                // ···
-                brightness: Brightness.light,
-              ),
-            ),
+            // Your existing theme and home widget
             home: Scaffold(
               appBar: AppBar(
-                title: const Text("Upload postingan"), // judul appbar
+                title: const Text("Upload postingan"),
                 backgroundColor: Colors.purple[100],
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   tooltip: 'Back',
                   onPressed: () {
-                    // handle the press
                     Navigator.pop(context);
                   },
                 ),
@@ -72,7 +51,6 @@ class _UploadState extends State<Upload> {
                   child: ListView(
                     children: [
                       const SizedBox(height: 20),
-                      // J U D U L   P O S T
                       TextFormField(
                         maxLines: null,
                         decoration: const InputDecoration(
@@ -88,7 +66,6 @@ class _UploadState extends State<Upload> {
                           });
                         },
                       ),
-                      // I S I   P O S T
                       const SizedBox(height: 20),
                       TextFormField(
                         maxLines: null,
@@ -105,26 +82,25 @@ class _UploadState extends State<Upload> {
                           });
                         },
                       ),
-                      // S H O W   U P L O A D   F I L E
                       const SizedBox(height: 20),
                       _file?.length != 0
                           ? Center(
                               child: Column(
                                 children: [
-                                  // S H O W   F I L E
                                   Container(
                                     height: 200,
                                     child: PageView.builder(
                                       itemCount: _file!.length,
                                       itemBuilder: (context, index) {
                                         return ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Image.file(_file![index]));
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: Image.file(_file![index]),
+                                        );
                                       },
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  // D E L E T E    F I L E
                                   ElevatedButton(
                                       onPressed: () => setState(() {
                                             _file?.length = 0;
@@ -135,23 +111,21 @@ class _UploadState extends State<Upload> {
                             )
                           : Text(''),
                       const SizedBox(height: 20),
-                      // U P L O A D   F I L E   B U T T O N
                       ElevatedButton(
                         onPressed: () async {
-                          List<XFile> pickedFiles = await ImagePicker().pickMultipleMedia();
+                          List<XFile> pickedFiles =
+                              await ImagePicker().pickMultipleMedia();
 
                           if (pickedFiles != null) {
                             pickedFiles.forEach((e) {
                               _file?.add(File(e.path));
                             });
 
-                            setState(() {
-                            });
+                            setState(() {});
                           }
                         },
                         child: Text('Upload Image'),
                       ),
-                      // S E N D   P O S T
                       ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState != null) {
@@ -160,19 +134,15 @@ class _UploadState extends State<Upload> {
                                 loading = true;
                               });
                               try {
-                                // loop save
-                                for (var i = 0; i < _file!.length; i++) {
-                                  
-                                }
-                                // await StoreData().savePostImage(
-                                //     file: _file[Index],
-                                //     title: title,
-                                //     body: body); // Note: _file can be null
+                                await StoreData().savePostImages(
+                                  files: _file,
+                                  title: title,
+                                  body: body,
+                                );
                                 setState(() {
                                   Navigator.pop(context);
                                   loading = false;
                                 });
-                                // Navigator.pop(context);
                               } catch (e) {
                                 setState(() {
                                   error =

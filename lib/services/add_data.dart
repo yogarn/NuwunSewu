@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 final FirebaseStorage _storage = FirebaseStorage.instance;
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -37,35 +38,36 @@ class StoreData {
     return resp;
   }
 
-  Future<String> savePostImage(
-      {Uint8List? file, required String title, required String body}) async {
+  Future<String> savePostImages(
+      {List<File>? files, required String title, required String body}) async {
     String resp = 'some error occurred';
     try {
       String docId = _firestore.collection('postingan').doc().id;
 
-      if (file != null) {
-        // Upload the image to storage if file is provided
-        String imagePath = 'postImage/${Uri.encodeComponent(docId)}';
-        String imageUrl = await uploadImageToStorage(imagePath, file);
+      List<String> imageUrls = [];
+      if (files != null && files.isNotEmpty) {
+        // Upload each image to storage and collect their download URLs
+        for (var i = 0; i < files.length; i++) {
+          String imagePath = 'postImage/${Uri.encodeComponent(docId)}_$i';
 
-        // Save post data to Firestore with image
-        await _firestore.collection('postingan').doc(docId).set({
-          'title': title,
-          'body': body,
-          'imagePath': imageUrl,
-          'uidSender': FirebaseAuth.instance.currentUser?.uid,
-          'dateTime': FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Save post data to Firestore without image
-        await _firestore.collection('postingan').doc(docId).set({
-          'title': title,
-          'body': body,
-          'imagePath': null,
-          'uidSender': FirebaseAuth.instance.currentUser?.uid,
-          'dateTime': FieldValue.serverTimestamp(),
-        });
+          // Read the file and convert it to Uint8List
+          List<int> bytes = await files[i].readAsBytes();
+          Uint8List fileUint8List = Uint8List.fromList(bytes);
+
+          String imageUrl =
+              await uploadImageToStorage(imagePath, fileUint8List);
+          imageUrls.add(imageUrl);
+        }
       }
+
+      // Save post data to Firestore with image URLs
+      await _firestore.collection('postingan').doc(docId).set({
+        'title': title,
+        'body': body,
+        'imagePaths': imageUrls,
+        'uidSender': FirebaseAuth.instance.currentUser?.uid,
+        'dateTime': FieldValue.serverTimestamp(),
+      });
 
       resp = 'success';
     } catch (e) {

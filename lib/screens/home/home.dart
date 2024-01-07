@@ -86,10 +86,12 @@ class _FirstTabHomeState extends State<FirstTabHome> {
             var post = snapshot.data!.docs[index];
             var title = post['title'];
             var body = post['body'];
-            var imagePath = post['imagePath'];
+            List<String>? imagePaths =
+                (post['imagePaths'] as List<dynamic>).cast<String>();
             var uidSender = post['uidSender'];
             var dateTime = post['dateTime'];
-            DateTime parsedDateTime = dateTime.toDate();
+            DateTime parsedDateTime =
+                dateTime != null ? dateTime.toDate() : DateTime.now();
 
             var postID = (snapshot.data!.docs[index].id);
 
@@ -120,7 +122,7 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                     return PostWidget(
                       title: title,
                       body: body,
-                      imagePath: imagePath,
+                      imagePaths: imagePaths,
                       uidSender: uidSender,
                       dateTime: parsedDateTime,
                       namaLengkap: namaLengkap,
@@ -142,7 +144,7 @@ class PostWidget extends StatefulWidget {
   PostWidget({
     required this.title,
     required this.body,
-    required this.imagePath,
+    required this.imagePaths,
     required this.uidSender,
     required this.dateTime,
     required this.namaLengkap,
@@ -152,7 +154,7 @@ class PostWidget extends StatefulWidget {
 
   final String title;
   final String body;
-  final String? imagePath;
+  final List<String>? imagePaths;
   final String uidSender;
   final DateTime dateTime;
   final String namaLengkap;
@@ -165,59 +167,6 @@ class PostWidget extends StatefulWidget {
 
 class _PostWidgetState extends State<PostWidget> {
   StoreData db = StoreData();
-  int likeCount = 0;
-  int commentCount = 0;
-  bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
-
-  final Duration _debounceDuration = Duration(milliseconds: 500);
-  Timer? _debounceTimer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    getLikeCount(widget.postID).then((count) {
-      setState(() {
-        likeCount = count;
-      });
-    });
-
-    getCommentCount(widget.postID).then((count) {
-      setState(() {
-        commentCount = count;
-      });
-    });
-
-    // Inisialisasi status like berdasarkan hasil dari hasUserLikedPost
-    final currentUserID = FirebaseAuth.instance.currentUser!.uid;
-    db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
-      setState(() {
-        isLiked = liked;
-      });
-    });
-  }
-
-  Future<void> _toggleLikePost() async {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, () async {
-      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
-
-      if (isLiked) {
-        setState(() {
-          likeCount -= 1;
-          isLiked = false; // Perbarui status like secara lokal
-        });
-        await db.deleteLikePost(widget.postID, currentUserID);
-      } else {
-        setState(() {
-          likeCount += 1;
-          isLiked = true; // Perbarui status like secara lokal
-        });
-        await db.likePost(widget.postID, currentUserID);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -241,13 +190,14 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: widget.imagePath != null
+                child: widget.imagePaths != null &&
+                        widget.imagePaths!.isNotEmpty
                     ? Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.network(
-                            widget.imagePath!,
+                            widget.imagePaths![0], // Display the first image
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -352,8 +302,7 @@ class SecondTabHome extends StatefulWidget {
 }
 
 class _SecondTabHomeState extends State<SecondTabHome> {
-  String uidSender =
-      FirebaseAuth.instance.currentUser!.uid;
+  String uidSender = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
