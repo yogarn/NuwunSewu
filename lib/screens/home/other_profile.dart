@@ -153,13 +153,28 @@ class _OtherProfileState extends State<OtherProfile> {
                       ),
                     ),
                   ),
-                  Text('${followerCount} Follower'),
-                  Text('${followingCount} Following'),
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            margin: EdgeInsets.all(10),
+                            child: Text('${followerCount} Follower')),
+                        Container(
+                            margin: EdgeInsets.all(10),
+                            child: Text('${followingCount} Following')),
+                      ],
+                    ),
+                  ),
                   Container(
                       margin: EdgeInsets.all(20),
                       child: ElevatedButton(
                           onPressed: _toggleFollowAccount,
-                          child: isFollowing ? Text('Following') : Text('Follow'))),
+                          child: isFollowing
+                              ? Text('Following')
+                              : Text('Follow'))),
                   StreamBuilder<DocumentSnapshot>(
                     stream: userCollection.doc(widget.uidSender).snapshots(),
                     builder: (context, snapshot) {

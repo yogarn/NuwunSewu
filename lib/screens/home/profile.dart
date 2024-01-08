@@ -133,8 +133,18 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
                   ),
-                  Text('${followerCount} Follower'),
-                  Text('${followingCount} Following'),
+
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(margin: EdgeInsets.all(10), child: Text('${followerCount} Follower')),
+                        Container(margin: EdgeInsets.all(10), child: Text('${followingCount} Following')),
+                      ],
+                    ),
+                  ),
                   Center(
                     child: ElevatedButton(
                       child: const Text('Edit Profile Picture'),
