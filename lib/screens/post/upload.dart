@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/shared/loading.dart';
-import 'package:nuwunsewu/screens/home/home.dart';
 
 class Upload extends StatefulWidget {
   const Upload({Key? key});
@@ -17,9 +17,7 @@ class _UploadState extends State<Upload> {
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 
-  List<File>? _file = [];
-
-  TextEditingController nameController = TextEditingController();
+  final List<File> _file = [];
 
   String title = "";
   String body = "";
@@ -31,7 +29,6 @@ class _UploadState extends State<Upload> {
     return loading
         ? const Loading()
         : MaterialApp(
-            // Your existing theme and home widget
             home: Scaffold(
               appBar: AppBar(
                 title: const Text("Upload postingan"),
@@ -46,7 +43,9 @@ class _UploadState extends State<Upload> {
               ),
               body: Container(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 50.0),
+                  vertical: 20.0,
+                  horizontal: 50.0,
+                ),
                 child: Form(
                   key: _formKey,
                   child: ListView(
@@ -84,49 +83,61 @@ class _UploadState extends State<Upload> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      _file?.length != 0
+                      _file.isNotEmpty
                           ? Center(
                               child: Column(
                                 children: [
                                   Container(
-                                    height: 200,
-                                    child: PageView.builder(
-                                      itemCount: _file!.length,
-                                      itemBuilder: (context, index) {
-                                        return ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          child: Image.file(_file![index]),
-                                        );
-                                      },
+                                    height:
+                                        MediaQuery.of(context).size.height / 3,
+                                    width:
+                                        MediaQuery.of(context).size.width / 1.5,
+                                    child: Scrollbar(
+                                      thumbVisibility: true,
+                                      controller: ScrollController(),
+                                      thickness: 10,
+                                      radius: const Radius.circular(10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: PageView.builder(
+                                          itemCount: _file.length,
+                                          itemBuilder: (context, index) {
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              child: Image.file(_file[index]),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 5),
                                   ElevatedButton(
-                                      onPressed: () => setState(() {
-                                            _file?.length = 0;
-                                          }),
-                                      child: Text('Hapus Gambar'))
+                                    onPressed: () => setState(() {
+                                      _file.length = 0;
+                                    }),
+                                    child: const Text('Hapus Semua Gambar'),
+                                  ),
                                 ],
                               ),
                             )
-                          : Text(''),
+                          : const SizedBox(height: 5),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
                           List<XFile> pickedFiles =
                               await ImagePicker().pickMultipleMedia();
 
-                          if (pickedFiles != null) {
-                            pickedFiles.forEach((e) {
-                              _file?.add(File(e.path));
-                            });
-
-                            setState(() {});
+                          for (var e in pickedFiles) {
+                            _file.add(File(e.path));
                           }
+
+                          setState(() {});
                         },
-                        child: Text('Upload Image'),
+                        child: const Text('Upload Image'),
                       ),
+                      const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState != null) {
@@ -134,6 +145,7 @@ class _UploadState extends State<Upload> {
                               setState(() {
                                 loading = true;
                               });
+
                               try {
                                 await StoreData().savePostImages(
                                   files: _file,
@@ -146,20 +158,20 @@ class _UploadState extends State<Upload> {
                                 });
                               } catch (e) {
                                 setState(() {
-                                  error =
-                                      "Mohon maaf, periksa detail Anda dan coba lagi nanti.";
+                                  error = "Terjadi kesalahan, coba lagi nanti.";
                                   loading = false;
                                 });
                               }
                             }
                           }
                         },
-                        child: Text('Kirim'),
+                        child: const Text('Kirim'),
                       ),
                       const SizedBox(height: 20),
                       Text(
                         error,
-                        style: TextStyle(color: Colors.red, fontSize: 14.0),
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 14.0),
                       )
                     ],
                   ),

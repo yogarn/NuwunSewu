@@ -513,7 +513,3 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
     );
   }
 }
-
-void main() {
-  runApp(Home());
-}

@@ -1,21 +1,75 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:nuwunsewu/screens/chats/view_chat.dart';
-import 'package:nuwunsewu/screens/home/other_profile.dart';
-import 'package:nuwunsewu/screens/home/profile.dart';
-import 'package:nuwunsewu/screens/post/post.dart';
-import 'package:nuwunsewu/screens/home/home.dart';
+
 import 'package:nuwunsewu/services/utils.dart';
 
 class MessageAnother extends StatefulWidget {
+  const MessageAnother({super.key});
+
   @override
-  _MessageAnotherState createState() => _MessageAnotherState();
+  State<MessageAnother> createState() => _MessageAnotherState();
 }
 
 class _MessageAnotherState extends State<MessageAnother> {
   final TextEditingController _searchController = TextEditingController();
   late Stream<List<DocumentSnapshot>> _searchResults = Stream.value([]);
+  
+  void _startSearch() {
+    String query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      setState(() {
+        _searchResults = searchPostsStream(query);
+      });
+    } else {
+      setState(() {
+        _searchResults = Stream.value([]);
+      });
+    }
+  }
+
+  Stream<List<DocumentSnapshot>> searchPostsStream(String query) async* {
+    query = query.toLowerCase();
+    List<String> queryWords = query.split(' ');
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> postResults =
+          await FirebaseFirestore.instance.collection('postingan').get();
+
+      QuerySnapshot<Map<String, dynamic>> userResults =
+          await FirebaseFirestore.instance.collection('userData').get();
+
+      List<DocumentSnapshot> filteredUserResults =
+          userResults.docs.where((doc) {
+        String namaLengkap =
+            (doc['namaLengkap'] as String?)?.toLowerCase() ?? '';
+        String uid = doc.id;
+
+        return uid != FirebaseAuth.instance.currentUser!.uid &&
+            queryWords.any(
+                (word) => namaLengkap.contains(word) || uid.contains(word));
+      }).toList();
+
+      List<DocumentSnapshot> filteredPostsResults =
+          postResults.docs.where((doc) {
+        String title = (doc['title'] as String?)?.toLowerCase() ?? '';
+        String body = (doc['body'] as String?)?.toLowerCase() ?? '';
+
+        return queryWords
+            .any((word) => title.contains(word) || body.contains(word));
+      }).toList();
+
+      List<DocumentSnapshot> combinedResults = [];
+      combinedResults.addAll(filteredPostsResults);
+      combinedResults.addAll(filteredUserResults);
+      yield combinedResults;
+    } catch (e) {
+      print("Error: $e");
+      yield [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +93,8 @@ class _MessageAnotherState extends State<MessageAnother> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
                   hintText: 'Cari orang...',
                   border: InputBorder.none,
                   suffixIcon: IconButton(
@@ -77,7 +132,6 @@ class _MessageAnotherState extends State<MessageAnother> {
                         return ListTile(
                           title: InkWell(
                             onTap: () async {
-                              // print(results[index].id);
                               var currentUserID =
                                   FirebaseAuth.instance.currentUser!.uid;
                               var otherUserID = results[index].id;
@@ -85,18 +139,16 @@ class _MessageAnotherState extends State<MessageAnother> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewChat(
-                                          chatID: generateChatID(
-                                              currentUserID, otherUserID),
-                                          senderID: currentUserID,
-                                          targetUserID: otherUserID,
-                                        )),
+                                  builder: (context) => ViewChat(
+                                    chatID: generateChatID(
+                                        currentUserID, otherUserID),
+                                    senderID: currentUserID,
+                                    targetUserID: otherUserID,
+                                  ),
+                                ),
                               );
                             },
-                            child:
-                                // Text(
-                                //     '${resultData['namaLengkap']} (${resultData['username']})'),
-                                Container(
+                            child: Container(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 20.0, vertical: 10.0),
                               decoration: BoxDecoration(
@@ -146,7 +198,7 @@ class _MessageAnotherState extends State<MessageAnother> {
                           ),
                         );
                       } else {
-                        return SizedBox.shrink();
+                        return const SizedBox.shrink();
                       }
                     },
                   );
@@ -157,62 +209,5 @@ class _MessageAnotherState extends State<MessageAnother> {
         ],
       ),
     );
-  }
-
-  void _startSearch() {
-    String query = _searchController.text.trim();
-    if (query.isNotEmpty) {
-      setState(() {
-        _searchResults = searchPostsStream(query);
-      });
-    } else {
-      // Handle the case when the query is empty
-      setState(() {
-        _searchResults = Stream.value([]);
-      });
-    }
-  }
-
-  Stream<List<DocumentSnapshot>> searchPostsStream(String query) async* {
-    query = query.toLowerCase();
-    List<String> queryWords = query.split(' ');
-
-    try {
-      QuerySnapshot<Map<String, dynamic>> postResults =
-          await FirebaseFirestore.instance.collection('postingan').get();
-
-      QuerySnapshot<Map<String, dynamic>> userResults =
-          await FirebaseFirestore.instance.collection('userData').get();
-
-      List<DocumentSnapshot> filteredUserResults =
-          userResults.docs.where((doc) {
-        String namaLengkap =
-            (doc['namaLengkap'] as String?)?.toLowerCase() ?? '';
-        String uid = doc.id;
-
-        // Exclude the current user from the search results
-        return uid != FirebaseAuth.instance.currentUser!.uid &&
-            queryWords.any(
-                (word) => namaLengkap.contains(word) || uid.contains(word));
-      }).toList();
-
-      List<DocumentSnapshot> filteredPostsResults =
-          postResults.docs.where((doc) {
-        String title = (doc['title'] as String?)?.toLowerCase() ?? '';
-        String body = (doc['body'] as String?)?.toLowerCase() ?? '';
-
-        return queryWords
-            .any((word) => title.contains(word) || body.contains(word));
-      }).toList();
-
-      // Combine both lists
-      List<DocumentSnapshot> combinedResults = [];
-      combinedResults.addAll(filteredPostsResults);
-      combinedResults.addAll(filteredUserResults);
-      yield combinedResults;
-    } catch (e) {
-      print("Error: $e");
-      yield [];
-    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:nuwunsewu/screens/chats/messsage_another.dart';
 import 'package:nuwunsewu/screens/chats/view_chat.dart';
 import 'package:nuwunsewu/services/utils.dart';
@@ -8,8 +9,10 @@ import 'package:nuwunsewu/services/utils.dart';
 class Chats extends StatefulWidget {
   final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
 
+  Chats({super.key});
+
   @override
-  _ChatsState createState() => _ChatsState();
+  State<Chats> createState() => _ChatsState();
 }
 
 class _ChatsState extends State<Chats> {
@@ -17,7 +20,7 @@ class _ChatsState extends State<Chats> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Recent Chats'),
+        title: const Text('Recent Chats'),
       ),
       body: Column(
         children: [
@@ -26,7 +29,7 @@ class _ChatsState extends State<Chats> {
               future: _getRecentChats(),
               builder: (context, AsyncSnapshot<List<ChatInfo>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -40,7 +43,7 @@ class _ChatsState extends State<Chats> {
                 List<ChatInfo> recentChats = snapshot.data ?? [];
 
                 if (recentChats.isEmpty) {
-                  return Center(
+                  return const Center(
                     child: Text('No recent chats'),
                   );
                 }
@@ -61,8 +64,7 @@ class _ChatsState extends State<Chats> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => MessageAnother()),
+                    MaterialPageRoute(builder: (context) => MessageAnother()),
                   );
                 },
               ))
@@ -74,21 +76,17 @@ class _ChatsState extends State<Chats> {
   Future<List<ChatInfo>> _getRecentChats() async {
     List<ChatInfo> recentChats = [];
 
-    // Query Firestore to get recent chats, ordered by timestamp in descending order
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('chats')
         .where('participants', arrayContains: widget.currentUserID)
-        .orderBy('lastTimestamp',
-            descending: true) // Assuming you have a field named 'lastTimestamp'
+        .orderBy('lastTimestamp', descending: true)
         .get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      // Check if there are messages in the subcollection
       QuerySnapshot messagesSnapshot =
           await doc.reference.collection('messages').get();
 
       if (messagesSnapshot.docs.isNotEmpty) {
-        // Extract information for each chat
         List<String> users = List.castFrom(doc['participants']);
         users.remove(widget.currentUserID);
 
@@ -98,7 +96,6 @@ class _ChatsState extends State<Chats> {
         recentChats.add(ChatInfo(
           chatID: chatID,
           otherUserID: otherUserID,
-          // Add the correct timestamp based on your data structure
         ));
       }
     }
@@ -111,13 +108,13 @@ class _ChatsState extends State<Chats> {
       future: getNamaLengkap(chatInfo.otherUserID),
       builder: (context, AsyncSnapshot<String> nameSnapshot) {
         if (nameSnapshot.connectionState == ConnectionState.waiting) {
-          return ListTile(
+          return const ListTile(
             title: Text('Loading...'),
           );
         }
 
         if (nameSnapshot.hasError) {
-          return ListTile(
+          return const ListTile(
             title: Text('Error loading name'),
           );
         }
@@ -128,13 +125,13 @@ class _ChatsState extends State<Chats> {
           future: getProfilePicture(chatInfo.otherUserID),
           builder: (context, AsyncSnapshot<String> pictureSnapshot) {
             if (pictureSnapshot.connectionState == ConnectionState.waiting) {
-              return ListTile(
+              return const ListTile(
                 title: Text('Loading...'),
               );
             }
 
             if (pictureSnapshot.hasError) {
-              return ListTile(
+              return const ListTile(
                 title: Text('Error loading profile picture'),
               );
             }
@@ -142,7 +139,7 @@ class _ChatsState extends State<Chats> {
             var profilePicture = (pictureSnapshot.data == 'defaultProfilePict'
                     ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                     : pictureSnapshot.data) ??
-                'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'; // Use the fetched profile picture
+                'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
 
             return Container(
               padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
@@ -150,13 +147,11 @@ class _ChatsState extends State<Chats> {
                 children: [
                   ListTile(
                     title: Text(otherUserName),
-                    tileColor: Colors.purple[100], // Set the background color
+                    tileColor: Colors.purple[100],
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(20), // Set the border radius
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    contentPadding:
-                        const EdgeInsets.all(15), // Set the content padding
+                    contentPadding: const EdgeInsets.all(15),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -174,7 +169,7 @@ class _ChatsState extends State<Chats> {
                       backgroundImage: NetworkImage(profilePicture),
                     ),
                   ),
-                  SizedBox(height: 8), // Add this line for the margin
+                  SizedBox(height: 8),
                 ],
               ),
             );

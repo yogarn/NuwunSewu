@@ -31,7 +31,7 @@ class _ExpandPostState extends State<ExpandPost> {
   int likeCount = 0;
   int dislikeCount = 0;
   int commentCount = 0;
-  bool isLiked = false; // Tambahkan variabel lokal untuk melacak status like
+  bool isLiked = false;
   bool isDisliked = false;
 
   final Duration _debounceDuration = Duration(milliseconds: 500);
@@ -118,7 +118,7 @@ class _ExpandPostState extends State<ExpandPost> {
       if (isDisliked) {
         setState(() {
           dislikeCount -= 1;
-          isDisliked = false; // Perbarui status like secara lokal
+          isDisliked = false; // Perbarui status dislike secara lokal
         });
         await db.deleteDislikePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -133,7 +133,7 @@ class _ExpandPostState extends State<ExpandPost> {
             _toggleLikePost();
           }
           dislikeCount += 1;
-          isDisliked = true; // Perbarui status like secara lokal
+          isDisliked = true; // Perbarui status dislike secara lokal
         });
         await db.dislikePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -284,9 +284,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                               icon: isDisliked
                                                   ? const Icon(Icons.thumb_down,
                                                       color: Colors
-                                                          .purple) // Icon untuk sudah di like
+                                                          .purple) // Icon untuk sudah di dislike
                                                   : const Icon(Icons
-                                                      .thumb_down_outlined), // Icon untuk belum di like
+                                                      .thumb_down_outlined), // Icon untuk belum di dislike
                                             ),
                                             Text(dislikeCount.toString()),
                                           ],
@@ -359,12 +359,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                                     side: BorderSide.none,
                                                     backgroundColor:
                                                         Colors.white,
-                                                    // shape:
-                                                    //     new RoundedRectangleBorder(
-                                                    //   borderRadius:
-                                                    //       new BorderRadius
-                                                    //           .circular(12.0),
-                                                    // ),
                                                   ),
                                                   child: Icon(Icons.send),
                                                   onPressed: () async {
@@ -405,7 +399,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                                           setState(() {
                                                             loading = false;
                                                           });
-                                                          // Navigator.pop(context);
                                                         } catch (e) {
                                                           setState(() {
                                                             error =
@@ -426,7 +419,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                                 color: Colors.red,
                                                 fontSize: 14.0),
                                           ),
-
                                           // Display comments using StreamBuilder
                                           CommentWidget(postId: widget.postID),
                                         ],
@@ -449,8 +441,6 @@ class _ExpandPostState extends State<ExpandPost> {
           );
   }
 }
-
-// CommentWidget class
 
 class CommentWidget extends StatelessWidget {
   final String postId;
