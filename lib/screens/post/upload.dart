@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/shared/loading.dart';
+import 'package:nuwunsewu/screens/home/home.dart';
 
 class Upload extends StatefulWidget {
   const Upload({Key? key});
