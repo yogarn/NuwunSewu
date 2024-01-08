@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nuwunsewu/screens/chats/view_chat.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/services/utils.dart';
@@ -154,7 +155,7 @@ class _OtherProfileState extends State<OtherProfile> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -168,13 +169,40 @@ class _OtherProfileState extends State<OtherProfile> {
                       ],
                     ),
                   ),
-                  Container(
-                      margin: EdgeInsets.all(20),
-                      child: ElevatedButton(
-                          onPressed: _toggleFollowAccount,
-                          child: isFollowing
-                              ? Text('Following')
-                              : Text('Follow'))),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 10, 10),
+                        child: ElevatedButton(
+                          child: Text('Kirim Pesan'),
+                          onPressed: () async {
+                            String currentUserID = FirebaseAuth
+                                .instance
+                                .currentUser!
+                                .uid; // Replace with the actual current user ID
+                            String otherUserID = widget
+                                .uidSender; // Replace with the actual other person's user ID
+                            await startNewChat(currentUserID, otherUserID);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewChat(chatID: generateChatID(currentUserID, otherUserID), senderID: currentUserID, targetUserID: otherUserID,)
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Container(
+                          margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                          child: ElevatedButton(
+                              onPressed: _toggleFollowAccount,
+                              child: isFollowing
+                                  ? Text('Following')
+                                  : Text('Follow'))),
+                    ],
+                  ),
                   StreamBuilder<DocumentSnapshot>(
                     stream: userCollection.doc(widget.uidSender).snapshots(),
                     builder: (context, snapshot) {

@@ -27,7 +27,7 @@ class _NavigationState extends State<Navigation> {
   final List _pages = [
     const Home(),
     Search(),
-    const Chats(),
+    Chats(),
     Profile(isRedirected: false,),
   ];
 

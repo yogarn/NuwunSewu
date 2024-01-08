@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nuwunsewu/services/add_data.dart';
@@ -144,4 +145,33 @@ Future<List<DocumentSnapshot>> searchPosts(String query) async {
       .get();
 
   return searchResults.docs;
+}
+
+String generateChatID(String userID1, String userID2) {
+  List<String> sortedUserIDs = [userID1, userID2]..sort();
+  String concatenatedString = sortedUserIDs.join();
+  String chatID = sha256.convert(utf8.encode(concatenatedString)).toString();
+  return chatID;
+}
+
+Future<bool> doesChatExist(String userID1, String userID2) async {
+  String chatID = generateChatID(userID1, userID2);
+  // Use Firestore to check if the chat with this ID exists
+  var chatDoc = await FirebaseFirestore.instance.collection('chats').doc(chatID).get();
+  return chatDoc.exists;
+} // Import the utility functions
+
+Future<void> startNewChat(String currentUserID, String otherUserID) async {
+  // Generate a unique chat ID
+  String chatID = generateChatID(currentUserID, otherUserID);
+
+  // Check if the chat already exists
+  bool chatExists = await doesChatExist(currentUserID, otherUserID);
+  if (!chatExists) {
+    // If the chat doesn't exist, add it to Firestore
+    await FirebaseFirestore.instance.collection('chats').doc(chatID).set({
+      'participants': [currentUserID, otherUserID],
+      // Add any other chat data you want to store
+    });
+  }
 }

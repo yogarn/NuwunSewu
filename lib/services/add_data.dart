@@ -213,4 +213,25 @@ class StoreData {
         .get();
     return likeSnapshot.exists;
   }
+
+  Future<void> sendMessage(
+    String chatID, String senderID, String content) async {
+  // Tambahkan pesan ke subcollection messages di dokumen chat
+  await FirebaseFirestore.instance
+      .collection('chats')
+      .doc(chatID)
+      .collection('messages')
+      .add({
+    'sender': senderID,
+    'content': content,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
+
+  // Update the 'lastTimestamp' field in the chat document
+  await FirebaseFirestore.instance
+      .collection('chats')
+      .doc(chatID)
+      .update({'lastTimestamp': FieldValue.serverTimestamp()});
+}
+
 }

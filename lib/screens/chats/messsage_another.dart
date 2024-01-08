@@ -1,18 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nuwunsewu/screens/chats/view_chat.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
-class Search extends StatefulWidget {
+class MessageAnother extends StatefulWidget {
   @override
-  _SearchState createState() => _SearchState();
+  _MessageAnotherState createState() => _MessageAnotherState();
 }
 
-class _SearchState extends State<Search> {
+class _MessageAnotherState extends State<MessageAnother> {
   final TextEditingController _searchController = TextEditingController();
   late Stream<List<DocumentSnapshot>> _searchResults = Stream.value([]);
 
@@ -21,7 +22,7 @@ class _SearchState extends State<Search> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple[100],
-        title: Text('Cari Postingan'),
+        title: Text('Kirim Pesan'),
       ),
       body: Column(
         children: [
@@ -39,7 +40,7 @@ class _SearchState extends State<Search> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
-                  hintText: 'Cari...',
+                  hintText: 'Cari orang...',
                   border: InputBorder.none,
                   suffixIcon: IconButton(
                     icon: Icon(Icons.search),
@@ -67,53 +68,7 @@ class _SearchState extends State<Search> {
                       Map<String, dynamic> resultData =
                           results[index].data() as Map<String, dynamic>;
 
-                      if (resultData.containsKey('title') &&
-                          resultData.containsKey('body')) {
-                        return FutureBuilder<String>(
-                          future: getNamaLengkap(resultData['uidSender']),
-                          builder: (context, namaLengkapSnapshot) {
-                            if (namaLengkapSnapshot.hasError) {
-                              return Text(
-                                  'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
-                            }
-
-                            var namaLengkap =
-                                namaLengkapSnapshot.data ?? 'null';
-
-                            return FutureBuilder<String>(
-                              future:
-                                  getProfilePicture(resultData['uidSender']),
-                              builder: (context, profilePictureSnapshot) {
-                                if (profilePictureSnapshot.hasError) {
-                                  return Text(
-                                      'Error fetching profilePicture: ${profilePictureSnapshot.error}');
-                                }
-
-                                var profilePicture = (profilePictureSnapshot
-                                                .data ==
-                                            'defaultProfilePict'
-                                        ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                        : profilePictureSnapshot.data) ??
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-
-                                return PostWidget(
-                                  title: resultData['title'],
-                                  body: resultData['body'],
-                                  uidSender: resultData['uidSender'],
-                                  dateTime: resultData['dateTime'].toDate(),
-                                  // Assuming 'dateTime' is a Timestamp, convert it to a DateTime object
-                                  namaLengkap: namaLengkap,
-                                  imagePaths: (resultData['imagePaths']
-                                          as List<dynamic>)
-                                      .cast<String>(),
-                                  profilePicture: profilePicture,
-                                  postID: results[index].id,
-                                );
-                              },
-                            );
-                          },
-                        );
-                      } else if (resultData.containsKey('namaLengkap')) {
+                      if (resultData.containsKey('namaLengkap')) {
                         var profilePicture = (resultData['profilePicture'] ==
                                     'defaultProfilePict'
                                 ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
@@ -121,17 +76,21 @@ class _SearchState extends State<Search> {
                             'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
                         return ListTile(
                           title: InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              // print(results[index].id);
+                              var currentUserID =
+                                  FirebaseAuth.instance.currentUser!.uid;
+                              var otherUserID = results[index].id;
+                              await startNewChat(currentUserID, otherUserID);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => results[index].id ==
-                                          FirebaseAuth.instance.currentUser?.uid
-                                      ? Profile(isRedirected: true)
-                                      : OtherProfile(
-                                          uidSender: results[index].id,
-                                        ),
-                                ),
+                                    builder: (context) => ViewChat(
+                                          chatID: generateChatID(
+                                              currentUserID, otherUserID),
+                                          senderID: currentUserID,
+                                          targetUserID: otherUserID,
+                                        )),
                               );
                             },
                             child:
@@ -231,8 +190,10 @@ class _SearchState extends State<Search> {
             (doc['namaLengkap'] as String?)?.toLowerCase() ?? '';
         String uid = doc.id;
 
-        return queryWords
-            .any((word) => namaLengkap.contains(word) || uid.contains(word));
+        // Exclude the current user from the search results
+        return uid != FirebaseAuth.instance.currentUser!.uid &&
+            queryWords.any(
+                (word) => namaLengkap.contains(word) || uid.contains(word));
       }).toList();
 
       List<DocumentSnapshot> filteredPostsResults =
