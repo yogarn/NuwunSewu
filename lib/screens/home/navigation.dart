@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:nuwunsewu/screens/chats/chats.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/search/search.dart';
@@ -26,6 +27,7 @@ class _NavigationState extends State<Navigation> {
   final List _pages = [
     const Home(),
     Search(),
+    const Chats(),
     Profile(isRedirected: false,),
   ];
 
@@ -54,10 +56,13 @@ class _NavigationState extends State<Navigation> {
           onTap: _navigateHomePage,
           // Isi yg ad di bar bawah
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
+          selectedItemColor: Colors.purple, // Set the selected item color
+          unselectedItemColor: Colors.purple[100],
         ),
       ),
     );
