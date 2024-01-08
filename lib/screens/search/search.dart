@@ -114,6 +114,11 @@ class _SearchState extends State<Search> {
                           },
                         );
                       } else if (resultData.containsKey('namaLengkap')) {
+                        var profilePicture = (resultData['profilePicture'] ==
+                                    'defaultProfilePict'
+                                ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                : resultData['profilePicture']) ??
+                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
                         return ListTile(
                           title: InkWell(
                             onTap: () {
@@ -129,8 +134,56 @@ class _SearchState extends State<Search> {
                                 ),
                               );
                             },
-                            child: Text(
-                                '${resultData['namaLengkap']} (${resultData['username']})'),
+                            child:
+                                // Text(
+                                //     '${resultData['namaLengkap']} (${resultData['username']})'),
+                                Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 10.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.purple[100],
+                              ),
+                              child: Container(
+                                margin: const EdgeInsets.all(15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: CircleAvatar(
+                                            radius: 21,
+                                            backgroundImage: NetworkImage(
+                                                profilePicture),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 10,
+                                          child: Container(
+                                            margin:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  resultData['namaLengkap'],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       } else {
