@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
@@ -9,7 +10,12 @@ class ViewChat extends StatefulWidget {
   final String senderID;
   final String targetUserID;
 
-  const ViewChat({super.key, required this.chatID, required this.senderID, required this.targetUserID});
+  const ViewChat({
+    Key? key,
+    required this.chatID,
+    required this.senderID,
+    required this.targetUserID,
+  }) : super(key: key);
 
   @override
   State<ViewChat> createState() => _ViewChatState();
@@ -34,7 +40,6 @@ class _ViewChatState extends State<ViewChat> {
     });
   }
 
-  
   void _sendMessage() {
     if (_formKey.currentState!.validate()) {
       String messageContent = messageController.text.trim();
@@ -43,29 +48,78 @@ class _ViewChatState extends State<ViewChat> {
     }
   }
 
-  Widget _buildMessageWidget(Map<String, dynamic> message) {
+  Widget _buildMessageWidget(Map<String, dynamic> message, bool showDate) {
     bool isUserSender = message['sender'] == widget.senderID;
+    Intl.defaultLocale = 'en_US';
+    DateTime? parsedDateTime;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        right: isUserSender ? 0.0 : 50.0,
-        left: isUserSender ? 50.0 : 0.0,
-      ),
-      child: Align(
-        alignment: isUserSender ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          margin: EdgeInsets.all(5),
-          padding: EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: isUserSender ? Colors.blue : Colors.grey,
-            borderRadius: BorderRadius.circular(8.0),
+    try {
+      // Convert Firestore server timestamp to DateTime
+      var dateTime = message['timestamp'];
+      if (dateTime != null) {
+        parsedDateTime = dateTime.toDate();
+        print(parsedDateTime);
+      } else {
+        print('Timestamp is null in Firebase for this message.');
+      }
+    } catch (e) {
+      print('Error parsing timestamp: $e');
+    }
+
+    return Column(
+      children: [
+        if (showDate && parsedDateTime != null)
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                DateFormat('yy/MM/dd').format(parsedDateTime!),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-          child: Text(
-            message['content'],
-            style: TextStyle(color: Colors.white),
+        Padding(
+          padding: EdgeInsets.only(
+            right: isUserSender ? 0.0 : 50.0,
+            left: isUserSender ? 50.0 : 0.0,
+          ),
+          child: Align(
+            alignment:
+                isUserSender ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              margin: EdgeInsets.all(5),
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: isUserSender ? Colors.blue : Colors.grey,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                crossAxisAlignment: isUserSender
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message['content'],
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  if (parsedDateTime != null)
+                    Text(
+                      DateFormat('HH:mm').format(parsedDateTime),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -98,18 +152,24 @@ class _ViewChatState extends State<ViewChat> {
                       .map((doc) => {
                             'content': doc['content'].toString(),
                             'sender': doc['sender'].toString(),
+                            'timestamp': doc['timestamp'],
                           })
                       .toList();
 
                   WidgetsBinding.instance!.addPostFrameCallback((_) {
-                    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+                    _scrollController
+                        .jumpTo(_scrollController.position.maxScrollExtent);
                   });
 
                   return ListView.builder(
                     controller: _scrollController,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
-                      return _buildMessageWidget(messages[index]);
+                      bool showDate = index == 0 ||
+                          (messages[index]['timestamp']?.toDate().day !=
+                              messages[index - 1]['timestamp']?.toDate().day);
+
+                      return _buildMessageWidget(messages[index], showDate);
                     },
                   );
                 },
