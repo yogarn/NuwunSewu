@@ -7,11 +7,11 @@ List<String> genderList = [
   "Laki-laki",
   "Perempuan",
   "Tidak Memilih"
-]; // initialize list untuk gender
+  ];
 
 class Register extends StatefulWidget {
   final Function toggleSignIn;
-  Register({required this.toggleSignIn});
+  const Register({super.key, required this.toggleSignIn});
 
   @override
   State<Register> createState() => _RegisterState();
@@ -22,8 +22,7 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 
-  String genderValue =
-      genderList.first; // default value untuk gender => laki-laki
+  String genderValue = genderList[0];
 
   String namaLengkap = "";
   String username = "";
@@ -36,28 +35,21 @@ class _RegisterState extends State<Register> {
 
   String error = "";
 
-  void kirimData() {
-    // uji coba
-  }
-
   @override
   Widget build(BuildContext context) {
     return loading
-        ? Loading()
+        ? const Loading()
         : MaterialApp(
             theme: ThemeData(
               useMaterial3: true,
-
-              // Define the default brightness and colors.
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.purple,
-                // ···
                 brightness: Brightness.light,
               ),
             ),
             home: Scaffold(
               appBar: AppBar(
-                title: Text("Sign Up Page"), // judul appbar
+                title: const Text('Sign Up'),
                 backgroundColor: Colors.purple[100],
                 actions: [
                   TextButton.icon(
@@ -65,20 +57,20 @@ class _RegisterState extends State<Register> {
                         foregroundColor: Colors.black,
                       ),
                       onPressed: () => widget.toggleSignIn(),
-                      icon: Icon(Icons.person),
-                      label: Text('Sign In'))
+                      icon: const Icon(Icons.person),
+                      label: const Text('Sign In'))
                 ],
               ),
               body: Container(
-                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
                 child: Form(
                   key: _formKey,
                   child: ListView(children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'John Doe',
                         label: Text('Nama Lengkap'),
                       ),
@@ -90,11 +82,11 @@ class _RegisterState extends State<Register> {
                         });
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'johndoe',
                         label: Text('Username'),
                       ),
@@ -106,11 +98,11 @@ class _RegisterState extends State<Register> {
                         });
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'example@hackfest.id',
                         label: Text('Email Address'),
                       ),
@@ -122,16 +114,16 @@ class _RegisterState extends State<Register> {
                         });
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Minimal 8 karakter',
                         label: Text('Password'),
                       ),
                       validator: (val) => val!.length < 8
-                          ? 'Minimal password 8 karakter!'
+                          ? 'Password minimal 8 karakter!'
                           : null,
                       obscureText: true,
                       onChanged: (val) {
@@ -140,13 +132,13 @@ class _RegisterState extends State<Register> {
                         });
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Tanggal Lahir',
                           style: TextStyle(color: Colors.black),
                         ),
@@ -155,16 +147,16 @@ class _RegisterState extends State<Register> {
                             Flexible(
                               flex: 1,
                               child: Container(
-                                padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                                 child: TextFormField(
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     hintText: '31',
                                     label: Text('Tanggal'),
                                   ),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ], // Only numbers can be entered
+                                  ],
                                   validator: (val) =>
                                       val!.isEmpty || int.parse(val) > 31
                                           ? 'Tidak valid!'
@@ -180,16 +172,16 @@ class _RegisterState extends State<Register> {
                             Flexible(
                               flex: 1,
                               child: Container(
-                                padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                                 child: TextFormField(
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     hintText: '12',
                                     label: Text('Bulan'),
                                   ),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ], // Only numbers can be entered
+                                  ],
                                   validator: (val) =>
                                       val!.isEmpty || int.parse(val) > 12
                                           ? 'Tidak valid!'
@@ -231,7 +223,7 @@ class _RegisterState extends State<Register> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Column(
@@ -295,7 +287,7 @@ class _RegisterState extends State<Register> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     ElevatedButton(
@@ -326,7 +318,7 @@ class _RegisterState extends State<Register> {
                           }
                         },
                         child: Text('Register')),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Text(

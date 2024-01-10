@@ -10,9 +10,6 @@ class ExpandComment extends StatefulWidget {
   final String postID;
   final CollectionReference postCollection =
       FirebaseFirestore.instance.collection('postingan');
-  // final DocumentReference postRef = FirebaseFirestore.instance.collection('postingan').doc(postID);
-  // final CollectionReference commentsCollection = postRef.collection('comments');
-  // final DocumentSnapshot commentSnapshot = await commentsCollection.doc(commentID).get();
 
   final TextEditingController commentController = new TextEditingController();
 
@@ -57,21 +54,18 @@ class _ExpandCommentState extends State<ExpandComment> {
                           .doc(widget.postID)
                           .collection('comments')
                           .doc(widget
-                              .commentID) // Mengakses dokumen spesifik dengan commentID
+                              .commentID)
                           .snapshots(),
                       builder: (context, commentSnapshot) {
                         if (commentSnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Loading(); // Atau indikator loading lainnya
+                          return Loading();
                         } else {
                           if (commentSnapshot.hasData &&
                               commentSnapshot.data!.exists) {
-                            // Dapatkan data dari dokumen komentar
                             Map<String, dynamic> commentData =
                                 commentSnapshot.data!.data()
                                     as Map<String, dynamic>;
-
-                            // Tambahkan widget atau tindakan yang sesuai di sini
                             return Column(
                               children: [
                                 Row(
@@ -204,12 +198,6 @@ class _ExpandCommentState extends State<ExpandComment> {
                                     minimumSize: Size(50, 50),
                                     side: BorderSide.none,
                                     backgroundColor: Colors.white,
-                                    // shape:
-                                    //     new RoundedRectangleBorder(
-                                    //   borderRadius:
-                                    //       new BorderRadius
-                                    //           .circular(12.0),
-                                    // ),
                                   ),
                                   child: Icon(Icons.send),
                                   onPressed: () async {
@@ -219,7 +207,6 @@ class _ExpandCommentState extends State<ExpandComment> {
                                           loading = true;
                                         });
                                         try {
-                                          // print(widget.commentController.text);
                                           await db.balasKomentar(
                                               widget.postID,
                                               widget.commentID,
@@ -230,7 +217,6 @@ class _ExpandCommentState extends State<ExpandComment> {
                                           setState(() {
                                             loading = false;
                                           });
-                                          // Navigator.pop(context);
                                         } catch (e) {
                                           setState(() {
                                             error =
@@ -249,8 +235,6 @@ class _ExpandCommentState extends State<ExpandComment> {
                             error,
                             style: TextStyle(color: Colors.red, fontSize: 14.0),
                           ),
-
-                          // Display comments using StreamBuilder
                           ExpandCommentWidget(
                               postID: widget.postID,
                               commentID: widget.commentID),
@@ -284,7 +268,7 @@ class ExpandCommentWidget extends StatelessWidget {
           .snapshots(),
       builder: (context, replyCommentsSnapshot) {
         if (replyCommentsSnapshot.connectionState == ConnectionState.waiting) {
-          return Loading(); // Atau indikator loading lainnya
+          return Loading();
         } else {
           if (replyCommentsSnapshot.hasData) {
             List<DocumentSnapshot> replyComments =

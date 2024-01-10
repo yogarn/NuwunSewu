@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
-import 'package:nuwunsewu/screens/post/post.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
@@ -101,7 +100,6 @@ class _SearchState extends State<Search> {
                                   body: resultData['body'],
                                   uidSender: resultData['uidSender'],
                                   dateTime: resultData['dateTime'].toDate(),
-                                  // Assuming 'dateTime' is a Timestamp, convert it to a DateTime object
                                   namaLengkap: namaLengkap,
                                   imagePaths: (resultData['imagePaths']
                                           as List<dynamic>)
@@ -135,8 +133,6 @@ class _SearchState extends State<Search> {
                               );
                             },
                             child:
-                                // Text(
-                                //     '${resultData['namaLengkap']} (${resultData['username']})'),
                                 Container(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 20.0, vertical: 10.0),

@@ -65,7 +65,6 @@ class _ProfileState extends State<Profile> {
                         icon: Icon(Icons.arrow_back),
                         tooltip: 'Back',
                         onPressed: () {
-                          // handle the press
                           Navigator.pop(context);
                         },
                       )
@@ -101,13 +100,11 @@ class _ProfileState extends State<Profile> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // or some loading indicator
+                            return CircularProgressIndicator();
                           } else {
                             if (snapshot.hasData && snapshot.data!.exists) {
                               Map<String, dynamic> userData =
                                   snapshot.data!.data() as Map<String, dynamic>;
-
-                              // Check if the 'profilePicture' field is not empty
                               if (userData['profilePicture'] !=
                                   "defaultProfilePict") {
                                 return CircleAvatar(
@@ -116,32 +113,32 @@ class _ProfileState extends State<Profile> {
                                     userData['profilePicture'],
                                   ),
                                 );
-                              } else {
-                                // Use a default image if 'profilePicture' is empty
-                                return CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage: NetworkImage(
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
-                                  ),
-                                );
                               }
-                            } else {
-                              return Text('Dokumen tidak ditemukan');
+                              return CircleAvatar(
+                                radius: 64,
+                                backgroundImage: NetworkImage(
+                                  'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain',
+                                ),
+                              );
                             }
+                            return Text('Dokumen tidak ditemukan');
                           }
                         },
                       ),
                     ),
                   ),
-
                   Container(
                     margin: EdgeInsets.all(20),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(margin: EdgeInsets.all(10), child: Text('${followerCount} Follower')),
-                        Container(margin: EdgeInsets.all(10), child: Text('${followingCount} Following')),
+                        Container(
+                            margin: EdgeInsets.all(10),
+                            child: Text('${followerCount} Follower')),
+                        Container(
+                            margin: EdgeInsets.all(10),
+                            child: Text('${followingCount} Following')),
                       ],
                     ),
                   ),
@@ -149,7 +146,6 @@ class _ProfileState extends State<Profile> {
                     child: ElevatedButton(
                       child: const Text('Edit Profile Picture'),
                       onPressed: () {
-                        // Navigate to second route when tapped.
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -160,7 +156,6 @@ class _ProfileState extends State<Profile> {
                   ),
                   Row(
                     children: [
-                      // Text('Login Sebagai : '),
                       StreamBuilder<User?>(
                         stream: FirebaseAuth.instance.authStateChanges(),
                         builder: (context, snapshot) {
@@ -171,27 +166,21 @@ class _ProfileState extends State<Profile> {
                             User? user = snapshot.data;
                             return Container(
                               margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                              child:
-                                  // Text(user?.uid ?? 'Not logged in'),
-                                  Row(
+                              child: Row(
                                 children: [
                                   Container(
                                     width: 100,
                                     child: Text(
                                       'Alamat Email',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0,
+                                      ),
                                     ),
                                   ),
-                                  Container(
-                                    width: 10,
-                                    child: Text(':'),
-                                  ),
-                                  Container(
-                                      child: Text(user?.email ??
-                                          'Error: Email tidak ada!')),
+                                  Container(child: Text(':   ${user!.email}')),
                                 ],
-                              ), //berhasil
+                              ),
                             );
                           }
                         },
@@ -205,108 +194,100 @@ class _ProfileState extends State<Profile> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text('');
-                      } else {
-                        if (snapshot.hasData && snapshot.data!.exists) {
-                          Map<String, dynamic> userData =
-                              snapshot.data!.data() as Map<String, dynamic>;
-                          if (userData['gender'] == 0) {
-                            gender = "Lainnya";
-                          } else if (userData['gender'] == 1) {
-                            gender = "Pria";
-                          } else if (userData['gender'] == 2) {
-                            gender = "Wanita";
-                          }
-
-                          try {
-                            umur = 2023 - userData['tahunLahir'];
-                            print('Umur: $umur tahun');
-                          } catch (e) {
-                            print('Error parsing tahunLahir: $e');
-                          }
-
-                          return Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Nama',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(
-                                        child: Text(userData['namaLengkap'])),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Username',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(
-                                        child: Text(userData['username'])),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Jenis Kelamin',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(child: Text(gender)),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Umur',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(child: Text(umur.toString())),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                          // Gantilah 'nama' dengan nama field yang sesuai di dokumen Anda
-                        } else {
-                          return Text('Dokumen tidak ditemukan');
-                        }
                       }
+                      if (snapshot.hasData && snapshot.data!.exists) {
+                        Map<String, dynamic> userData =
+                            snapshot.data!.data() as Map<String, dynamic>;
+                        if (userData['gender'] == 0) {
+                          gender = "Lainnya";
+                        } else if (userData['gender'] == 1) {
+                          gender = "Pria";
+                        } else if (userData['gender'] == 2) {
+                          gender = "Wanita";
+                        }
+
+                        try {
+                          umur = 2023 - userData['tahunLahir'];
+                          print('Umur: $umur tahun');
+                        } catch (e) {
+                          print('Error parsing tahunLahir: $e');
+                        }
+
+                        return Container(
+                          margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      'Nama',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    child:
+                                        Text(":   ${userData['namaLengkap']}"),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      'Username',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Text(":   ${userData['username']}"),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      'Jenis Kelamin',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(child: Text(':   $gender')),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      'Umur',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(child: Text(':   $umur')),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return Text('Dokumen tidak ditemukan');
                     },
                   ),
                 ],

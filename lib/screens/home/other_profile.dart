@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nuwunsewu/screens/chats/view_chat.dart';
 import 'package:nuwunsewu/services/add_data.dart';
-import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
@@ -17,7 +16,6 @@ class OtherProfile extends StatefulWidget {
 }
 
 class _OtherProfileState extends State<OtherProfile> {
-  final AuthService _auth = AuthService();
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('userData');
   bool loading = false;

@@ -10,13 +10,9 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<Pengguna?>(context);
-    print(user);
-    // mengembalikan antara home atau authenticate
     if (user == null) {
-      print('go to authenticate');
-      return Authenticate();
-    } else {
-      return Navigation();
+      return const Authenticate();
     }
+    return const Navigation();
   }
 }

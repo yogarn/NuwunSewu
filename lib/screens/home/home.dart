@@ -197,7 +197,7 @@ class _PostWidgetState extends State<PostWidget> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.network(
-                            widget.imagePaths![0], // Display the first image
+                            widget.imagePaths![0],
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -363,7 +363,6 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                 body: resultData['body'],
                                 uidSender: resultData['uidSender'],
                                 dateTime: resultData['dateTime'].toDate(),
-                                // Assuming 'dateTime' is a Timestamp, convert it to a DateTime object
                                 namaLengkap: namaLengkap,
                                 imagePaths: (resultData['imagePaths'] as List<dynamic>).cast<String>(),
                                 profilePicture: profilePicture,
@@ -388,16 +387,13 @@ class _SecondTabHomeState extends State<SecondTabHome> {
 
   Stream<List<String>> getFollowingListStream(String uidSender) async* {
     try {
-      // Get a reference to the 'following' subcollection in the document with uidSender
       CollectionReference followingCollection = FirebaseFirestore.instance
           .collection('userData')
           .doc(uidSender)
           .collection('following');
 
-      // Get documents from the 'following' subcollection
       QuerySnapshot followingSnapshot = await followingCollection.get();
 
-      // Get the list of uidTarget from the documents in the 'following' subcollection
       List<String> followingList =
           followingSnapshot.docs.map((doc) => doc.id).toList();
 
@@ -417,11 +413,9 @@ class _SecondTabHomeState extends State<SecondTabHome> {
           postResults.docs.where((doc) {
         String uid = (doc['uidSender'] as String);
 
-        // Menggunakan contains untuk memeriksa apakah uid ada dalam list uids
         return uids.contains(uid);
       }).toList();
 
-      // Gabungkan kedua list
       yield filteredPostsResults;
     } catch (e) {
       print("Error: $e");
@@ -492,7 +486,6 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                             ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                             : profilePictureSnapshot.data) ??
                         'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-                    // print(title);
                     return PostWidget(
                       title: title,
                       body: body,

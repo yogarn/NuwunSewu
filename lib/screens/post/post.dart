@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:nuwunsewu/screens/post/expand_comment.dart';
 import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
@@ -10,11 +11,10 @@ import 'package:nuwunsewu/services/add_data.dart';
 
 class ExpandPost extends StatefulWidget {
   final String postID;
+  final TextEditingController commentController = TextEditingController();
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('postingan');
-
-  final TextEditingController commentController = new TextEditingController();
-
+  
   ExpandPost({required this.postID});
 
   @override
@@ -59,7 +59,6 @@ class _ExpandPostState extends State<ExpandPost> {
       });
     });
 
-    // Inisialisasi status like berdasarkan hasil dari hasUserLikedPost
     final currentUserID = FirebaseAuth.instance.currentUser!.uid;
     db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
       setState(() {
@@ -82,7 +81,7 @@ class _ExpandPostState extends State<ExpandPost> {
       if (isLiked) {
         setState(() {
           likeCount -= 1;
-          isLiked = false; // Perbarui status like secara lokal
+          isLiked = false;
         });
         await db.deleteLikePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -97,7 +96,7 @@ class _ExpandPostState extends State<ExpandPost> {
             _toggleDislikePost();
           }
           likeCount += 1;
-          isLiked = true; // Perbarui status like secara lokal
+          isLiked = true;
         });
         await db.likePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -118,7 +117,7 @@ class _ExpandPostState extends State<ExpandPost> {
       if (isDisliked) {
         setState(() {
           dislikeCount -= 1;
-          isDisliked = false; // Perbarui status dislike secara lokal
+          isDisliked = false;
         });
         await db.deleteDislikePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -133,7 +132,7 @@ class _ExpandPostState extends State<ExpandPost> {
             _toggleLikePost();
           }
           dislikeCount += 1;
-          isDisliked = true; // Perbarui status dislike secara lokal
+          isDisliked = true;
         });
         await db.dislikePost(widget.postID, currentUserID);
         FirebaseFirestore.instance
@@ -158,7 +157,6 @@ class _ExpandPostState extends State<ExpandPost> {
                   icon: Icon(Icons.arrow_back),
                   tooltip: 'Back',
                   onPressed: () {
-                    // handle the press
                     Navigator.pop(context);
                   },
                 ),
@@ -174,13 +172,12 @@ class _ExpandPostState extends State<ExpandPost> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Loading(); // or some loading indicator
+                          return Loading();
                         } else {
                           if (snapshot.hasData && snapshot.data!.exists) {
                             Map<String, dynamic> postingan =
                                 snapshot.data!.data() as Map<String, dynamic>;
 
-                            // Check if the 'profilePicture' field is not empty
                             return FutureBuilder<String>(
                               future: getNamaLengkap(postingan['uidSender']),
                               builder: (context, namaLengkapSnapshot) {
@@ -230,7 +227,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                             children: (postingan['imagePaths']
                                                     as List<dynamic>)
                                                 .cast<
-                                                    String>() // Explicitly cast the elements to String
+                                                    String>()
                                                 .map((imagePath) {
                                               return Container(
                                                 margin: EdgeInsets.fromLTRB(
@@ -268,9 +265,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                               icon: isLiked
                                                   ? const Icon(Icons.thumb_up,
                                                       color: Colors
-                                                          .purple) // Icon untuk sudah di like
+                                                          .purple)
                                                   : const Icon(Icons
-                                                      .thumb_up_outlined), // Icon untuk belum di like
+                                                      .thumb_up_outlined),
                                             ),
                                             Text(likeCount.toString()),
                                           ],
@@ -284,9 +281,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                               icon: isDisliked
                                                   ? const Icon(Icons.thumb_down,
                                                       color: Colors
-                                                          .purple) // Icon untuk sudah di dislike
+                                                          .purple)
                                                   : const Icon(Icons
-                                                      .thumb_down_outlined), // Icon untuk belum di dislike
+                                                      .thumb_down_outlined),
                                             ),
                                             Text(dislikeCount.toString()),
                                           ],
@@ -371,7 +368,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                                           commentCount += 1;
                                                         });
                                                         try {
-                                                          // print(widget.commentController.text);
                                                           await db.tambahKomentar(
                                                               widget.postID,
                                                               FirebaseAuth
@@ -419,7 +415,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                                 color: Colors.red,
                                                 fontSize: 14.0),
                                           ),
-                                          // Display comments using StreamBuilder
                                           CommentWidget(postId: widget.postID),
                                         ],
                                       ),
@@ -584,10 +579,10 @@ class CommentWidget extends StatelessWidget {
 
     if (daysDifference > 0) {
       return '${daysDifference} hari yang lalu';
-    } else if (hoursDifference > 0) {
-      return '${hoursDifference} jam yang lalu';
-    } else {
-      return '${minuteDifference} menit yang lalu';
     }
+    if (hoursDifference > 0) {
+      return '${hoursDifference} jam yang lalu';
+    }
+    return '${minuteDifference} menit yang lalu';
   }
 }
