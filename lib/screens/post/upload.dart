@@ -168,46 +168,52 @@ class _UploadState extends State<Upload> {
                             )
                           : const SizedBox(height: 5),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        child: const Text('Upload Image'),
-                        onPressed: () async {
-                          List<XFile> pickedFiles =
-                              await ImagePicker().pickMultipleMedia();
-                          for (var e in pickedFiles) {
-                            _file.add(File(e.path));
-                          }
-                          setState(() {});
-                        },
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ElevatedButton(
+                          child: const Text('Upload Image'),
+                          onPressed: () async {
+                            List<XFile> pickedFiles =
+                                await ImagePicker().pickMultipleMedia();
+                            for (var e in pickedFiles) {
+                              _file.add(File(e.path));
+                            }
+                            setState(() {});
+                          },
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      ElevatedButton(
-                        child: const Text('Kirim'),
-                        onPressed: () async {
-                          if (_formKey.currentState != null) {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                loading = true;
-                              });
-
-                              try {
-                                await StoreData().savePostImages(
-                                  files: _file,
-                                  title: title,
-                                  body: body,
-                                );
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ElevatedButton(
+                          child: const Text('Kirim'),
+                          onPressed: () async {
+                            if (_formKey.currentState != null) {
+                              if (_formKey.currentState!.validate()) {
                                 setState(() {
-                                  Navigator.pop(context);
-                                  loading = false;
+                                  loading = true;
                                 });
-                              } catch (e) {
-                                setState(() {
-                                  error = "Terjadi kesalahan, coba lagi nanti.";
-                                  loading = false;
-                                });
+                        
+                                try {
+                                  await StoreData().savePostImages(
+                                    files: _file,
+                                    title: title,
+                                    body: body,
+                                  );
+                                  setState(() {
+                                    Navigator.pop(context);
+                                    loading = false;
+                                  });
+                                } catch (e) {
+                                  setState(() {
+                                    error = "Terjadi kesalahan, coba lagi nanti.";
+                                    loading = false;
+                                  });
+                                }
                               }
                             }
-                          }
-                        },
+                          },
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Text(
