@@ -1,5 +1,5 @@
 # nuwunsewu
-## Tim Lorem Ipsum
+## Lorem Ipsum Team
 - Muhammad Abyan Syauqi (Hustler)
 - Satria Angga Wahyunenda (Hispter)
 - Samuel Alfito Deanova (Hacker)
