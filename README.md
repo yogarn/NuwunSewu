@@ -1,4 +1,4 @@
-# nuwunsewu
+# NuwunSewu
 ## Lorem Ipsum Team
 - Muhammad Abyan Syauqi (Hustler)
 - Satria Angga Wahyunenda (Hispter)
