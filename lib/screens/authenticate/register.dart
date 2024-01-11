@@ -206,7 +206,7 @@ class _RegisterState extends State<Register> {
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ], // Only numbers can be entered
+                                  ],
                                   validator: (val) =>
                                       val!.isEmpty || int.parse(val) > 2099
                                           ? 'Tidak valid!'

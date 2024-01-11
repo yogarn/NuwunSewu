@@ -36,7 +36,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
               icon: Icon(Icons.arrow_back),
               tooltip: 'Back',
               onPressed: () {
-                // handle the press
                 Navigator.pop(context);
               },
             ),
@@ -59,13 +58,12 @@ class _ProfilePictureState extends State<ProfilePicture> {
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator(); // or some loading indicator
+                                return CircularProgressIndicator();
                               } else {
                                 if (snapshot.hasData && snapshot.data!.exists) {
                                   Map<String, dynamic> userData = snapshot.data!
                                       .data() as Map<String, dynamic>;
 
-                                  // Check if the 'profilePicture' field is not empty
                                   if (userData['profilePicture'] != null) {
                                     return CircleAvatar(
                                       radius: 64,
@@ -74,7 +72,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
                                       ),
                                     );
                                   } else {
-                                    // Use a default image if 'profilePicture' is empty
                                     return CircleAvatar(
                                       radius: 64,
                                       backgroundImage: NetworkImage(

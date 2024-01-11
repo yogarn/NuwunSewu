@@ -54,7 +54,6 @@ class _ViewChatState extends State<ViewChat> {
     DateTime? parsedDateTime;
 
     try {
-      // Convert Firestore server timestamp to DateTime
       var dateTime = message['timestamp'];
       if (dateTime != null) {
         parsedDateTime = dateTime.toDate();

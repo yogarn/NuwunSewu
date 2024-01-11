@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
@@ -203,7 +204,6 @@ class _SearchState extends State<Search> {
         _searchResults = searchPostsStream(query);
       });
     } else {
-      // Handle the case when the query is empty
       setState(() {
         _searchResults = Stream.value([]);
       });
@@ -240,7 +240,6 @@ class _SearchState extends State<Search> {
             .any((word) => title.contains(word) || body.contains(word));
       }).toList();
 
-      // Combine both lists
       List<DocumentSnapshot> combinedResults = [];
       combinedResults.addAll(filteredPostsResults);
       combinedResults.addAll(filteredUserResults);

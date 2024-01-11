@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nuwunsewu/services/add_data.dart';
 
 pickImage(ImageSource source) async {
   final ImagePicker _imagePicker = ImagePicker();
@@ -63,7 +62,7 @@ Future<int> getLikeCount(String postID) async {
     return querySnapshot.size;
   } catch (error) {
     print('Error getting like count: $error');
-    return 0; // Handle the error as needed
+    return 0;
   }
 }
 
@@ -78,7 +77,7 @@ Future<int> getDislikeCount(String postID) async {
     return querySnapshot.size;
   } catch (error) {
     print('Error getting like count: $error');
-    return 0; // Handle the error as needed
+    return 0;
   }
 }
 
@@ -93,7 +92,7 @@ Future<int> getCommentCount(String postID) async {
     return querySnapshot.size;
   } catch (error) {
     print('Error getting like count: $error');
-    return 0; // Handle the error as needed
+    return 0;
   }
 }
 
@@ -108,27 +107,21 @@ Future<int> getFollowingCount(String targetUserID) async {
     return querySnapshot.size;
   } catch (error) {
     print('Error getting like count: $error');
-    return 0; // Handle the error as needed
+    return 0;
   }
 }
 
 Future<int> getFollowerCount(String uidSaya) async {
   int jumlahFollower = 0;
 
-  // Dapatkan referensi ke Firestore
   final firestore = FirebaseFirestore.instance;
 
-  // Dapatkan semua dokumen dari koleksi 'userData'
   final users = await firestore.collection('userData').get();
 
-  // Loop pada setiap dokumen user
   for (final user in users.docs) {
-    // Dapatkan subkoleksi 'following' dari user ini
     final following = await user.reference.collection('following').get();
 
-    // Periksa apakah user ini mengikuti Anda
     if (following.docs.any((doc) => doc.id == uidSaya)) {
-      // Jika ya, tambahkan counter follower
       jumlahFollower++;
     }
   }
@@ -140,7 +133,7 @@ Future<List<DocumentSnapshot>> searchPosts(String query) async {
   QuerySnapshot<Map<String, dynamic>> searchResults = await FirebaseFirestore
       .instance
       .collection(
-          'postingan') // Gantilah 'nama_koleksi' dengan nama koleksi Anda
+          'postingan')
       .where('title', isGreaterThanOrEqualTo: query)
       .get();
 
@@ -156,22 +149,17 @@ String generateChatID(String userID1, String userID2) {
 
 Future<bool> doesChatExist(String userID1, String userID2) async {
   String chatID = generateChatID(userID1, userID2);
-  // Use Firestore to check if the chat with this ID exists
   var chatDoc = await FirebaseFirestore.instance.collection('chats').doc(chatID).get();
   return chatDoc.exists;
-} // Import the utility functions
+}
 
 Future<void> startNewChat(String currentUserID, String otherUserID) async {
-  // Generate a unique chat ID
   String chatID = generateChatID(currentUserID, otherUserID);
 
-  // Check if the chat already exists
   bool chatExists = await doesChatExist(currentUserID, otherUserID);
   if (!chatExists) {
-    // If the chat doesn't exist, add it to Firestore
     await FirebaseFirestore.instance.collection('chats').doc(chatID).set({
       'participants': [currentUserID, otherUserID],
-      // Add any other chat data you want to store
     });
   }
 }

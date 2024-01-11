@@ -20,7 +20,6 @@ class StoreData {
   }
 
   Future<String> saveProfilePicture({required Uint8List file}) async {
-    //ignore this func
     String resp = 'some error occured';
     try {
       String imagePath =
@@ -46,11 +45,9 @@ class StoreData {
 
       List<String> imageUrls = [];
       if (files != null && files.isNotEmpty) {
-        // Upload each image to storage and collect their download URLs
         for (var i = 0; i < files.length; i++) {
           String imagePath = 'postImage/${Uri.encodeComponent(docId)}_$i';
 
-          // Read the file and convert it to Uint8List
           List<int> bytes = await files[i].readAsBytes();
           Uint8List fileUint8List = Uint8List.fromList(bytes);
 
@@ -60,7 +57,6 @@ class StoreData {
         }
       }
 
-      // Save post data to Firestore with image URLs
       await _firestore.collection('postingan').doc(docId).set({
         'title': title,
         'body': body,
@@ -79,15 +75,12 @@ class StoreData {
     return resp;
   }
 
-  // Fungsi untuk menambahkan komentar
   Future<void> tambahKomentar(
       String postID, String uidSender, String teksKomentar) async {
     try {
-      // Mendapatkan referensi dokumen postingan
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('postingan').doc(postID);
 
-      // Menambahkan komentar ke dalam subkoleksi 'comments'
       await postRef.collection('comments').add({
         'user': uidSender,
         'text': teksKomentar,
@@ -103,11 +96,9 @@ class StoreData {
   Future<void> balasKomentar(String postID, String commentID, String uidSender,
       String teksKomentar) async {
     try {
-      // Mendapatkan referensi dokumen postingan
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('postingan').doc(postID);
 
-      // Menambahkan komentar ke dalam subkoleksi 'comments'
       await postRef
           .collection('comments')
           .doc(commentID)
@@ -216,7 +207,6 @@ class StoreData {
 
   Future<void> sendMessage(
     String chatID, String senderID, String content) async {
-  // Tambahkan pesan ke subcollection messages di dokumen chat
   await FirebaseFirestore.instance
       .collection('chats')
       .doc(chatID)
@@ -227,7 +217,6 @@ class StoreData {
     'timestamp': FieldValue.serverTimestamp(),
   });
 
-  // Update the 'lastTimestamp' field in the chat document
   await FirebaseFirestore.instance
       .collection('chats')
       .doc(chatID)

@@ -9,17 +9,12 @@ class AuthService {
     return user != null ? Pengguna(uid: user.uid) : null;
   }
 
-  // auth change user stream
   Stream<Pengguna?> get user {
     return _auth
         .authStateChanges()
-        // .map((User? user) => _userFromFirebaseUser(user));
         .map(_userFromFirebaseUser);
   }
 
-
-
-  // sign in anonymous
   Future signInAnon() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
@@ -31,7 +26,6 @@ class AuthService {
     }
   }
 
-  // sign in dengan email/password
   Future SignInWithEmailAndPassword(String email, String pass) async {
     try {
       UserCredential result =
@@ -44,7 +38,6 @@ class AuthService {
     }
   }
 
-  // register dengan email/password
   Future registerWithEmailAndPassword(
       String email,
       String pass,
@@ -67,7 +60,6 @@ class AuthService {
     }
   }
 
-  // sign out
   Future signOut() async {
     try {
       return await _auth.signOut();

@@ -66,13 +66,13 @@ class _OtherProfileState extends State<OtherProfile> {
       if (isFollowing) {
         setState(() {
           followerCount -= 1;
-          isFollowing = false; // Perbarui status like secara lokal
+          isFollowing = false;
         });
         await db.unfollowAccount(widget.uidSender, currentUserID);
       } else {
         setState(() {
           followerCount += 1;
-          isFollowing = true; // Perbarui status like secara lokal
+          isFollowing = true;
         });
         await db.followAccount(widget.uidSender, currentUserID);
       }
@@ -120,13 +120,12 @@ class _OtherProfileState extends State<OtherProfile> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // or some loading indicator
+                            return CircularProgressIndicator();
                           } else {
                             if (snapshot.hasData && snapshot.data!.exists) {
                               Map<String, dynamic> userData =
                                   snapshot.data!.data() as Map<String, dynamic>;
 
-                              // Check if the 'profilePicture' field is not empty
                               if (userData['profilePicture'] !=
                                   "defaultProfilePict") {
                                 return CircleAvatar(
@@ -136,11 +135,10 @@ class _OtherProfileState extends State<OtherProfile> {
                                   ),
                                 );
                               } else {
-                                // Use a default image if 'profilePicture' is empty
                                 return CircleAvatar(
                                   radius: 64,
                                   backgroundImage: NetworkImage(
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
+                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain',
                                   ),
                                 );
                               }
@@ -178,9 +176,9 @@ class _OtherProfileState extends State<OtherProfile> {
                             String currentUserID = FirebaseAuth
                                 .instance
                                 .currentUser!
-                                .uid; // Replace with the actual current user ID
+                                .uid;
                             String otherUserID = widget
-                                .uidSender; // Replace with the actual other person's user ID
+                                .uidSender;
                             await startNewChat(currentUserID, otherUserID);
                             Navigator.push(
                               context,
@@ -303,7 +301,6 @@ class _OtherProfileState extends State<OtherProfile> {
                               ],
                             ),
                           );
-                          // Gantilah 'nama' dengan nama field yang sesuai di dokumen Anda
                         } else {
                           return Text('Dokumen tidak ditemukan');
                         }
