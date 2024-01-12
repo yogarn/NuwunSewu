@@ -15,14 +15,14 @@ password: `admin123`<br>
 - Firebase
 ## Screenshots
 ### Login Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Login_Page.jpg" width = "30" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Login_Page.jpg" width = "100" />
 
 ### Home Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page.jpg" width = "30" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page.jpg" width = "100" />
 
 ### Upload Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_01.jpg" width = "30" />
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_02.jpg" width = "30" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_01.jpg" width = "100" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_02.jpg" width = "100" />
 
 ### Chat Dashboard Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width = "30" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width = "100" />
