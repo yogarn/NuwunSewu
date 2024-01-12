@@ -12,6 +12,10 @@ email: `admin@hackfest.id`<br>
 password: `admin123`<br>
 ## Screenshots
 ### Login Page
+![[Screenshot_Login_Page.jpg]]
 ### Home Page
+![[Screenshot_Home_Page.jpg]]
 ### Upload Page
+![[Screenshot_Upload_Page.jpg]]
 ### Chat Dashboard Page
+![[Screenshot_Chat_Dashboard_Page.jpg]]
