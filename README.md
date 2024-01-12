@@ -12,10 +12,14 @@ email: `admin@hackfest.id`<br>
 password: `admin123`<br>
 ## Screenshots
 ### Login Page
-![Image](https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Login_Page.jpg)
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Login_Page.jpg" width = "30" />
+
 ### Home Page
-![Image](https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page.jpg)
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page.jpg" width = "30" />
+
 ### Upload Page
-![Image](https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page.jpg)
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_01.jpg" width = "30" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_02.jpg" width = "30" />
+
 ### Chat Dashboard Page
-![Image](https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg)
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width = "30" />
