@@ -41,8 +41,8 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width="50%" height="50%" />
 
 ### Search People to Chat Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_Page_01.jpg" width="50%" height="50%" />
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_Page_02.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_01.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_02.jpg" width="50%" height="50%" />
 
 ### Chat with People Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Others_Page.jpg" width="50%" height="50%" />
