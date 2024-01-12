@@ -51,7 +51,7 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_Profile_Page.jpg" width="50%" height="50%" />
 
 ### Change Profile Image Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Change_Profile_Image.jpg" width="50%" height="50%" />
 
 ### View People Profile Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_People_Profile_Page.jpg" width="50%" height="50%" />
