@@ -21,10 +21,9 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Register_Page.jpg" width="50%" height="50%" />
 
 ### Home Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page_For_You.jpg" width="50%" height="50%" />
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page_Following.jpg" width="50%" height="50%" />
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Page_Trending.jpg" width="50%" height="50%" />
-
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_For_You_Page.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Following_Page.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Home_Trending_Page.jpg" width="50%" height="50%" />
 
 ### Upload Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Page_01.jpg" width="50%" height="50%" />
@@ -32,6 +31,9 @@ password: `admin123`<br>
 
 ### View Post Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_Post_Page.jpg" width="50%" height="50%" />
+
+### Reply Comment Page
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Reply_Comment_Page.jpg" width="50%" height="50%" />
 
 ### Search Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Search_Page_01.jpg" width="50%" height="50%" />
@@ -41,8 +43,8 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Dashboard_Page.jpg" width="50%" height="50%" />
 
 ### Search People to Chat Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_01.jpg" width="50%" height="50%" />
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_02.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_Page_01.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Search_Page_02.jpg" width="50%" height="50%" />
 
 ### Chat with People Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Chat_Others_Page.jpg" width="50%" height="50%" />
@@ -51,7 +53,7 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_Profile_Page.jpg" width="50%" height="50%" />
 
 ### Change Profile Image Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Change_Profile_Image.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Change_Profile_Image_Page.jpg" width="50%" height="50%" />
 
 ### View People Profile Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_People_Profile_Page.jpg" width="50%" height="50%" />
