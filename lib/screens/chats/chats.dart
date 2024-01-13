@@ -25,9 +25,9 @@ class _ChatsState extends State<Chats> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder(
-              future: _getRecentChats(),
-              builder: (context, AsyncSnapshot<List<ChatInfo>> snapshot) {
+            child: StreamBuilder<List<ChatInfo>>(
+              stream: _getRecentChatsStream(),
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
@@ -58,131 +58,135 @@ class _ChatsState extends State<Chats> {
             ),
           ),
           Container(
-              margin: EdgeInsets.all(20),
-              child: ElevatedButton(
-                child: Text('Message Another Person'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MessageAnother()),
-                  );
-                },
-              ))
+            margin: EdgeInsets.all(20),
+            child: ElevatedButton(
+              child: Text('Message Another Person'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MessageAnother()),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Future<List<ChatInfo>> _getRecentChats() async {
-    List<ChatInfo> recentChats = [];
-
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  Stream<List<ChatInfo>> _getRecentChatsStream() {
+    return FirebaseFirestore.instance
         .collection('chats')
         .where('participants', arrayContains: widget.currentUserID)
         .orderBy('lastTimestamp', descending: true)
-        .get();
+        .snapshots()
+        .asyncMap<List<ChatInfo>>((querySnapshot) async {
+      List<ChatInfo> recentChats = [];
 
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      QuerySnapshot messagesSnapshot =
-          await doc.reference.collection('messages').get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        QuerySnapshot messagesSnapshot = await doc.reference
+            .collection('messages')
+            .orderBy('timestamp', descending: true)
+            .limit(1)
+            .get();
 
-      if (messagesSnapshot.docs.isNotEmpty) {
-        List<String> users = List.castFrom(doc['participants']);
-        users.remove(widget.currentUserID);
+        if (messagesSnapshot.docs.isNotEmpty) {
+          List<String> users = List.castFrom(doc['participants']);
+          users.remove(widget.currentUserID);
 
-        String otherUserID = users.first;
-        String chatID = doc.id;
+          String otherUserID = users.first;
+          String chatID = doc.id;
+          String profilePict = await getProfilePicture(otherUserID);
 
-        recentChats.add(ChatInfo(
-          chatID: chatID,
-          otherUserID: otherUserID,
-        ));
+          Message lastMessage = Message(
+            sender: messagesSnapshot.docs.first['sender'],
+            content: messagesSnapshot.docs.first['content'],
+            timestamp: messagesSnapshot.docs.first['timestamp'],
+          );
+
+          recentChats.add(ChatInfo(
+            profilePict: profilePict,
+            chatID: chatID,
+            otherUserID: otherUserID,
+            lastMessage: lastMessage,
+          ));
+        }
       }
-    }
 
-    return recentChats;
+      return recentChats;
+    });
   }
 
   Widget _buildChatBox(ChatInfo chatInfo) {
-    return FutureBuilder(
-      future: getNamaLengkap(chatInfo.otherUserID),
-      builder: (context, AsyncSnapshot<String> nameSnapshot) {
-        if (nameSnapshot.connectionState == ConnectionState.waiting) {
-          return const ListTile(
-            title: Text('Loading...'),
-          );
-        }
-
-        if (nameSnapshot.hasError) {
-          return const ListTile(
-            title: Text('Error loading name'),
-          );
-        }
-
-        String otherUserName = nameSnapshot.data ?? 'Unknown User';
-
-        return FutureBuilder(
-          future: getProfilePicture(chatInfo.otherUserID),
-          builder: (context, AsyncSnapshot<String> pictureSnapshot) {
-            if (pictureSnapshot.connectionState == ConnectionState.waiting) {
-              return const ListTile(
-                title: Text('Loading...'),
-              );
-            }
-
-            if (pictureSnapshot.hasError) {
-              return const ListTile(
-                title: Text('Error loading profile picture'),
-              );
-            }
-
-            var profilePicture = (pictureSnapshot.data == 'defaultProfilePict'
-                    ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                    : pictureSnapshot.data) ??
-                'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-
-            return Container(
-              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(otherUserName),
-                    tileColor: Colors.purple[100],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    contentPadding: const EdgeInsets.all(15),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewChat(
-                            chatID: chatInfo.chatID,
-                            senderID: widget.currentUserID,
-                            targetUserID: chatInfo.otherUserID,
-                          ),
-                        ),
-                      );
-                    },
-                    leading: CircleAvatar(
-                      radius: 21,
-                      backgroundImage: NetworkImage(profilePicture),
-                    ),
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+      child: Column(
+        children: [
+          ListTile(
+            title: FutureBuilder<String>(
+              future: getNamaLengkap(chatInfo.otherUserID),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Text('Loading...');
+                }
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                return Text(snapshot.data ?? 'Unknown User');
+              },
+            ),
+            subtitle: Text(chatInfo.lastMessage.sender == widget.currentUserID
+                ? "You : " + chatInfo.lastMessage.content
+                : chatInfo.lastMessage.content),
+            tileColor: Colors.purple[100],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            contentPadding: const EdgeInsets.all(15),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewChat(
+                    chatID: chatInfo.chatID,
+                    senderID: widget.currentUserID,
+                    targetUserID: chatInfo.otherUserID,
                   ),
-                  SizedBox(height: 8),
-                ],
+                ),
+              );
+            },
+            leading: CircleAvatar(
+              radius: 21,
+              backgroundImage: NetworkImage(
+                chatInfo.profilePict == "defaultProfilePict" ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain' : chatInfo.profilePict,
               ),
-            );
-          },
-        );
-      },
+            ),
+          ),
+          SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }
 
+class Message {
+  final String content;
+  final Timestamp timestamp;
+  final String sender;
+
+  Message(
+      {required this.content, required this.timestamp, required this.sender});
+}
+
 class ChatInfo {
+  final String profilePict;
   final String chatID;
   final String otherUserID;
+  final Message lastMessage;
 
-  ChatInfo({required this.chatID, required this.otherUserID});
+  ChatInfo(
+      {required this.profilePict,
+      required this.chatID,
+      required this.otherUserID,
+      required this.lastMessage});
 }
