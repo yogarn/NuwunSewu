@@ -40,7 +40,7 @@ class Home extends StatelessWidget {
               tabs: [
                 Tab(text: 'For You'),
                 Tab(text: 'Following'),
-                Tab(text: 'Trending'),
+                Tab(text: 'Your Page'),
               ],
             ),
             title: const Text('NuwunSewu'),
@@ -190,19 +190,19 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: widget.imagePaths != null &&
-                        widget.imagePaths!.isNotEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            widget.imagePaths![0],
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      )
-                    : Container(),
+                child:
+                    widget.imagePaths != null && widget.imagePaths!.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                widget.imagePaths![0],
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          )
+                        : Container(),
               ),
               Row(
                 children: [
@@ -364,7 +364,9 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                 uidSender: resultData['uidSender'],
                                 dateTime: resultData['dateTime'].toDate(),
                                 namaLengkap: namaLengkap,
-                                imagePaths: (resultData['imagePaths'] as List<dynamic>).cast<String>(),
+                                imagePaths:
+                                    (resultData['imagePaths'] as List<dynamic>)
+                                        .cast<String>(),
                                 profilePicture: profilePicture,
                                 postID: results[index].id,
                               );
@@ -425,6 +427,8 @@ class _SecondTabHomeState extends State<SecondTabHome> {
 }
 
 class ThirdTabHome extends StatefulWidget {
+  final String currentUserUID = '';
+  
   const ThirdTabHome({Key? key}) : super(key: key);
 
   @override
@@ -432,6 +436,21 @@ class ThirdTabHome extends StatefulWidget {
 }
 
 class _ThirdTabHomeState extends State<ThirdTabHome> {
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUID();
+  }
+
+  String getCurrentUID() {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      return user.uid;
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
