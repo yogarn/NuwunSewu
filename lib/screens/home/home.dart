@@ -427,8 +427,6 @@ class _SecondTabHomeState extends State<SecondTabHome> {
 }
 
 class ThirdTabHome extends StatefulWidget {
-  final String currentUserUID = '';
-  
   const ThirdTabHome({Key? key}) : super(key: key);
 
   @override
@@ -437,27 +435,9 @@ class ThirdTabHome extends StatefulWidget {
 
 class _ThirdTabHomeState extends State<ThirdTabHome> {
   @override
-  void initState() {
-    super.initState();
-    getCurrentUID();
-  }
-
-  String getCurrentUID() {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      return user.uid;
-    }
-    return '';
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('postingan')
-          .orderBy('likesCount', descending: true)
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('postingan').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container();
@@ -471,54 +451,61 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             var post = snapshot.data!.docs[index];
-            var title = post['title'];
-            var body = post['body'];
-            List<String>? imagePaths =
-                (post['imagePaths'] as List<dynamic>).cast<String>();
             var uidSender = post['uidSender'];
-            var dateTime = post['dateTime'];
-            DateTime parsedDateTime =
-                dateTime != null ? dateTime.toDate() : DateTime.now();
 
-            var postID = (snapshot.data!.docs[index].id);
+            // cek uid pengirim sama dgn uid user
+            if (uidSender == FirebaseAuth.instance.currentUser?.uid) {
+              var title = post['title'];
+              var body = post['body'];
+              List<String>? imagePaths =
+                  (post['imagePaths'] as List<dynamic>).cast<String>();
+              var dateTime = post['dateTime'];
+              DateTime parsedDateTime =
+                  dateTime != null ? dateTime.toDate() : DateTime.now();
 
-            return FutureBuilder<String>(
-              future: getNamaLengkap(uidSender),
-              builder: (context, namaLengkapSnapshot) {
-                if (namaLengkapSnapshot.hasError) {
-                  return Text(
-                      'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
-                }
+              var postID = (snapshot.data!.docs[index].id);
 
-                var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+              return FutureBuilder<String>(
+                future: getNamaLengkap(uidSender),
+                builder: (context, namaLengkapSnapshot) {
+                  if (namaLengkapSnapshot.hasError) {
+                    return Text(
+                        'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                  }
 
-                return FutureBuilder<String>(
-                  future: getProfilePicture(uidSender),
-                  builder: (context, profilePictureSnapshot) {
-                    if (profilePictureSnapshot.hasError) {
-                      return Text(
-                          'Error fetching profilePicture: ${profilePictureSnapshot.error}');
-                    }
+                  var namaLengkap = namaLengkapSnapshot.data ?? 'null';
 
-                    var profilePicture = (profilePictureSnapshot.data ==
-                                'defaultProfilePict'
-                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                            : profilePictureSnapshot.data) ??
-                        'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-                    return PostWidget(
-                      title: title,
-                      body: body,
-                      imagePaths: imagePaths,
-                      uidSender: uidSender,
-                      dateTime: parsedDateTime,
-                      namaLengkap: namaLengkap,
-                      profilePicture: profilePicture,
-                      postID: postID,
-                    );
-                  },
-                );
-              },
-            );
+                  return FutureBuilder<String>(
+                    future: getProfilePicture(uidSender),
+                    builder: (context, profilePictureSnapshot) {
+                      if (profilePictureSnapshot.hasError) {
+                        return Text(
+                            'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                      }
+
+                      var profilePicture = (profilePictureSnapshot.data ==
+                                  'defaultProfilePict'
+                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                              : profilePictureSnapshot.data) ??
+                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                      return PostWidget(
+                        title: title,
+                        body: body,
+                        imagePaths: imagePaths,
+                        uidSender: uidSender,
+                        dateTime: parsedDateTime,
+                        namaLengkap: namaLengkap,
+                        profilePicture: profilePicture,
+                        postID: postID,
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              return Container();
+            }
           },
         );
       },
