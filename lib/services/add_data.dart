@@ -206,21 +206,50 @@ class StoreData {
   }
 
   Future<void> sendMessage(
-    String chatID, String senderID, String content) async {
-  await FirebaseFirestore.instance
-      .collection('chats')
-      .doc(chatID)
-      .collection('messages')
-      .add({
-    'sender': senderID,
-    'content': content,
-    'timestamp': FieldValue.serverTimestamp(),
-  });
+      String chatID, String senderID, String content) async {
+    await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatID)
+        .collection('messages')
+        .add({
+      'sender': senderID,
+      'content': content,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
 
-  await FirebaseFirestore.instance
-      .collection('chats')
-      .doc(chatID)
-      .update({'lastTimestamp': FieldValue.serverTimestamp()});
-}
+    await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatID)
+        .update({'lastTimestamp': FieldValue.serverTimestamp()});
+  }
 
+  Future<void> repost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('reposts')
+        .doc(userID)
+        .set({
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> undoRepost(String postID, String userID) async {
+    await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('reposts')
+        .doc(userID)
+        .delete();
+  }
+
+  Future<bool> hasUserRepost(String postID, String userID) async {
+    final likeSnapshot = await _firestore
+        .collection('postingan')
+        .doc(postID)
+        .collection('reposts')
+        .doc(userID)
+        .get();
+    return likeSnapshot.exists;
+  }
 }

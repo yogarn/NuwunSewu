@@ -14,7 +14,7 @@ class ExpandPost extends StatefulWidget {
   final TextEditingController commentController = TextEditingController();
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('postingan');
-  
+
   ExpandPost({required this.postID});
 
   @override
@@ -31,8 +31,11 @@ class _ExpandPostState extends State<ExpandPost> {
   int likeCount = 0;
   int dislikeCount = 0;
   int commentCount = 0;
+  int repostCount = 0;
+
   bool isLiked = false;
   bool isDisliked = false;
+  bool isReposted = false;
 
   final Duration _debounceDuration = Duration(milliseconds: 500);
   Timer? _debounceTimer;
@@ -59,6 +62,12 @@ class _ExpandPostState extends State<ExpandPost> {
       });
     });
 
+    getRepostCount(widget.postID).then((count) {
+      setState(() {
+        repostCount = count;
+      });
+    });
+
     final currentUserID = FirebaseAuth.instance.currentUser!.uid;
     db.hasUserLikedPost(widget.postID, currentUserID).then((liked) {
       setState(() {
@@ -69,6 +78,12 @@ class _ExpandPostState extends State<ExpandPost> {
     db.hasUserDislikedPost(widget.postID, currentUserID).then((disliked) {
       setState(() {
         isDisliked = disliked;
+      });
+    });
+
+    db.hasUserRepost(widget.postID, currentUserID).then((reposted) {
+      setState(() {
+        isReposted = reposted;
       });
     });
   }
@@ -140,6 +155,39 @@ class _ExpandPostState extends State<ExpandPost> {
             .doc(widget.postID)
             .update({
           'dislikesCount': FieldValue.increment(1),
+        });
+      }
+    });
+  }
+
+  Future<void> _toggleRepost() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, () async {
+      final currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isReposted) {
+        setState(() {
+          repostCount -= 1;
+          isReposted = false;
+        });
+        await db.undoRepost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'repostsCount': FieldValue.increment(-1),
+        });
+      } else {
+        setState(() {
+          repostCount += 1;
+          isReposted = true;
+        });
+        await db.repost(widget.postID, currentUserID);
+        FirebaseFirestore.instance
+            .collection('postingan')
+            .doc(widget.postID)
+            .update({
+          'repostsCount': FieldValue.increment(1),
         });
       }
     });
@@ -226,8 +274,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                         ? Column(
                                             children: (postingan['imagePaths']
                                                     as List<dynamic>)
-                                                .cast<
-                                                    String>()
+                                                .cast<String>()
                                                 .map((imagePath) {
                                               return Container(
                                                 margin: EdgeInsets.fromLTRB(
@@ -264,10 +311,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                               },
                                               icon: isLiked
                                                   ? const Icon(Icons.thumb_up,
-                                                      color: Colors
-                                                          .purple)
-                                                  : const Icon(Icons
-                                                      .thumb_up_outlined),
+                                                      color: Colors.purple)
+                                                  : const Icon(
+                                                      Icons.thumb_up_outlined),
                                             ),
                                             Text(likeCount.toString()),
                                           ],
@@ -280,8 +326,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                               },
                                               icon: isDisliked
                                                   ? const Icon(Icons.thumb_down,
-                                                      color: Colors
-                                                          .purple)
+                                                      color: Colors.purple)
                                                   : const Icon(Icons
                                                       .thumb_down_outlined),
                                             ),
@@ -291,10 +336,16 @@ class _ExpandPostState extends State<ExpandPost> {
                                         Column(
                                           children: [
                                             IconButton(
-                                              onPressed: () {},
-                                              icon: const Icon(Icons.share),
+                                              onPressed: () async {
+                                                await _toggleRepost();
+                                              },
+                                              icon: isReposted
+                                                  ? const Icon(Icons.share,
+                                                      color: Colors.purple)
+                                                  : const Icon(
+                                                      Icons.share_outlined),
                                             ),
-                                            Text('Share'),
+                                            Text(repostCount.toString()),
                                           ],
                                         ),
                                       ],

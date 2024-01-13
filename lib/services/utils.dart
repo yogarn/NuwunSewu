@@ -163,3 +163,18 @@ Future<void> startNewChat(String currentUserID, String otherUserID) async {
     });
   }
 }
+
+Future<int> getRepostCount(String postID) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('postingan')
+        .doc(postID)
+        .collection('reposts')
+        .get();
+
+    return querySnapshot.size;
+  } catch (error) {
+    print('Error getting reposts count: $error');
+    return 0;
+  }
+}
