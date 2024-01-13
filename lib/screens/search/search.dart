@@ -59,6 +59,9 @@ class _SearchState extends State<Search> {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // If there is no data or the data is empty, show Trending
+                  return Trending();
                 } else {
                   List<DocumentSnapshot> results = snapshot.data ?? [];
                   return ListView.builder(
@@ -133,8 +136,7 @@ class _SearchState extends State<Search> {
                                 ),
                               );
                             },
-                            child:
-                                Container(
+                            child: Container(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 20.0, vertical: 10.0),
                               decoration: BoxDecoration(
@@ -248,5 +250,92 @@ class _SearchState extends State<Search> {
       print("Error: $e");
       yield [];
     }
+  }
+}
+
+class Trending extends StatefulWidget {
+  const Trending({Key? key}) : super(key: key);
+
+  @override
+  _TrendingState createState() => _TrendingState();
+}
+
+class _TrendingState extends State<Trending> {
+  @override
+  Widget build(BuildContext context) {
+    return 
+    Scaffold(
+      appBar: AppBar(title: Text("On Trending")),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('postingan')
+            .orderBy('likesCount', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container();
+          }
+      
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+      
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var post = snapshot.data!.docs[index];
+              var title = post['title'];
+              var body = post['body'];
+              List<String>? imagePaths =
+                  (post['imagePaths'] as List<dynamic>).cast<String>();
+              var uidSender = post['uidSender'];
+              var dateTime = post['dateTime'];
+              DateTime parsedDateTime =
+                  dateTime != null ? dateTime.toDate() : DateTime.now();
+      
+              var postID = (snapshot.data!.docs[index].id);
+      
+              return FutureBuilder<String>(
+                future: getNamaLengkap(uidSender),
+                builder: (context, namaLengkapSnapshot) {
+                  if (namaLengkapSnapshot.hasError) {
+                    return Text(
+                        'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                  }
+      
+                  var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+      
+                  return FutureBuilder<String>(
+                    future: getProfilePicture(uidSender),
+                    builder: (context, profilePictureSnapshot) {
+                      if (profilePictureSnapshot.hasError) {
+                        return Text(
+                            'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                      }
+      
+                      var profilePicture = (profilePictureSnapshot.data ==
+                                  'defaultProfilePict'
+                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                              : profilePictureSnapshot.data) ??
+                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                      return PostWidget(
+                        title: title,
+                        body: body,
+                        imagePaths: imagePaths,
+                        uidSender: uidSender,
+                        dateTime: parsedDateTime,
+                        namaLengkap: namaLengkap,
+                        profilePicture: profilePicture,
+                        postID: postID,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 }
