@@ -19,8 +19,15 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
-  int _selectedPageIndex = 0;
   bool showUploadPage = false;
+
+  void setShowUploadPage(bool kebenaran) {
+    setState(() {
+      showUploadPage = kebenaran;
+    });
+  }
+
+  int _selectedPageIndex = 0;
 
   void _navigateHomePage(int index) {
     setState(() {
@@ -50,26 +57,26 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
         body: Stack(
           children: [
             _pages[_selectedPageIndex],
-            showUploadPage ? const Upload() : const Text(''),
+            showUploadPage
+                ? Upload(setShowUploadPage: setShowUploadPage)
+                : const Text(''),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: !showUploadPage
+        floatingActionButton: showUploadPage
             ? Container(
-                margin: const EdgeInsets.only(top: 20),
-                height: 90,
-                width: 90,
+                margin: const EdgeInsets.only(bottom: 45),
+                height: 30,
+                width: 30,
                 child: FloatingActionButton(
                   onPressed: () {
-                    setState(() {
-                      showUploadPage = !showUploadPage;
-                    });
+                    setShowUploadPage(!showUploadPage);
                   },
                   backgroundColor: Colors.black,
                   tooltip: "Post",
                   shape: const CircleBorder(),
-                  child: Icon(Icons.add_rounded,
-                      color: Colors.grey[850], size: 80),
+                  child: Icon(Icons.keyboard_arrow_down_outlined,
+                      color: Colors.grey[850], size: 30),
                 ),
               )
             : Container(
@@ -78,14 +85,12 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 width: 90,
                 child: FloatingActionButton(
                   onPressed: () {
-                    setState(() {
-                      showUploadPage = !showUploadPage;
-                    });
+                    setShowUploadPage(!showUploadPage);
                   },
                   backgroundColor: Colors.black,
                   tooltip: "Post",
                   shape: const CircleBorder(),
-                  child: Icon(Icons.keyboard_arrow_down_outlined,
+                  child: Icon(Icons.add_rounded,
                       color: Colors.grey[850], size: 80),
                 ),
               ),
@@ -98,7 +103,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 flex: 5,
                 child: IconButton(
                   onPressed: () {
-                    _navigateHomePage(0);
+                    if (!showUploadPage) _navigateHomePage(0);
                   },
                   icon: _selectedPageIndex == 0
                       ? Icon(
@@ -117,7 +122,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 flex: 5,
                 child: IconButton(
                   onPressed: () {
-                    _navigateHomePage(1);
+                    if (!showUploadPage) _navigateHomePage(1);
                   },
                   icon: _selectedPageIndex == 1
                       ? Icon(
@@ -137,7 +142,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 flex: 5,
                 child: IconButton(
                   onPressed: () {
-                    _navigateHomePage(2);
+                    if (!showUploadPage) _navigateHomePage(2);
                   },
                   icon: _selectedPageIndex == 2
                       ? Icon(
@@ -156,7 +161,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 flex: 5,
                 child: IconButton(
                   onPressed: () {
-                    _navigateHomePage(3);
+                    if (!showUploadPage) _navigateHomePage(3);
                   },
                   icon: _selectedPageIndex == 3
                       ? Icon(
@@ -180,7 +185,9 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
 }
 
 class Upload extends StatefulWidget {
-  const Upload({Key? key});
+  final Function(bool) setShowUploadPage;
+
+  Upload({required this.setShowUploadPage});
 
   @override
   State<Upload> createState() => _UploadState();
@@ -238,6 +245,7 @@ class _UploadState extends State<Upload> {
                     const SizedBox(height: 20),
                     TextFormField(
                       maxLines: null,
+                      style: TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         fillColor: Colors.white,
                         hintText: 'Masukkan judul postingan',
@@ -258,6 +266,7 @@ class _UploadState extends State<Upload> {
                     const SizedBox(height: 20),
                     TextFormField(
                       maxLines: null,
+                      style: TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: 'Masukkan isi postingan',
                         label: Text(
@@ -409,6 +418,7 @@ class _UploadState extends State<Upload> {
                         onPressed: () async {
                           if (_formKey.currentState != null) {
                             if (_formKey.currentState!.validate()) {
+                              widget.setShowUploadPage(false);
                               setState(() {
                                 loading = true;
                               });
@@ -420,7 +430,6 @@ class _UploadState extends State<Upload> {
                                   body: body,
                                 );
                                 setState(() {
-                                  Navigator.pop(context);
                                   loading = false;
                                 });
                               } catch (e) {
