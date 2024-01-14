@@ -1,21 +1,257 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:nuwunsewu/screens/chats/messsage_another.dart';
 import 'package:nuwunsewu/screens/chats/view_chat.dart';
+import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
 class Chats extends StatefulWidget {
-  final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
-
-  Chats({super.key});
-
   @override
-  State<Chats> createState() => _ChatsState();
+  _ChatsState createState() => _ChatsState();
 }
 
 class _ChatsState extends State<Chats> {
+  final TextEditingController _searchController = TextEditingController();
+  late Stream<List<DocumentSnapshot>> _searchResults = Stream.value([]);
+
+  void _startSearch() {
+    String query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      setState(() {
+        _searchResults = searchPostsStream(query);
+      });
+    } else {
+      setState(() {
+        _searchResults = Stream.value([]);
+      });
+    }
+  }
+
+  Stream<List<DocumentSnapshot>> searchPostsStream(String query) async* {
+    query = query.toLowerCase();
+    List<String> queryWords = query.split(' ');
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> userResults =
+          await FirebaseFirestore.instance.collection('userData').get();
+
+      List<DocumentSnapshot> filteredUserResults =
+          userResults.docs.where((doc) {
+        String namaLengkap =
+            (doc['namaLengkap'] as String?)?.toLowerCase() ?? '';
+        String uid = doc.id;
+
+        return uid != FirebaseAuth.instance.currentUser!.uid &&
+            queryWords.any(
+                (word) => namaLengkap.contains(word) || uid.contains(word));
+      }).toList();
+
+      yield filteredUserResults;
+    } catch (e) {
+      print("Error: $e");
+      yield [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.purple[100],
+        title: Text('Cari Chat'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            height: 48,
+            color: Colors.purple[100],
+            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                  hintText: 'Cari...',
+                  border: InputBorder.none,
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      _startSearch();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<DocumentSnapshot>>(
+              stream: _searchResults,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // If there is no data or the data is empty, show Trending
+                  return RecentChats();
+                } else {
+                  List<DocumentSnapshot> results = snapshot.data ?? [];
+                  return ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> resultData =
+                          results[index].data() as Map<String, dynamic>;
+
+                      if (resultData.containsKey('title') &&
+                          resultData.containsKey('body')) {
+                        return FutureBuilder<String>(
+                          future: getNamaLengkap(resultData['uidSender']),
+                          builder: (context, namaLengkapSnapshot) {
+                            if (namaLengkapSnapshot.hasError) {
+                              return Text(
+                                  'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                            }
+
+                            var namaLengkap =
+                                namaLengkapSnapshot.data ?? 'null';
+
+                            return FutureBuilder<String>(
+                              future:
+                                  getProfilePicture(resultData['uidSender']),
+                              builder: (context, profilePictureSnapshot) {
+                                if (profilePictureSnapshot.hasError) {
+                                  return Text(
+                                      'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                                }
+
+                                var profilePicture = (profilePictureSnapshot
+                                                .data ==
+                                            'defaultProfilePict'
+                                        ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                        : profilePictureSnapshot.data) ??
+                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                                return PostWidget(
+                                  title: resultData['title'],
+                                  body: resultData['body'],
+                                  uidSender: resultData['uidSender'],
+                                  dateTime: resultData['dateTime'].toDate(),
+                                  namaLengkap: namaLengkap,
+                                  imagePaths: (resultData['imagePaths']
+                                          as List<dynamic>)
+                                      .cast<String>(),
+                                  profilePicture: profilePicture,
+                                  postID: results[index].id,
+                                );
+                              },
+                            );
+                          },
+                        );
+                      } else if (resultData.containsKey('namaLengkap')) {
+                        var profilePicture = (resultData['profilePicture'] ==
+                                    'defaultProfilePict'
+                                ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                : resultData['profilePicture']) ??
+                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                        return ListTile(
+                          title: InkWell(
+                            onTap: () async {
+                              var currentUserID =
+                                  FirebaseAuth.instance.currentUser!.uid;
+                              var otherUserID = results[index].id;
+                              await startNewChat(currentUserID, otherUserID);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewChat(
+                                    chatID: generateChatID(
+                                        currentUserID, otherUserID),
+                                    senderID: currentUserID,
+                                    targetUserID: otherUserID,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 5.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.purple[100],
+                              ),
+                              child: Container(
+                                margin: const EdgeInsets.all(15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: CircleAvatar(
+                                            radius: 21,
+                                            backgroundImage:
+                                                NetworkImage(profilePicture),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 10,
+                                          child: Container(
+                                            margin:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  resultData['namaLengkap'],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// recent chats
+class RecentChats extends StatefulWidget {
+  final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+  RecentChats({super.key});
+
+  @override
+  State<RecentChats> createState() => _RecentChatsState();
+}
+
+class _RecentChatsState extends State<RecentChats> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,18 +289,6 @@ class _ChatsState extends State<Chats> {
                   itemBuilder: (context, index) {
                     return _buildChatBox(recentChats[index]);
                   },
-                );
-              },
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.all(20),
-            child: ElevatedButton(
-              child: Text('Message Another Person'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MessageAnother()),
                 );
               },
             ),
@@ -158,7 +382,9 @@ class _ChatsState extends State<Chats> {
             leading: CircleAvatar(
               radius: 21,
               backgroundImage: NetworkImage(
-                chatInfo.profilePict == "defaultProfilePict" ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain' : chatInfo.profilePict,
+                chatInfo.profilePict == "defaultProfilePict"
+                    ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                    : chatInfo.profilePict,
               ),
             ),
           ),
