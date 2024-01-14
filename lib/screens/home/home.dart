@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/post/post.dart';
-import 'package:nuwunsewu/screens/post/upload.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
 
@@ -25,16 +24,6 @@ class Home extends StatelessWidget {
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Upload()),
-              );
-            },
-            tooltip: "Post",
-            child: const Icon(Icons.add),
-          ),
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
