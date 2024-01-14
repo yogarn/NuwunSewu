@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nuwunsewu/screens/chats/view_chat.dart';
+import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/services/utils.dart';
 import 'package:nuwunsewu/shared/loading.dart';
@@ -44,7 +45,6 @@ class _OtherProfileState extends State<OtherProfile> {
 
     getFollowerCount(widget.uidSender).then((count) {
       setState(() {
-        // print(count);
         followerCount = count;
       });
     });
@@ -52,7 +52,6 @@ class _OtherProfileState extends State<OtherProfile> {
     final currentUserID = FirebaseAuth.instance.currentUser!.uid;
     db.hasUserFollowAccount(widget.uidSender, currentUserID).then((following) {
       setState(() {
-        print(following);
         isFollowing = following;
       });
     });
@@ -77,8 +76,8 @@ class _OtherProfileState extends State<OtherProfile> {
         await db.followAccount(widget.uidSender, currentUserID);
       }
 
-      print(isFollowing);
-      print(followerCount);
+      // print(widget.uidSender);
+      // print(followerCount);
     });
   }
 
@@ -86,230 +85,403 @@ class _OtherProfileState extends State<OtherProfile> {
   Widget build(BuildContext context) {
     return loading
         ? Loading()
-        : MaterialApp(
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.purple,
-                brightness: Brightness.light,
+        : Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
+              title: Text('Detail Profile'),
+              backgroundColor: Colors.purple[100],
+              elevation: 0.0,
             ),
-            home: Scaffold(
-              backgroundColor: Colors.brown[50],
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  tooltip: 'Back',
-                  onPressed: () {
-                    // handle the press
-                    Navigator.pop(context);
-                  },
-                ),
-                title: Text('Detail Profile'),
-                backgroundColor: Colors.purple[100],
-                elevation: 0.0,
-              ),
-              body: ListView(
-                children: [
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                    child: Center(
-                      child: StreamBuilder<DocumentSnapshot>(
-                        stream:
-                            userCollection.doc(widget.uidSender).snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else {
-                            if (snapshot.hasData && snapshot.data!.exists) {
-                              Map<String, dynamic> userData =
-                                  snapshot.data!.data() as Map<String, dynamic>;
-
-                              if (userData['profilePicture'] !=
-                                  "defaultProfilePict") {
-                                return CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage: NetworkImage(
-                                    userData['profilePicture'],
-                                  ),
-                                );
-                              } else {
-                                return CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage: NetworkImage(
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain',
-                                  ),
-                                );
-                              }
-                            } else {
-                              return Text('Dokumen tidak ditemukan');
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+            body: StreamBuilder<DocumentSnapshot>(
+              stream: userCollection.doc(widget.uidSender).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    Map<String, dynamic> userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    return ListView(
                       children: [
                         Container(
-                            margin: EdgeInsets.all(10),
-                            child: Text('${followerCount} Follower')),
-                        Container(
-                            margin: EdgeInsets.all(10),
-                            child: Text('${followingCount} Following')),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 0, 10, 10),
-                        child: ElevatedButton(
-                          child: Text('Kirim Pesan'),
-                          onPressed: () async {
-                            String currentUserID = FirebaseAuth
-                                .instance
-                                .currentUser!
-                                .uid;
-                            String otherUserID = widget
-                                .uidSender;
-                            await startNewChat(currentUserID, otherUserID);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewChat(chatID: generateChatID(currentUserID, otherUserID), senderID: currentUserID, targetUserID: otherUserID,)
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Container(
-                          margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
-                          child: ElevatedButton(
-                              onPressed: _toggleFollowAccount,
-                              child: isFollowing
-                                  ? Text('Following')
-                                  : Text('Follow'))),
-                    ],
-                  ),
-                  StreamBuilder<DocumentSnapshot>(
-                    stream: userCollection.doc(widget.uidSender).snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text('');
-                      } else {
-                        if (snapshot.hasData && snapshot.data!.exists) {
-                          Map<String, dynamic> userData =
-                              snapshot.data!.data() as Map<String, dynamic>;
-                          if (userData['gender'] == 0) {
-                            gender = "Lainnya";
-                          } else if (userData['gender'] == 1) {
-                            gender = "Pria";
-                          } else if (userData['gender'] == 2) {
-                            gender = "Wanita";
-                          }
-
-                          try {
-                            umur = 2023 - userData['tahunLahir'];
-                            print('Umur: $umur tahun');
-                          } catch (e) {
-                            print('Error parsing tahunLahir: $e');
-                          }
-
-                          return Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                          child: Center(
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Nama',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                                Expanded(
+                                  child: CircleAvatar(
+                                    radius: 72,
+                                    backgroundImage: NetworkImage(
+                                      userData['profilePicture'],
                                     ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(
-                                        child: Text(userData['namaLengkap'])),
-                                  ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Username',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            userData['namaLengkap'],
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20.0),
+                                          ),
+                                          Text(
+                                            '@' + userData['username'],
+                                            style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontStyle: FontStyle.italic),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(
-                                        child: Text(userData['username'])),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Jenis Kelamin',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                      SizedBox(
+                                        height: 8,
                                       ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(child: Text(gender)),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        'Umur',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            flex: 1,
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  'Following',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(followingCount.toString()),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 40,
+                                          ),
+                                          Flexible(
+                                            flex: 1,
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  'Follower',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(followerCount.toString())
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                      child: Text(':'),
-                                    ),
-                                    Container(child: Text(umur.toString())),
-                                  ],
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Flexible(
+                                            child: ElevatedButton(
+                                              child: Text('Kirim Pesan'),
+                                              onPressed: () async {
+                                                String currentUserID =
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid;
+                                                String otherUserID =
+                                                    widget.uidSender;
+                                                await startNewChat(
+                                                    currentUserID, otherUserID);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ViewChat(
+                                                            chatID: generateChatID(
+                                                                currentUserID,
+                                                                otherUserID),
+                                                            senderID:
+                                                                currentUserID,
+                                                            targetUserID:
+                                                                otherUserID,
+                                                          )),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Flexible(
+                                            child: ElevatedButton(
+                                                onPressed: _toggleFollowAccount,
+                                                child: Text(isFollowing
+                                                    ? 'Following'
+                                                    : 'Follow')),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          );
-                        } else {
-                          return Text('Dokumen tidak ditemukan');
-                        }
-                      }
-                    },
-                  ),
-                ],
-              ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'About Me',
+                                style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(userData['aboutMe'] == null
+                                  ? ''
+                                  : userData['aboutMe']),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Text(
+                                'My Works',
+                                style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Works(context, widget.uidSender),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return Text('Dokumen tidak ditemukan');
+                }
+              },
             ),
           );
+  }
+}
+
+Widget Works(BuildContext context, String uidTarget) {
+  return DefaultTabController(
+    length: 2,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          child: TabBar(tabs: [
+            Tab(text: "All Posts"),
+            Tab(text: "Categorized"),
+          ]),
+        ),
+        Container(
+          //Add this to give height
+          height: MediaQuery.of(context).size.height,
+          child: TabBarView(children: [AllWorks(uidTarget: uidTarget,), CategorizedWorks()]),
+        ),
+      ],
+    ),
+  );
+}
+
+class AllWorks extends StatefulWidget {
+  final String uidTarget;
+  AllWorks({required this.uidTarget});
+
+  @override
+  _AllWorksState createState() => _AllWorksState();
+}
+
+class _AllWorksState extends State<AllWorks> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('postingan')
+          .orderBy('dateTime', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container();
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var post = snapshot.data!.docs[index];
+            var uidSender = post['uidSender'];
+
+            // cek uid pengirim sama dgn uid user
+            if (uidSender == widget.uidTarget) {
+              var title = post['title'];
+              var body = post['body'];
+              List<String>? imagePaths =
+                  (post['imagePaths'] as List<dynamic>).cast<String>();
+              var dateTime = post['dateTime'];
+              DateTime parsedDateTime =
+                  dateTime != null ? dateTime.toDate() : DateTime.now();
+              var postID = (snapshot.data!.docs[index].id);
+
+              return FutureBuilder<String>(
+                future: getNamaLengkap(uidSender),
+                builder: (context, namaLengkapSnapshot) {
+                  if (namaLengkapSnapshot.hasError) {
+                    return Text(
+                        'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                  }
+
+                  var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+
+                  return FutureBuilder<String>(
+                    future: getProfilePicture(uidSender),
+                    builder: (context, profilePictureSnapshot) {
+                      if (profilePictureSnapshot.hasError) {
+                        return Text(
+                            'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                      }
+
+                      var profilePicture = (profilePictureSnapshot.data ==
+                                  'defaultProfilePict'
+                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                              : profilePictureSnapshot.data) ??
+                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                      return PostWidget(
+                        title: title,
+                        body: body,
+                        imagePaths: imagePaths,
+                        uidSender: uidSender,
+                        dateTime: parsedDateTime,
+                        namaLengkap: namaLengkap,
+                        profilePicture: profilePicture,
+                        postID: postID,
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              // If postingan is a repost, check if the current user (your UID) reposted it
+              var repostsCollection = post.reference.collection('reposts');
+              var currentUserUid = widget.uidTarget;
+
+              return FutureBuilder<QuerySnapshot>(
+                future: repostsCollection.get(),
+                builder:
+                    (context, AsyncSnapshot<QuerySnapshot> repostsSnapshot) {
+                  if (repostsSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Container();
+                  }
+
+                  if (repostsSnapshot.hasError) {
+                    return Text('Error: ${repostsSnapshot.error}');
+                  }
+
+                  // Check if the current user's UID has a corresponding document in the reposts subcollection
+                  var currentUserRepost = repostsSnapshot.data!.docs
+                      .any((repostDoc) => repostDoc.id == currentUserUid);
+
+                  // If the current user reposted this post, fetch the reposted post details and display
+                  if (currentUserRepost) {
+                    // Get the ID of the reposted post
+                    // var repostedPostId = repostsSnapshot.data!.docs.first
+                    //     .id; // ini mengembalikan uid, bukan post id
+                    print('kerefresh');
+
+                    var title = post['title'];
+                    var body = post['body'];
+                    List<String>? imagePaths =
+                        (post['imagePaths'] as List<dynamic>).cast<String>();
+                    var dateTime = post['dateTime'];
+                    DateTime parsedDateTime =
+                        dateTime != null ? dateTime.toDate() : DateTime.now();
+                    var postID = (snapshot.data!.docs[index].id);
+
+                    return FutureBuilder<String>(
+                      future: getNamaLengkap(uidSender),
+                      builder: (context, namaLengkapSnapshot) {
+                        if (namaLengkapSnapshot.hasError) {
+                          return Text(
+                              'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                        }
+
+                        var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+
+                        return FutureBuilder<String>(
+                          future: getProfilePicture(uidSender),
+                          builder: (context, profilePictureSnapshot) {
+                            if (profilePictureSnapshot.hasError) {
+                              return Text(
+                                  'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                            }
+
+                            var profilePicture = (profilePictureSnapshot.data ==
+                                        'defaultProfilePict'
+                                    ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+                                    : profilePictureSnapshot.data) ??
+                                'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                            return Column(
+                              children: [
+                                Text('You Reposted'),
+                                PostWidget(
+                                  title: title,
+                                  body: body,
+                                  imagePaths: imagePaths,
+                                  uidSender: uidSender,
+                                  dateTime: parsedDateTime,
+                                  namaLengkap: namaLengkap,
+                                  profilePicture: profilePicture,
+                                  postID: postID,
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    // If the current user did not repost this post, return an empty container
+                    return Container();
+                  }
+                },
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+}
+
+class CategorizedWorks extends StatefulWidget {
+  const CategorizedWorks({Key? key}) : super(key: key);
+
+  @override
+  _CategorizedWorksState createState() => _CategorizedWorksState();
+}
+
+class _CategorizedWorksState extends State<CategorizedWorks> {
+  @override
+  Widget build(BuildContext context) {
+    return Text('test');
   }
 }

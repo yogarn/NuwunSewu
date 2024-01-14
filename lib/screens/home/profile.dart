@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile_picture.dart';
 import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/services/utils.dart';
@@ -52,13 +53,10 @@ class _ProfileState extends State<Profile> {
         : MaterialApp(
             theme: ThemeData(
               useMaterial3: true,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.purple,
-                brightness: Brightness.light,
-              ),
+              scaffoldBackgroundColor: Color(0x2e2b2b),
             ),
             home: Scaffold(
-              backgroundColor: Colors.brown[50],
+              backgroundColor: Color(0x2e2b2b),
               appBar: AppBar(
                 leading: widget.isRedirected
                     ? IconButton(
@@ -88,209 +86,150 @@ class _ProfileState extends State<Profile> {
                   ),
                 ],
               ),
-              body: ListView(
-                children: [
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                    child: Center(
-                      child: StreamBuilder<DocumentSnapshot>(
-                        stream: userCollection
-                            .doc(FirebaseAuth.instance.currentUser?.uid)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else {
-                            if (snapshot.hasData && snapshot.data!.exists) {
-                              Map<String, dynamic> userData =
-                                  snapshot.data!.data() as Map<String, dynamic>;
-                              if (userData['profilePicture'] !=
-                                  "defaultProfilePict") {
-                                return CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage: NetworkImage(
-                                    userData['profilePicture'],
-                                  ),
-                                );
-                              }
-                              return CircleAvatar(
-                                radius: 64,
-                                backgroundImage: NetworkImage(
-                                  'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain',
-                                ),
-                              );
-                            }
-                            return Text('Dokumen tidak ditemukan');
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(20),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                            margin: EdgeInsets.all(10),
-                            child: Text('${followerCount} Follower')),
-                        Container(
-                            margin: EdgeInsets.all(10),
-                            child: Text('${followingCount} Following')),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                      child: const Text('Edit Profile Picture'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ProfilePicture()),
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      StreamBuilder<User?>(
-                        stream: FirebaseAuth.instance.authStateChanges(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Text('');
-                          } else {
-                            User? user = snapshot.data;
-                            return Container(
-                              margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              body: StreamBuilder<DocumentSnapshot>(
+                stream: userCollection
+                    .doc(FirebaseAuth.instance.currentUser?.uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    if (snapshot.hasData && snapshot.data!.exists) {
+                      Map<String, dynamic> userData =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                      return ListView(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                            child: Center(
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Alamat Email',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0,
+                                  Expanded(
+                                    child: CircleAvatar(
+                                      radius: 72,
+                                      backgroundImage: NetworkImage(
+                                        userData['profilePicture'],
                                       ),
                                     ),
                                   ),
-                                  Container(child: Text(':   ${user!.email}')),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  StreamBuilder<DocumentSnapshot>(
-                    stream: userCollection
-                        .doc(FirebaseAuth.instance.currentUser?.uid)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text('');
-                      }
-                      if (snapshot.hasData && snapshot.data!.exists) {
-                        Map<String, dynamic> userData =
-                            snapshot.data!.data() as Map<String, dynamic>;
-                        if (userData['gender'] == 0) {
-                          gender = "Lainnya";
-                        } else if (userData['gender'] == 1) {
-                          gender = "Pria";
-                        } else if (userData['gender'] == 2) {
-                          gender = "Wanita";
-                        }
-
-                        try {
-                          umur = 2023 - userData['tahunLahir'];
-                          print('Umur: $umur tahun');
-                        } catch (e) {
-                          print('Error parsing tahunLahir: $e');
-                        }
-
-                        return Container(
-                          margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Nama',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0,
-                                      ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              userData['namaLengkap'],
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20.0),
+                                            ),
+                                            Text(
+                                              '@' + userData['username'],
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontStyle: FontStyle.italic),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'Following',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Text(followingCount
+                                                      .toString()),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 40,
+                                            ),
+                                            Flexible(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'Follower',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Text(followerCount.toString())
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        ElevatedButton(
+                                          child: const Text(
+                                              'Edit Profile Picture'),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ProfilePicture(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Container(
-                                    child:
-                                        Text(":   ${userData['namaLengkap']}"),
-                                  ),
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Username',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    child: Text(":   ${userData['username']}"),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Jenis Kelamin',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(child: Text(':   $gender')),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    child: Text(
-                                      'Umur',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(child: Text(':   $umur')),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
-                        );
-                      }
-                      return Text('Dokumen tidak ditemukan');
-                    },
-                  ),
-                ],
+                          Container(
+                            padding: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'About Me',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(userData['aboutMe'] == null
+                                    ? ''
+                                    : userData['aboutMe']),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Text(
+                                  'My Works',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Works(context, FirebaseAuth.instance.currentUser!.uid),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return Text('Dokumen tidak ditemukan');
+                  }
+                },
               ),
             ),
           );
