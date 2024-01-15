@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
@@ -64,11 +67,11 @@ class _FirstTabHomeState extends State<FirstTabHome> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           }
-      
+
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
-      
+
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
@@ -81,9 +84,9 @@ class _FirstTabHomeState extends State<FirstTabHome> {
               var dateTime = post['dateTime'];
               DateTime parsedDateTime =
                   dateTime != null ? dateTime.toDate() : DateTime.now();
-      
+
               var postID = (snapshot.data!.docs[index].id);
-      
+
               return FutureBuilder<String>(
                 future: getNamaLengkap(uidSender),
                 builder: (context, namaLengkapSnapshot) {
@@ -91,9 +94,9 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                     return Text(
                         'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                   }
-      
+
                   var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-      
+
                   return FutureBuilder<String>(
                     future: getProfilePicture(uidSender),
                     builder: (context, profilePictureSnapshot) {
@@ -101,13 +104,13 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                         return Text(
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
-      
+
                       var profilePicture = (profilePictureSnapshot.data ==
                                   'defaultProfilePict'
                               ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                               : profilePictureSnapshot.data) ??
                           'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-      
+
                       return PostWidget(
                         title: title,
                         body: body,
@@ -127,6 +130,25 @@ class _FirstTabHomeState extends State<FirstTabHome> {
         },
       ),
     );
+  }
+}
+
+Future<Uint8List> compressImage(String imageUrl) async {
+  // Download the image
+  final response = await http.get(Uri.parse(imageUrl));
+
+  if (response.statusCode == 200) {
+    final bytes = Uint8List.fromList(response.bodyBytes);
+    // Compress the image
+    final result = await FlutterImageCompress.compressWithList(
+      bytes,
+      minHeight: 640,
+      minWidth: 360,
+      quality: 6,
+    );
+    return result;
+  } else {
+    throw Exception('Failed to load image');
   }
 }
 
@@ -180,19 +202,33 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child:
-                    widget.imagePaths != null && widget.imagePaths!.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                widget.imagePaths![0],
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          )
-                        : Container(),
+                child: widget.imagePaths != null &&
+                        widget.imagePaths!.isNotEmpty
+                    ? FutureBuilder<Uint8List>(
+                        future: compressImage(widget.imagePaths![0]),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.memory(
+                                    snapshot.data!,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('No data');
+                            }
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        },
+                      )
+                    : Container(),
               ),
               Row(
                 children: [
@@ -227,7 +263,8 @@ class _PostWidgetState extends State<PostWidget> {
                         children: [
                           Text(
                             widget.title,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
                             widget.body,
@@ -302,13 +339,13 @@ class _SecondTabHomeState extends State<SecondTabHome> {
           if (followingSnapshot.connectionState == ConnectionState.waiting) {
             return Container(); // or a loading indicator
           }
-      
+
           if (followingSnapshot.hasError) {
             return Text('Error: ${followingSnapshot.error}');
           }
-      
+
           var followingList = followingSnapshot.data;
-      
+
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('postingan')
@@ -318,17 +355,17 @@ class _SecondTabHomeState extends State<SecondTabHome> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Container();
               }
-      
+
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
-      
+
               return ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   var post = snapshot.data!.docs[index];
                   var uidSender = post['uidSender'];
-      
+
                   // Check if the uidSender is in the following list
                   if (followingList!.contains(uidSender)) {
                     var title = post['title'];
@@ -339,7 +376,7 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                     DateTime parsedDateTime =
                         dateTime != null ? dateTime.toDate() : DateTime.now();
                     var postID = snapshot.data!.docs[index].id;
-      
+
                     return FutureBuilder<String>(
                       future: getNamaLengkap(uidSender),
                       builder: (context, namaLengkapSnapshot) {
@@ -347,9 +384,9 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                           return Text(
                               'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                         }
-      
+
                         var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-      
+
                         return FutureBuilder<String>(
                           future: getProfilePicture(uidSender),
                           builder: (context, profilePictureSnapshot) {
@@ -357,13 +394,13 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                               return Text(
                                   'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                             }
-      
+
                             var profilePicture = (profilePictureSnapshot.data ==
                                         'defaultProfilePict'
                                     ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                                     : profilePictureSnapshot.data) ??
                                 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-      
+
                             return PostWidget(
                               title: title,
                               body: body,
@@ -379,9 +416,10 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                       },
                     );
                   } else {
-                    var repostsCollection = post.reference.collection('reposts');
+                    var repostsCollection =
+                        post.reference.collection('reposts');
                     var currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-      
+
                     return FutureBuilder<QuerySnapshot>(
                       future: repostsCollection.get(),
                       builder: (context,
@@ -390,18 +428,19 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                             ConnectionState.waiting) {
                           return Container();
                         }
-      
+
                         if (repostsSnapshot.hasError) {
                           return Text('Error: ${repostsSnapshot.error}');
                         }
-      
+
                         // Check if there is any repost by the current user or by people you follow
                         var currentUserRepost = repostsSnapshot.data!.docs
                             .any((repostDoc) => repostDoc.id == currentUserUid);
-      
+
                         var followingReposts = repostsSnapshot.data!.docs.any(
-                            (repostDoc) => followingList.contains(repostDoc.id));
-      
+                            (repostDoc) =>
+                                followingList.contains(repostDoc.id));
+
                         if (currentUserRepost || followingReposts) {
                           var title = post['title'];
                           var body = post['body'];
@@ -415,9 +454,7 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                           var postID = (snapshot.data!.docs[index].id);
                           var uidSender = post['uidSender'];
                           print(uidSender);
-      
-                          
-      
+
                           // Get the UID of the user who reposted
                           var repostedUid = currentUserRepost
                               ? currentUserUid
@@ -425,7 +462,7 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                   .firstWhere((repostDoc) =>
                                       followingList.contains(repostDoc.id))
                                   .id;
-      
+
                           return FutureBuilder<String>(
                             future: getNamaLengkap(uidSender),
                             builder: (context, namaLengkapSnapshot) {
@@ -433,10 +470,10 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                 return Text(
                                     'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                               }
-      
+
                               var namaLengkap =
                                   namaLengkapSnapshot.data ?? 'null';
-      
+
                               return FutureBuilder<String>(
                                 future: getProfilePicture(uidSender),
                                 builder: (context, profilePictureSnapshot) {
@@ -444,14 +481,14 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                     return Text(
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
-      
+
                                   var profilePicture = (profilePictureSnapshot
                                                   .data ==
                                               'defaultProfilePict'
                                           ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                                           : profilePictureSnapshot.data) ??
                                       'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-      
+
                                   return FutureBuilder<String>(
                                     future: getNamaLengkap(repostedUid),
                                     builder: (context, namaLengkapSnapshot) {
@@ -459,15 +496,15 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                           ConnectionState.waiting) {
                                         return Container(); // or a loading indicator
                                       }
-      
+
                                       if (namaLengkapSnapshot.hasError) {
                                         return Text(
                                             'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                                       }
-      
+
                                       var namaLengkapRepost =
                                           namaLengkapSnapshot.data ?? 'null';
-      
+
                                       return Column(
                                         children: [
                                           Text(
@@ -547,17 +584,17 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           }
-      
+
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
-      
+
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               var post = snapshot.data!.docs[index];
               var uidSender = post['uidSender'];
-      
+
               // cek uid pengirim sama dgn uid user
               if (uidSender == FirebaseAuth.instance.currentUser?.uid) {
                 var title = post['title'];
@@ -568,7 +605,7 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                 DateTime parsedDateTime =
                     dateTime != null ? dateTime.toDate() : DateTime.now();
                 var postID = (snapshot.data!.docs[index].id);
-      
+
                 return FutureBuilder<String>(
                   future: getNamaLengkap(uidSender),
                   builder: (context, namaLengkapSnapshot) {
@@ -576,9 +613,9 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                       return Text(
                           'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                     }
-      
+
                     var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-      
+
                     return FutureBuilder<String>(
                       future: getProfilePicture(uidSender),
                       builder: (context, profilePictureSnapshot) {
@@ -586,13 +623,13 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                           return Text(
                               'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                         }
-      
+
                         var profilePicture = (profilePictureSnapshot.data ==
                                     'defaultProfilePict'
                                 ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                                 : profilePictureSnapshot.data) ??
                             'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-      
+
                         return PostWidget(
                           title: title,
                           body: body,
@@ -611,7 +648,7 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                 // If postingan is a repost, check if the current user (your UID) reposted it
                 var repostsCollection = post.reference.collection('reposts');
                 var currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-      
+
                 return FutureBuilder<QuerySnapshot>(
                   future: repostsCollection.get(),
                   builder:
@@ -620,22 +657,22 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                         ConnectionState.waiting) {
                       return Container();
                     }
-      
+
                     if (repostsSnapshot.hasError) {
                       return Text('Error: ${repostsSnapshot.error}');
                     }
-      
+
                     // Check if the current user's UID has a corresponding document in the reposts subcollection
                     var currentUserRepost = repostsSnapshot.data!.docs
                         .any((repostDoc) => repostDoc.id == currentUserUid);
-      
+
                     // If the current user reposted this post, fetch the reposted post details and display
                     if (currentUserRepost) {
                       // Get the ID of the reposted post
                       // var repostedPostId = repostsSnapshot.data!.docs.first
                       //     .id; // ini mengembalikan uid, bukan post id
                       print(post);
-      
+
                       var title = post['title'];
                       var body = post['body'];
                       List<String>? imagePaths =
@@ -644,7 +681,7 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                       DateTime parsedDateTime =
                           dateTime != null ? dateTime.toDate() : DateTime.now();
                       var postID = (snapshot.data!.docs[index].id);
-      
+
                       return FutureBuilder<String>(
                         future: getNamaLengkap(uidSender),
                         builder: (context, namaLengkapSnapshot) {
@@ -652,9 +689,9 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                             return Text(
                                 'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                           }
-      
+
                           var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-      
+
                           return FutureBuilder<String>(
                             future: getProfilePicture(uidSender),
                             builder: (context, profilePictureSnapshot) {
@@ -662,13 +699,14 @@ class _ThirdTabHomeState extends State<ThirdTabHome> {
                                 return Text(
                                     'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                               }
-      
-                              var profilePicture = (profilePictureSnapshot.data ==
+
+                              var profilePicture = (profilePictureSnapshot
+                                              .data ==
                                           'defaultProfilePict'
                                       ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                                       : profilePictureSnapshot.data) ??
                                   'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-      
+
                               return Column(
                                 children: [
                                   Text('You Reposted'),

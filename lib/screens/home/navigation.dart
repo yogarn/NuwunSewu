@@ -62,38 +62,6 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                 : const Text(''),
           ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: showUploadPage
-            ? Container(
-                margin: const EdgeInsets.only(bottom: 45),
-                height: 30,
-                width: 30,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    setShowUploadPage(!showUploadPage);
-                  },
-                  backgroundColor: Colors.black,
-                  tooltip: "Post",
-                  shape: const CircleBorder(),
-                  child: Icon(Icons.keyboard_arrow_down_outlined,
-                      color: Colors.grey[850], size: 30),
-                ),
-              )
-            : Container(
-                margin: const EdgeInsets.only(top: 20),
-                height: 90,
-                width: 90,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    setShowUploadPage(!showUploadPage);
-                  },
-                  backgroundColor: Colors.black,
-                  tooltip: "Post",
-                  shape: const CircleBorder(),
-                  child: Icon(Icons.add_rounded,
-                      color: Colors.grey[850], size: 80),
-                ),
-              ),
         bottomNavigationBar: Container(
           height: 60,
           decoration: BoxDecoration(color: Colors.black),
@@ -137,7 +105,50 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                         ),
                 ),
               ),
-              Expanded(flex: 5, child: Container()),
+              Expanded(
+                flex: 5,
+                child: IconButton(
+                  onPressed: () {
+                    setShowUploadPage(!showUploadPage);
+                  },
+                  icon: Icon(
+                    Icons.add,
+                    size: 35,
+                  ),
+                ),
+              ),
+
+              //   showUploadPage
+              // ? Container(
+              //     margin: const EdgeInsets.only(bottom: 45),
+              //     height: 30,
+              //     width: 30,
+              //     child: FloatingActionButton(
+              //       onPressed: () {
+              //         setShowUploadPage(!showUploadPage);
+              //       },
+              //       backgroundColor: Colors.black,
+              //       tooltip: "Post",
+              //       shape: const CircleBorder(),
+              //       child: Icon(Icons.keyboard_arrow_down_outlined,
+              //           color: Colors.grey[850], size: 30),
+              //     ),
+              //   )
+              // : Container(
+              //     margin: const EdgeInsets.only(top: 20),
+              //     height: 90,
+              //     width: 90,
+              //     child: FloatingActionButton(
+              //       onPressed: () {
+              //         setShowUploadPage(!showUploadPage);
+              //       },
+              //       backgroundColor: Colors.black,
+              //       tooltip: "Post",
+              //       shape: const CircleBorder(),
+              //       child: Icon(Icons.add_rounded,
+              //           color: Colors.grey[850], size: 80),
+              //     ),
+              //   ),
               Expanded(
                 flex: 5,
                 child: IconButton(

@@ -1,8 +1,54 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+
+class ImageHelper {
+  final ImagePicker _imagePicker;
+
+  final ImageCropper _imageCropper;
+
+  ImageHelper({
+    ImagePicker? imagePicker,
+    ImageCropper? imageCropper,
+  })  : _imagePicker = imagePicker ?? ImagePicker(),
+        _imageCropper = imageCropper ?? ImageCropper();
+
+    Future<List<File>> pickImage({
+    ImageSource source = ImageSource.gallery,
+    int imageQuality = 100,
+    bool multiple = false,
+  }) async {
+    List<XFile>? xFiles;
+    if (multiple) {
+      xFiles = await _imagePicker.pickMultiImage(imageQuality: imageQuality);
+    } else {
+      XFile? file = await _imagePicker.pickImage(
+        source: source,
+        imageQuality: imageQuality,
+      );
+      xFiles = file != null ? [file] : null;
+    }
+
+    if (xFiles != null) {
+      return xFiles.map((xFile) => File(xFile.path)).toList();
+    } else {
+      return [];
+    }
+  }
+
+  Future<CroppedFile?> crop({
+    required XFile file,
+    CropStyle cropStyle = CropStyle.rectangle,
+  }) async =>
+      await _imageCropper.cropImage(
+        cropStyle: cropStyle,
+        sourcePath: file.path,
+      );
+}
 
 pickImage(ImageSource source) async {
   final ImagePicker _imagePicker = ImagePicker();
@@ -132,8 +178,7 @@ Future<int> getFollowerCount(String uidSaya) async {
 Future<List<DocumentSnapshot>> searchPosts(String query) async {
   QuerySnapshot<Map<String, dynamic>> searchResults = await FirebaseFirestore
       .instance
-      .collection(
-          'postingan')
+      .collection('postingan')
       .where('title', isGreaterThanOrEqualTo: query)
       .get();
 
@@ -149,7 +194,8 @@ String generateChatID(String userID1, String userID2) {
 
 Future<bool> doesChatExist(String userID1, String userID2) async {
   String chatID = generateChatID(userID1, userID2);
-  var chatDoc = await FirebaseFirestore.instance.collection('chats').doc(chatID).get();
+  var chatDoc =
+      await FirebaseFirestore.instance.collection('chats').doc(chatID).get();
   return chatDoc.exists;
 }
 
