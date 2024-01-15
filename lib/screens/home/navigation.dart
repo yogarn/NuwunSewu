@@ -64,7 +64,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
         ),
         bottomNavigationBar: Container(
           height: 60,
-          decoration: BoxDecoration(color: Colors.black),
+          decoration: BoxDecoration(color: Colors.grey[850]),
           child: Row(
             children: [
               Expanded(
@@ -79,10 +79,12 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                           color: Colors.purple,
                           size: 35,
                         )
-                      : Icon(
-                          Icons.home_outlined,
-                          color: Colors.grey[850],
-                          size: 35,
+                      : Container(
+                          height: 35,
+                          child: Image.asset(
+                            'lib/icons/house.png',
+                            color: Colors.grey[800],
+                          ),
                         ),
                 ),
               ),
@@ -93,15 +95,19 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                     if (!showUploadPage) _navigateHomePage(1);
                   },
                   icon: _selectedPageIndex == 1
-                      ? Icon(
-                          Icons.saved_search_rounded,
-                          color: Colors.purple,
-                          size: 35,
+                      ? Container(
+                          height: 30,
+                          child: Image.asset(
+                            'lib/icons/magnifying.png',
+                            color: Colors.purple,
+                          ),
                         )
-                      : Icon(
-                          Icons.search,
-                          color: Colors.grey[850],
-                          size: 35,
+                      : Container(
+                          height: 25,
+                          child: Image.asset(
+                            'lib/icons/loupe.png',
+                            color: Colors.grey[800],
+                          ),
                         ),
                 ),
               ),
@@ -113,42 +119,10 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                   },
                   icon: Icon(
                     Icons.add,
-                    size: 35,
+                    size: 45,
                   ),
                 ),
               ),
-
-              //   showUploadPage
-              // ? Container(
-              //     margin: const EdgeInsets.only(bottom: 45),
-              //     height: 30,
-              //     width: 30,
-              //     child: FloatingActionButton(
-              //       onPressed: () {
-              //         setShowUploadPage(!showUploadPage);
-              //       },
-              //       backgroundColor: Colors.black,
-              //       tooltip: "Post",
-              //       shape: const CircleBorder(),
-              //       child: Icon(Icons.keyboard_arrow_down_outlined,
-              //           color: Colors.grey[850], size: 30),
-              //     ),
-              //   )
-              // : Container(
-              //     margin: const EdgeInsets.only(top: 20),
-              //     height: 90,
-              //     width: 90,
-              //     child: FloatingActionButton(
-              //       onPressed: () {
-              //         setShowUploadPage(!showUploadPage);
-              //       },
-              //       backgroundColor: Colors.black,
-              //       tooltip: "Post",
-              //       shape: const CircleBorder(),
-              //       child: Icon(Icons.add_rounded,
-              //           color: Colors.grey[850], size: 80),
-              //     ),
-              //   ),
               Expanded(
                 flex: 5,
                 child: IconButton(
@@ -163,7 +137,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                         )
                       : Icon(
                           Icons.chat_bubble_outline,
-                          color: Colors.grey[850],
+                          color: Color.fromARGB(255, 64, 63, 63),
                           size: 35,
                         ),
                 ),
@@ -180,10 +154,12 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                           color: Colors.purple,
                           size: 35,
                         )
-                      : Icon(
-                          Icons.person_outline,
-                          color: Colors.grey[850],
-                          size: 35,
+                      : Container(
+                          height: 25,
+                          child: Image.asset(
+                            'lib/icons/user.png',
+                            color: Colors.grey[800],
+                          ),
                         ),
                 ),
               ),
@@ -244,7 +220,8 @@ class _UploadState extends State<Upload> {
             home: Container(
               margin: EdgeInsets.fromLTRB(10.0, 135.0, 10.0, 20.0),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20), color: Colors.black),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.grey[850]),
               padding: const EdgeInsets.symmetric(
                 vertical: 20.0,
                 horizontal: 50.0,
@@ -349,6 +326,7 @@ class _UploadState extends State<Upload> {
                                   }),
                                   style: ElevatedButton.styleFrom(
                                     padding: EdgeInsets.zero,
+                                    backgroundColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -397,6 +375,7 @@ class _UploadState extends State<Upload> {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.zero,
+                          backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -454,6 +433,7 @@ class _UploadState extends State<Upload> {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.zero,
+                          backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
