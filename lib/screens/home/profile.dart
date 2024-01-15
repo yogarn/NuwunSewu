@@ -27,6 +27,8 @@ class _ProfileState extends State<Profile> {
   int followingCount = 0;
   int followerCount = 0;
 
+  ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -98,6 +100,7 @@ class _ProfileState extends State<Profile> {
                       Map<String, dynamic> userData =
                           snapshot.data!.data() as Map<String, dynamic>;
                       return ListView(
+                        controller: _scrollController,
                         children: [
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
