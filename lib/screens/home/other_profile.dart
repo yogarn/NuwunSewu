@@ -122,7 +122,7 @@ class _OtherProfileState extends State<OtherProfile> {
                         controller: _scrollController,
                         children: [
                           Container(
-                            margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                            margin: EdgeInsets.fromLTRB(25, 40, 20, 20),
                             child: Center(
                               child: Row(
                                 children: [
@@ -140,132 +140,139 @@ class _OtherProfileState extends State<OtherProfile> {
                                   ),
                                   Flexible(
                                     flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              userData['namaLengkap'],
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20.0),
-                                            ),
-                                            Text(
-                                              '@' + userData['username'],
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontStyle: FontStyle.italic),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Flexible(
-                                              child: Column(
-                                                children: [],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 40,
-                                            ),
-                                            Flexible(
-                                              flex: 1,
-                                              child: Column(
-                                                children: [
-                                                  
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              flex: 1,
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        'Following',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold),
+                                    child: Container(
+                                      width: 500,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Container(
+                                            // margin: EdgeInsets.fromLTRB(
+                                            //     25, 0, 0, 0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  userData['namaLengkap'],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20.0),
+                                                ),
+                                                Text(
+                                                  '@' + userData['username'],
+                                                  style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Column(
+                                                            children: [
+                                                              Text(
+                                                                'Following',
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              Text(followingCount
+                                                                  .toString()),
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
-                                                      Text(followingCount
-                                                      .toString()),
-                                                    ],
-                                                  ),
-                                                  
-                                                  ElevatedButton(
-                                                    child: Text('Chat'),
-                                                    onPressed: () async {
-                                                      String currentUserID =
-                                                          FirebaseAuth.instance
-                                                              .currentUser!.uid;
-                                                      String otherUserID =
-                                                          widget.uidSender;
-                                                      await startNewChat(
-                                                          currentUserID,
-                                                          otherUserID);
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    ViewChat(
-                                                                      chatID: generateChatID(
-                                                                          currentUserID,
-                                                                          otherUserID),
-                                                                      senderID:
-                                                                          currentUserID,
-                                                                      targetUserID:
-                                                                          otherUserID,
-                                                                    )),
-                                                      );
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 1,
-                                              child: Column(
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        'Follower',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 40,
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Column(
+                                                            children: [
+                                                              Text(
+                                                                'Follower',
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              Text(followerCount
+                                                              .toString()),
+                                                            ],
+                                                          ),
+                                                          
+                                                        ],
                                                       ),
-                                                      Text(followerCount.toString()),
-                                                    ],
-                                                  ),
-                                                  
-                                                  ElevatedButton(
-                                                      onPressed:
-                                                          _toggleFollowAccount,
-                                                      child: Text(isFollowing
-                                                          ? 'Following'
-                                                          : 'Follow')),
-                                                ],
-                                              ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                // flex: 1,
+                                                child: ElevatedButton(
+                                                  child: Text('Chat'),
+                                                  onPressed: () async {
+                                                    String currentUserID =
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid;
+                                                    String otherUserID =
+                                                        widget.uidSender;
+                                                    await startNewChat(
+                                                        currentUserID,
+                                                        otherUserID);
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ViewChat(
+                                                                chatID: generateChatID(
+                                                                    currentUserID,
+                                                                    otherUserID),
+                                                                senderID:
+                                                                    currentUserID,
+                                                                targetUserID:
+                                                                    otherUserID,
+                                                              )),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 8,
+                                              ),
+                                              Expanded(
+                                                // flex: 1,
+                                                child: ElevatedButton(
+                                                    onPressed:
+                                                        _toggleFollowAccount,
+                                                    child: Text(isFollowing
+                                                        ? 'Following'
+                                                        : 'Follow')),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
