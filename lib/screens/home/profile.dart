@@ -55,10 +55,10 @@ class _ProfileState extends State<Profile> {
         : MaterialApp(
             theme: ThemeData(
               useMaterial3: true,
-              scaffoldBackgroundColor: Color(0x2e2b2b),
+              brightness: Brightness.dark,
             ),
             home: Scaffold(
-              backgroundColor: Color(0x2e2b2b),
+              backgroundColor: Color(0xFF2e2b2b),
               appBar: AppBar(
                 leading: widget.isRedirected
                     ? IconButton(
@@ -70,7 +70,7 @@ class _ProfileState extends State<Profile> {
                       )
                     : null,
                 title: Text('Profile'),
-                backgroundColor: Colors.purple[100],
+                backgroundColor: Color(0xFF131313),
                 elevation: 0.0,
                 actions: [
                   TextButton.icon(
@@ -83,8 +83,14 @@ class _ProfileState extends State<Profile> {
                       });
                       await _auth.signOut();
                     },
-                    icon: Icon(Icons.person),
-                    label: Text('Logout'),
+                    icon: Icon(
+                      Icons.person,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -177,6 +183,9 @@ class _ProfileState extends State<Profile> {
                                             )
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
                                         ElevatedButton(
                                           child: const Text(
                                               'Edit Profile Picture'),
@@ -208,9 +217,7 @@ class _ProfileState extends State<Profile> {
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                Text(userData['aboutMe'] == null
-                                    ? ''
-                                    : userData['aboutMe']),
+                                AboutMeWidget(userData: userData),
                                 SizedBox(
                                   height: 15,
                                 ),
@@ -223,7 +230,8 @@ class _ProfileState extends State<Profile> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Works(context, FirebaseAuth.instance.currentUser!.uid),
+                                Works(context,
+                                    FirebaseAuth.instance.currentUser!.uid),
                               ],
                             ),
                           ),
@@ -236,5 +244,68 @@ class _ProfileState extends State<Profile> {
               ),
             ),
           );
+  }
+}
+
+class AboutMeWidget extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  AboutMeWidget({required this.userData});
+
+  @override
+  _AboutMeWidgetState createState() => _AboutMeWidgetState();
+}
+
+class _AboutMeWidgetState extends State<AboutMeWidget> {
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isExpanded
+                  ? widget.userData['aboutMe']
+                  : widget.userData['aboutMe'].substring(0, 100),
+              maxLines: isExpanded ? null : 2,
+              overflow:
+                  isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            ),
+            if (!isExpanded)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isExpanded = true;
+                  });
+                },
+                child: Text(
+                  'View more...',
+                  style: TextStyle(
+                    color: Colors.purple[100], // Ganti warna sesuai kebutuhan
+                  ),
+                ),
+              ),
+            if (isExpanded)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isExpanded = false;
+                  });
+                },
+                child: Text(
+                  'Hide',
+                  style: TextStyle(
+                    color: Colors.purple[100], // Ganti warna sesuai kebutuhan
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 }

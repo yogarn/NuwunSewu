@@ -84,196 +84,273 @@ class _OtherProfileState extends State<OtherProfile> {
     });
   }
 
+  bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return loading
         ? Loading()
-        : Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                tooltip: 'Back',
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              title: Text('Detail Profile'),
-              backgroundColor: Colors.purple[100],
-              elevation: 0.0,
+        : MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              brightness: Brightness.dark,
             ),
-            body: StreamBuilder<DocumentSnapshot>(
-              stream: userCollection.doc(widget.uidSender).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else {
-                  if (snapshot.hasData && snapshot.data!.exists) {
-                    Map<String, dynamic> userData =
-                        snapshot.data!.data() as Map<String, dynamic>;
-                    return ListView(
-                      controller: _scrollController,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                          child: Center(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: CircleAvatar(
-                                    radius: 72,
-                                    backgroundImage: NetworkImage(
-                                      userData['profilePicture'],
+            home: Scaffold(
+              backgroundColor: Color(0xFF2e2b2b),
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  tooltip: 'Back',
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                title: Text('Detail Profile'),
+                backgroundColor: Color(0xFF131313),
+                elevation: 0.0,
+              ),
+              body: StreamBuilder<DocumentSnapshot>(
+                stream: userCollection.doc(widget.uidSender).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    if (snapshot.hasData && snapshot.data!.exists) {
+                      Map<String, dynamic> userData =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                      return ListView(
+                        controller: _scrollController,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                            child: Center(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    flex: 1,
+                                    child: CircleAvatar(
+                                      radius: 72,
+                                      backgroundImage: NetworkImage(
+                                        userData['profilePicture'],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            userData['namaLengkap'],
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20.0),
-                                          ),
-                                          Text(
-                                            '@' + userData['username'],
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Flexible(
-                                            flex: 1,
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  'Following',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(followingCount.toString()),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 40,
-                                          ),
-                                          Flexible(
-                                            flex: 1,
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  'Follower',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(followerCount.toString())
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Flexible(
-                                            child: ElevatedButton(
-                                              child: Text('Kirim Pesan'),
-                                              onPressed: () async {
-                                                String currentUserID =
-                                                    FirebaseAuth.instance
-                                                        .currentUser!.uid;
-                                                String otherUserID =
-                                                    widget.uidSender;
-                                                await startNewChat(
-                                                    currentUserID, otherUserID);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ViewChat(
-                                                            chatID: generateChatID(
-                                                                currentUserID,
-                                                                otherUserID),
-                                                            senderID:
-                                                                currentUserID,
-                                                            targetUserID:
-                                                                otherUserID,
-                                                          )),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Flexible(
-                                            child: ElevatedButton(
-                                                onPressed: _toggleFollowAccount,
-                                                child: Text(isFollowing
-                                                    ? 'Following'
-                                                    : 'Follow')),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                  SizedBox(
+                                    width: 20,
                                   ),
+                                  Flexible(
+                                    flex: 2,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              userData['namaLengkap'],
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20.0),
+                                            ),
+                                            Text(
+                                              '@' + userData['username'],
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontStyle: FontStyle.italic),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              child: Column(
+                                                children: [],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 40,
+                                            ),
+                                            Flexible(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        'Following',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold),
+                                                      ),
+                                                      Text(followingCount
+                                                      .toString()),
+                                                    ],
+                                                  ),
+                                                  
+                                                  ElevatedButton(
+                                                    child: Text('Chat'),
+                                                    onPressed: () async {
+                                                      String currentUserID =
+                                                          FirebaseAuth.instance
+                                                              .currentUser!.uid;
+                                                      String otherUserID =
+                                                          widget.uidSender;
+                                                      await startNewChat(
+                                                          currentUserID,
+                                                          otherUserID);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    ViewChat(
+                                                                      chatID: generateChatID(
+                                                                          currentUserID,
+                                                                          otherUserID),
+                                                                      senderID:
+                                                                          currentUserID,
+                                                                      targetUserID:
+                                                                          otherUserID,
+                                                                    )),
+                                                      );
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        'Follower',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold),
+                                                      ),
+                                                      Text(followerCount.toString()),
+                                                    ],
+                                                  ),
+                                                  
+                                                  ElevatedButton(
+                                                      onPressed:
+                                                          _toggleFollowAccount,
+                                                      child: Text(isFollowing
+                                                          ? 'Following'
+                                                          : 'Follow')),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(20, 40, 20, 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'About Me',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isExpanded
+                                          ? userData['aboutMe']
+                                          : userData['aboutMe']
+                                              .substring(0, 100),
+                                      maxLines: isExpanded ? null : 2,
+                                      overflow: isExpanded
+                                          ? TextOverflow.visible
+                                          : TextOverflow.ellipsis,
+                                    ),
+                                    if (!isExpanded)
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isExpanded = true;
+                                          });
+                                        },
+                                        child: Text(
+                                          'View more...',
+                                          style: TextStyle(
+                                            color: Colors.purple[
+                                                100], // Ganti warna sesuai kebutuhan
+                                          ),
+                                        ),
+                                      ),
+                                    if (isExpanded)
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isExpanded = false;
+                                          });
+                                        },
+                                        child: Text(
+                                          'Hide',
+                                          style: TextStyle(
+                                            color: Colors.purple[
+                                                100], // Ganti warna sesuai kebutuhan
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Text(
+                                  'My Works',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Works(context, widget.uidSender),
                               ],
                             ),
                           ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(20, 40, 20, 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'About Me',
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(userData['aboutMe'] == null
-                                  ? ''
-                                  : userData['aboutMe']),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                'My Works',
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Works(context, widget.uidSender),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
+                        ],
+                      );
+                    }
+                    return Text('Dokumen tidak ditemukan');
                   }
-                  return Text('Dokumen tidak ditemukan');
-                }
-              },
+                },
+              ),
             ),
           );
   }

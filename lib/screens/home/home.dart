@@ -171,7 +171,7 @@ class _PostWidgetState extends State<PostWidget> {
         margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: Colors.purple[100],
+          color: Color(0xFF3f3c3c),
         ),
         child: Container(
           margin: const EdgeInsets.all(15),
@@ -226,11 +226,11 @@ class _PostWidgetState extends State<PostWidget> {
                         children: [
                           Text(
                             widget.title,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
                             widget.body,
-                            maxLines: 2,
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Column(
@@ -241,7 +241,7 @@ class _PostWidgetState extends State<PostWidget> {
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,
-                                  color: Colors.black,
+                                  // color: Colors.black,
                                 ),
                               ),
                               Text(
@@ -249,7 +249,7 @@ class _PostWidgetState extends State<PostWidget> {
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300,
-                                  color: Colors.black,
+                                  // color: Colors.black,
                                 ),
                               ),
                             ],
