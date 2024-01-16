@@ -44,6 +44,7 @@ class _NavigasiState extends State<Navigasi> {
         onTap: navigateHomePage,
         items: [
           BottomNavigationBarItem(
+              backgroundColor: Colors.black,
               icon: _selectedPageIndex == 0
                   ? const Icon(Icons.home_filled)
                   : SizedBox(

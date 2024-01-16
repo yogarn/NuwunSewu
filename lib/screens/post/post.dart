@@ -204,6 +204,7 @@ class _ExpandPostState extends State<ExpandPost> {
             ),
             home: Scaffold(
               appBar: AppBar(
+                backgroundColor: Colors.black,
                 surfaceTintColor: Colors.transparent,
                 title: Text('Expand Post'),
                 leading: IconButton(
@@ -218,7 +219,6 @@ class _ExpandPostState extends State<ExpandPost> {
                 margin: EdgeInsets.all(20),
                 child: ListView(
                   children: [
-                    Text(widget.postID),
                     StreamBuilder<DocumentSnapshot>(
                       stream:
                           widget.userCollection.doc(widget.postID).snapshots(),
@@ -248,31 +248,28 @@ class _ExpandPostState extends State<ExpandPost> {
                                     Text(
                                       postingan['title'],
                                       style: TextStyle(
-                                          fontSize: 18.0,
+                                          fontSize: 20.0,
                                           fontFamily: "Times New Roman",
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
                                       namaLengkap,
                                       style: TextStyle(
-                                          fontSize: 12.0,
+                                          fontSize: 16.0,
                                           fontStyle: FontStyle.italic,
                                           fontFamily: "Times New Roman",
                                           fontWeight: FontWeight.w400),
                                     ),
-                                    SizedBox(
-                                      width: 20,
-                                    ),
                                     Text(
                                       postingan['dateTime'].toDate().toString(),
                                       style: TextStyle(
-                                          fontSize: 12.0,
+                                          fontSize: 16.0,
                                           fontStyle: FontStyle.italic,
                                           fontFamily: "Times New Roman",
                                           fontWeight: FontWeight.w300),
                                     ),
                                     SizedBox(
-                                      height: 20,
+                                      height: 8,
                                     ),
                                     postingan['imagePaths'] != null &&
                                             postingan['imagePaths'].isNotEmpty
@@ -283,7 +280,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                                 .map((imagePath) {
                                               return Container(
                                                 margin: EdgeInsets.fromLTRB(
-                                                    0, 0, 0, 20),
+                                                    0, 0, 0, 8),
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(20),
@@ -303,9 +300,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                         fontFamily: "Times New Roman",
                                       ),
                                     ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
                                     Row(
                                       children: [
                                         Column(
@@ -314,11 +308,16 @@ class _ExpandPostState extends State<ExpandPost> {
                                               onPressed: () async {
                                                 await _toggleLikePost();
                                               },
-                                              icon: isLiked
-                                                  ? const Icon(Icons.thumb_up,
-                                                      color: Colors.purple)
-                                                  : const Icon(
-                                                      Icons.thumb_up_outlined),
+                                              icon: Container(
+                                                height: 25,
+                                                child: Icon(
+                                                    Icons
+                                                        .keyboard_arrow_up_sharp,
+                                                    size: 40,
+                                                    color: isLiked
+                                                        ? Colors.purple
+                                                        : Colors.grey),
+                                              ),
                                             ),
                                             Text(likeCount.toString()),
                                           ],
@@ -329,11 +328,17 @@ class _ExpandPostState extends State<ExpandPost> {
                                               onPressed: () async {
                                                 await _toggleDislikePost();
                                               },
-                                              icon: isDisliked
-                                                  ? const Icon(Icons.thumb_down,
-                                                      color: Colors.purple)
-                                                  : const Icon(Icons
-                                                      .thumb_down_outlined),
+                                              icon: Container(
+                                                height: 25,
+                                                child: Icon(
+                                                  Icons
+                                                      .keyboard_arrow_down_sharp,
+                                                  size: 40,
+                                                  color: isDisliked
+                                                      ? Colors.purple
+                                                      : Colors.grey,
+                                                ),
+                                              ),
                                             ),
                                             Text(dislikeCount.toString()),
                                           ],
@@ -344,11 +349,14 @@ class _ExpandPostState extends State<ExpandPost> {
                                               onPressed: () async {
                                                 await _toggleRepost();
                                               },
-                                              icon: isReposted
-                                                  ? const Icon(Icons.share,
-                                                      color: Colors.purple)
-                                                  : const Icon(
-                                                      Icons.share_outlined),
+                                              icon: SizedBox(
+                                                height: 25,
+                                                child: Image.asset(
+                                                    'lib/icons/refresh.png',
+                                                    color: isReposted
+                                                        ? Colors.purple
+                                                        : Colors.grey),
+                                              ),
                                             ),
                                             Text(repostCount.toString()),
                                           ],
@@ -356,9 +364,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                       ],
                                     ),
                                     Divider(),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
                                     Row(
                                       children: [
                                         Row(
@@ -366,12 +371,17 @@ class _ExpandPostState extends State<ExpandPost> {
                                             Text(commentCount.toString()),
                                             IconButton(
                                               onPressed: () {},
-                                              icon: const Icon(
-                                                  Icons.chat_bubble_rounded),
+                                              icon: SizedBox(
+                                                height: 25,
+                                                child: Image.asset(
+                                                  'lib/icons/chat.png',
+                                                  color: Colors.purple,
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                        Text('Komentar',
+                                        Text('Comment',
                                             style: TextStyle(
                                               fontSize: 16.0,
                                               fontFamily: "Times New Roman",
@@ -393,77 +403,72 @@ class _ExpandPostState extends State<ExpandPost> {
                                             controller:
                                                 widget.commentController,
                                             decoration: InputDecoration(
-                                              hintText: "Tulis Komentar",
+                                              hintText: "Add Comment",
                                               border: OutlineInputBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(21),
+                                                    BorderRadius.circular(5),
                                                 borderSide: BorderSide(
                                                   color: Colors.white,
                                                   width: 1,
                                                   style: BorderStyle.solid,
                                                 ),
                                               ),
-                                              suffixIcon: Container(
-                                                margin: EdgeInsets.all(8),
-                                                child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    minimumSize: Size(50, 50),
-                                                    side: BorderSide.none,
-                                                    backgroundColor:
-                                                        Colors.transparent,
+                                              suffixIcon: InkWell(
+                                                onTap: () async {
+                                                  // Your onPressed logic here
+                                                  if (_formKey.currentState !=
+                                                      null) {
+                                                    if (_formKey.currentState!
+                                                        .validate()) {
+                                                      setState(() {
+                                                        loading = true;
+                                                        commentCount += 1;
+                                                      });
+                                                      try {
+                                                        await db.tambahKomentar(
+                                                            widget.postID,
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                            widget
+                                                                .commentController
+                                                                .text);
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'postingan')
+                                                            .doc(widget.postID)
+                                                            .update({
+                                                          'commentsCount':
+                                                              FieldValue
+                                                                  .increment(1),
+                                                        });
+                                                        widget.commentController
+                                                            .text = '';
+                                                        setState(() {
+                                                          loading = false;
+                                                        });
+                                                      } catch (e) {
+                                                        setState(() {
+                                                          error =
+                                                              "Mohon maaf, periksa detail komentar dan coba lagi nanti.";
+                                                          loading = false;
+                                                        });
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                child: Ink(
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.transparent,
                                                   ),
                                                   child: Icon(
                                                     Icons.send,
-                                                    color: Colors.white,
+                                                    color: Colors.purple,
+                                                    size: 30,
                                                   ),
-                                                  onPressed: () async {
-                                                    if (_formKey.currentState !=
-                                                        null) {
-                                                      if (_formKey.currentState!
-                                                          .validate()) {
-                                                        setState(() {
-                                                          loading = true;
-                                                          commentCount += 1;
-                                                        });
-                                                        try {
-                                                          await db.tambahKomentar(
-                                                              widget.postID,
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid,
-                                                              widget
-                                                                  .commentController
-                                                                  .text);
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  'postingan')
-                                                              .doc(
-                                                                  widget.postID)
-                                                              .update({
-                                                            'commentsCount':
-                                                                FieldValue
-                                                                    .increment(
-                                                                        1),
-                                                          });
-                                                          widget
-                                                              .commentController
-                                                              .text = '';
-                                                          setState(() {
-                                                            loading = false;
-                                                          });
-                                                        } catch (e) {
-                                                          setState(() {
-                                                            error =
-                                                                "Mohon maaf, periksa detail komentar dan coba lagi nanti.";
-                                                            loading = false;
-                                                          });
-                                                        }
-                                                      }
-                                                    }
-                                                  },
                                                 ),
                                               ),
                                             ),
@@ -550,8 +555,8 @@ class CommentWidget extends StatelessWidget {
                       margin: EdgeInsets.all(8.0),
                       padding: EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,22 +588,24 @@ class CommentWidget extends StatelessWidget {
                                         backgroundImage:
                                             NetworkImage(profilePicture),
                                       ),
-                                      SizedBox(
-                                        width: 10,
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0),
+                                            child: Text(namaLengkap),
+                                          ),
+                                          Text(
+                                            commentText,
+                                            style: TextStyle(fontSize: 12.0),
+                                          ),
+                                        ],
                                       ),
-                                      Text(namaLengkap),
                                     ],
                                   );
                                 },
                               );
                             },
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            commentText,
-                            style: TextStyle(fontSize: 12.0),
                           ),
                           SizedBox(
                             height: 10,
