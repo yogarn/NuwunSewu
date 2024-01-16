@@ -279,7 +279,7 @@ class _OtherProfileState extends State<OtherProfile> {
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                Column(
+                                userData['aboutMe'].length > 100 ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
@@ -323,7 +323,7 @@ class _OtherProfileState extends State<OtherProfile> {
                                         ),
                                       ),
                                   ],
-                                ),
+                                ) : Text(userData['aboutMe']),
                                 SizedBox(
                                   height: 15,
                                 ),

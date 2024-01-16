@@ -144,10 +144,10 @@ class _SearchState extends State<Search> {
                               },
                               child: Container(
                                 margin: const EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 10.0),
+                                    horizontal: 10.0, vertical: 10.0),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  color: Colors.purple[100],
+                                  color: Color(0xFF403d3d),
                                 ),
                                 child: Container(
                                   margin: const EdgeInsets.all(15),
