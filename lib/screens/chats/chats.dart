@@ -140,8 +140,8 @@ class _ChatsState extends State<Chats> {
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
 
-                                  var profilePicture = profilePictureSnapshot
-                                                  .data ?? '';
+                                  var profilePicture =
+                                      profilePictureSnapshot.data ?? '';
 
                                   return PostWidget(
                                     title: resultData['title'],
@@ -160,11 +160,7 @@ class _ChatsState extends State<Chats> {
                             },
                           );
                         } else if (resultData.containsKey('namaLengkap')) {
-                          var profilePicture = (resultData['profilePicture'] ==
-                                      'defaultProfilePict'
-                                  ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                  : resultData['profilePicture']) ??
-                              'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                          var profilePicture = resultData['profilePicture'];
                           return ListTile(
                             title: InkWell(
                               onTap: () async {
@@ -392,9 +388,7 @@ class _RecentChatsState extends State<RecentChats> {
             leading: CircleAvatar(
               radius: 21,
               backgroundImage: NetworkImage(
-                chatInfo.profilePict == "defaultProfilePict"
-                    ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                    : chatInfo.profilePict,
+                chatInfo.profilePict,
               ),
             ),
           ),
