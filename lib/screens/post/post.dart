@@ -192,6 +192,20 @@ class _ExpandPostState extends State<ExpandPost> {
       }
     });
   }
+    String _formatTimeDifference(DateTime postDateTime) {
+    Duration difference = DateTime.now().difference(postDateTime);
+    int daysDifference = difference.inDays;
+    int hoursDifference = difference.inHours;
+    int minuteDifference = difference.inMinutes;
+
+    if (daysDifference > 0) {
+      return '${daysDifference} hari yang lalu';
+    } else if (hoursDifference > 0) {
+      return '${hoursDifference} jam yang lalu';
+    } else {
+      return '${minuteDifference} menit yang lalu';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +266,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                           fontFamily: "Times New Roman",
                                           fontWeight: FontWeight.bold),
                                     ),
+                                    SizedBox(
+                                      height: 18,
+                                    ),
                                     Text(
                                       namaLengkap,
                                       style: TextStyle(
@@ -261,7 +278,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                           fontWeight: FontWeight.w400),
                                     ),
                                     Text(
-                                      postingan['dateTime'].toDate().toString(),
+                                      _formatTimeDifference(postingan['dateTime'].toDate()),
                                       style: TextStyle(
                                           fontSize: 16.0,
                                           fontStyle: FontStyle.italic,
@@ -269,7 +286,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                           fontWeight: FontWeight.w300),
                                     ),
                                     SizedBox(
-                                      height: 8,
+                                      height: 18,
                                     ),
                                     postingan['imagePaths'] != null &&
                                             postingan['imagePaths'].isNotEmpty
@@ -415,7 +432,6 @@ class _ExpandPostState extends State<ExpandPost> {
                                               ),
                                               suffixIcon: InkWell(
                                                 onTap: () async {
-                                                  // Your onPressed logic here
                                                   if (_formKey.currentState !=
                                                       null) {
                                                     if (_formKey.currentState!
