@@ -140,12 +140,8 @@ class _ChatsState extends State<Chats> {
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
 
-                                  var profilePicture = (profilePictureSnapshot
-                                                  .data ==
-                                              'defaultProfilePict'
-                                          ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                          : profilePictureSnapshot.data) ??
-                                      'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                  var profilePicture = profilePictureSnapshot
+                                                  .data ?? '';
 
                                   return PostWidget(
                                     title: resultData['title'],
