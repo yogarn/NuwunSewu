@@ -479,23 +479,23 @@ class CategorizedWorks extends StatefulWidget {
 
 class _CategorizedWorksState extends State<CategorizedWorks> {
   // Fungsi untuk mendapatkan kategori berdasarkan uidSender
-  Future<List<String>> getKategoriByUid(String uidSender) async {
+  Future<Set<String>> getKategoriByUid(String uidSender) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('postingan')
           .where('uidSender', isEqualTo: uidSender)
           .get();
 
-      List<String> kategoriList = [];
+      Set<String> kategoriSet = Set<String>();
 
       querySnapshot.docs.forEach((doc) {
         var kategori = doc['kategori'];
         if (kategori != null) {
-          kategoriList.add(kategori);
+          kategoriSet.add(kategori);
         }
       });
 
-      return kategoriList;
+      return kategoriSet;
     } catch (error) {
       print('Error getting kategori: $error');
       throw error;
@@ -506,36 +506,33 @@ class _CategorizedWorksState extends State<CategorizedWorks> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: getKategoriByUid(widget.uidTarget),
-      builder: (context, AsyncSnapshot<List<String>> snapshot) {
+      builder: (context, AsyncSnapshot<Set<String>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          List<String> kategoriList = snapshot.data ?? [];
+          Set<String> kategoriSet = snapshot.data ?? {};
 
-          // Tampilkan kategoriList dalam ListView
           return ListView.builder(
-            itemCount: kategoriList.length,
+            itemCount: kategoriSet.length,
             itemBuilder: (context, index) {
-              // Gunakan InkWell untuk menangani ketika pengguna mengetuk kategori
+              String kategori = kategoriSet.elementAt(index);
+
               return InkWell(
                 onTap: () {
-                  // Navigasi atau lakukan tindakan yang diinginkan ketika kategori ditekan
-                  print('Kategori ${kategoriList[index]} ditekan!');
-                  // Misalnya, navigasi ke halaman detail kategori
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ViewCategory(
-                        kategori: kategoriList[index],
+                        kategori: kategori,
                         uidTarget: widget.uidTarget,
                       ),
                     ),
                   );
                 },
                 child: ListTile(
-                  title: Text(kategoriList[index]),
+                  title: Text(kategori),
                 ),
               );
             },
@@ -545,6 +542,7 @@ class _CategorizedWorksState extends State<CategorizedWorks> {
     );
   }
 }
+
 
 class RepostWorks extends StatefulWidget {
   final String uidTarget;
