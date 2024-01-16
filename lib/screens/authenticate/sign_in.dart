@@ -27,21 +27,21 @@ class _SignInState extends State<SignIn> {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.purple,
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
         ),
       ),
       home: Scaffold(
         appBar: AppBar(
           title: Text("Login Page"),
-          backgroundColor: Colors.purple[100],
+          backgroundColor: Color(0xFF2e2b2b),
           actions: [
             TextButton.icon(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.black,
                 ),
                 onPressed: () => widget.toggleSignIn(),
-                icon: Icon(Icons.person),
-                label: Text('Register'))
+                icon: Icon(Icons.person, color: Colors.white),
+                label: Text('Register', style: TextStyle(color: Colors.white),))
           ],
         ),
         body: Container(

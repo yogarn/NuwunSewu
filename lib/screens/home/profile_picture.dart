@@ -28,88 +28,94 @@ class _ProfilePictureState extends State<ProfilePicture> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.purple[100],
-            title: Text('Upload foto profil'),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              tooltip: 'Back',
-              onPressed: () {
-                Navigator.pop(context);
-              },
+      home: MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+        ),
+        home: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Color(0xFF2e2b2b),
+              title: Text('Upload foto profil'),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    _image != null
-                        ? CircleAvatar(
-                            radius: 64,
-                            backgroundImage: MemoryImage(_image!),
-                          )
-                        : StreamBuilder<DocumentSnapshot>(
-                            stream: userCollection
-                                .doc(FirebaseAuth.instance.currentUser?.uid)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else {
-                                if (snapshot.hasData && snapshot.data!.exists) {
-                                  Map<String, dynamic> userData = snapshot.data!
-                                      .data() as Map<String, dynamic>;
-
-                                  if (userData['profilePicture'] != null) {
-                                    return CircleAvatar(
-                                      radius: 64,
-                                      backgroundImage: NetworkImage(
-                                        userData['profilePicture'],
-                                      ),
-                                    );
-                                  } else {
-                                    return CircleAvatar(
-                                      radius: 64,
-                                      backgroundImage: NetworkImage(
-                                        'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain', // Default image
-                                      ),
-                                    );
-                                  }
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      _image != null
+                          ? CircleAvatar(
+                              radius: 64,
+                              backgroundImage: MemoryImage(_image!),
+                            )
+                          : StreamBuilder<DocumentSnapshot>(
+                              stream: userCollection
+                                  .doc(FirebaseAuth.instance.currentUser?.uid)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
                                 } else {
-                                  return Text('Dokumen tidak ditemukan');
+                                  if (snapshot.hasData && snapshot.data!.exists) {
+                                    Map<String, dynamic> userData = snapshot.data!
+                                        .data() as Map<String, dynamic>;
+
+                                    if (userData['profilePicture'] != null) {
+                                      return CircleAvatar(
+                                        radius: 64,
+                                        backgroundImage: NetworkImage(
+                                          userData['profilePicture'],
+                                        ),
+                                      );
+                                    } else {
+                                      return CircleAvatar(
+                                        radius: 64,
+                                        backgroundImage: NetworkImage(
+                                          '', // Default image
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    return Text('Dokumen tidak ditemukan');
+                                  }
                                 }
-                              }
-                            },
-                          ),
-                    Positioned(
-                      child: IconButton(
-                        onPressed: () async {
-                          Uint8List? img = await selectImage();
-                          setState(() {
-                            _image = img;
-                              isSelected = true;
-                          });
-                        },
-                        icon: Icon(Icons.add_a_photo),
+                              },
+                            ),
+                      Positioned(
+                        child: IconButton(
+                          onPressed: () async {
+                            Uint8List? img = await selectImage();
+                            setState(() {
+                              _image = img;
+                                isSelected = true;
+                            });
+                          },
+                          icon: Icon(Icons.add_a_photo),
+                        ),
+                        bottom: -10,
+                        left: 80,
                       ),
-                      bottom: -10,
-                      left: 80,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                ElevatedButton(
-                    onPressed: (isSelected) ? saveProfile : null,
-                    child: Text('Save Profile Picture'))
-              ],
-            ),
-          )),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  ElevatedButton(
+                      onPressed: (isSelected) ? saveProfile : null,
+                      child: Text('Save Profile Picture'))
+                ],
+              ),
+            )),
+      ),
     );
   }
 }

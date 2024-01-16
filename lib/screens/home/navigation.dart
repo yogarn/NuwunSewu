@@ -1,35 +1,26 @@
+// navigation.dart
+
 import 'package:flutter/material.dart';
-import 'dart:io';
-
-import 'package:image_picker/image_picker.dart';
-import 'package:dots_indicator/dots_indicator.dart';
-import 'package:nuwunsewu/services/add_data.dart';
-import 'package:nuwunsewu/shared/loading.dart';
-
 import 'package:nuwunsewu/screens/chats/chats.dart';
 import 'package:nuwunsewu/screens/home/home.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
 import 'package:nuwunsewu/screens/search/search.dart';
+import '../post/upload.dart';
 
-class Navigation extends StatefulWidget {
-  const Navigation({super.key});
+class Navigasi extends StatefulWidget {
+  static final GlobalKey<_NavigasiState> navigatorKey =
+  GlobalKey<_NavigasiState>();
+
+  const Navigasi({Key? key}) : super(key: key);
 
   @override
-  State<Navigation> createState() => _NavigationState();
+  _NavigasiState createState() => _NavigasiState();
 }
 
-class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
-  bool showUploadPage = false;
-
-  void setShowUploadPage(bool kebenaran) {
-    setState(() {
-      showUploadPage = kebenaran;
-    });
-  }
-
+class _NavigasiState extends State<Navigasi> {
   int _selectedPageIndex = 0;
 
-  void _navigateHomePage(int index) {
+  void navigateHomePage(int index) {
     setState(() {
       _selectedPageIndex = index;
     });
@@ -38,435 +29,28 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
   final List _pages = [
     const Home(),
     Search(),
+    Upload(),
     Chats(),
     Profile(isRedirected: false),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          brightness: Brightness.light,
-        ),
-      ),
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            _pages[_selectedPageIndex],
-            showUploadPage
-                ? Upload(setShowUploadPage: setShowUploadPage)
-                : const Text(''),
-          ],
-        ),
-        bottomNavigationBar: Container(
-          height: 60,
-          decoration: BoxDecoration(color: Colors.grey[850]),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 5,
-                child: IconButton(
-                  onPressed: () {
-                    if (!showUploadPage) _navigateHomePage(0);
-                  },
-                  icon: _selectedPageIndex == 0
-                      ? Icon(
-                          Icons.home_filled,
-                          color: Colors.purple,
-                          size: 35,
-                        )
-                      : Container(
-                          height: 35,
-                          child: Image.asset(
-                            'lib/icons/house.png',
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: IconButton(
-                  onPressed: () {
-                    if (!showUploadPage) _navigateHomePage(1);
-                  },
-                  icon: _selectedPageIndex == 1
-                      ? Container(
-                          height: 30,
-                          child: Image.asset(
-                            'lib/icons/magnifying.png',
-                            color: Colors.purple,
-                          ),
-                        )
-                      : Container(
-                          height: 25,
-                          child: Image.asset(
-                            'lib/icons/loupe.png',
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: IconButton(
-                  onPressed: () {
-                    setShowUploadPage(!showUploadPage);
-                  },
-                  icon: Icon(
-                    Icons.add,
-                    size: 45,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: IconButton(
-                  onPressed: () {
-                    if (!showUploadPage) _navigateHomePage(2);
-                  },
-                  icon: _selectedPageIndex == 2
-                      ? Icon(
-                          Icons.chat_bubble,
-                          color: Colors.purple,
-                          size: 35,
-                        )
-                      : Icon(
-                          Icons.chat_bubble_outline,
-                          color: Color.fromARGB(255, 64, 63, 63),
-                          size: 35,
-                        ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: IconButton(
-                  onPressed: () {
-                    if (!showUploadPage) _navigateHomePage(3);
-                  },
-                  icon: _selectedPageIndex == 3
-                      ? Icon(
-                          Icons.person,
-                          color: Colors.purple,
-                          size: 35,
-                        )
-                      : Container(
-                          height: 25,
-                          child: Image.asset(
-                            'lib/icons/user.png',
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    return Scaffold(
+      body: _pages[_selectedPageIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedPageIndex,
+        onTap: navigateHomePage,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+        unselectedItemColor: Colors.purple[100],
+        selectedItemColor: Colors.purple,
       ),
     );
-  }
-}
-
-class Upload extends StatefulWidget {
-  final Function(bool) setShowUploadPage;
-
-  Upload({required this.setShowUploadPage});
-
-  @override
-  State<Upload> createState() => _UploadState();
-}
-
-class _UploadState extends State<Upload> {
-  final _formKey = GlobalKey<FormState>();
-  bool loading = false;
-
-  final List<File> _file = [];
-
-  String title = "";
-  String body = "";
-
-  String error = "";
-
-  late final PageController _pageController;
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return loading
-        ? const Loading()
-        : MaterialApp(
-            home: Container(
-              margin: EdgeInsets.fromLTRB(10.0, 135.0, 10.0, 20.0),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.grey[850]),
-              padding: const EdgeInsets.symmetric(
-                vertical: 20.0,
-                horizontal: 50.0,
-              ),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      maxLines: null,
-                      style: TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        hintText: 'Masukkan judul postingan',
-                        label: Text(
-                          'Title',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      validator: (val) => val!.isEmpty
-                          ? 'Judul postingan tidak boleh kosong!'
-                          : null,
-                      onChanged: (val) {
-                        setState(() {
-                          title = val;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      maxLines: null,
-                      style: TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Masukkan isi postingan',
-                        label: Text(
-                          'Table of Content',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      validator: (val) => val!.isEmpty
-                          ? 'Isi postingan tidak boleh kosong!'
-                          : null,
-                      onChanged: (val) {
-                        setState(() {
-                          body = val;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _file.isNotEmpty
-                        ? Center(
-                            child: Column(
-                              children: [
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.height / 3,
-                                  width:
-                                      MediaQuery.of(context).size.width / 1.5,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: _file.isNotEmpty
-                                        ? PageView.builder(
-                                            controller: _pageController,
-                                            itemCount: _file.length,
-                                            itemBuilder: (context, index) {
-                                              return ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                child: Image.file(_file[index]),
-                                              );
-                                            },
-                                            onPageChanged: (index) {
-                                              _onPageChanged(index);
-                                            },
-                                          )
-                                        : const Text(''),
-                                  ),
-                                ),
-                                _file.length > 1
-                                    ? Center(
-                                        child: DotsIndicator(
-                                          dotsCount: _file.length,
-                                          position: _currentIndex,
-                                          decorator: DotsDecorator(
-                                            size: const Size.square(9.0),
-                                            color: Colors.white24,
-                                            activeColor: Colors.white,
-                                            activeSize: const Size(18.0, 9.0),
-                                            activeShape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : Text(''),
-                                const SizedBox(height: 5),
-                                ElevatedButton(
-                                  onPressed: () => setState(() {
-                                    _file.length = 0;
-                                  }),
-                                  style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: Ink(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          colors: [
-                                            Colors.purple,
-                                            Color(0xFF212121)
-                                          ],
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              20,
-                                      width: MediaQuery.of(context).size.width /
-                                          2.0,
-                                      child: Center(
-                                        child: const Text(
-                                          'Hapus Semua Gambar',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox(height: 5),
-                    const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          List<XFile> pickedFiles =
-                              await ImagePicker().pickMultipleMedia();
-                          for (var e in pickedFiles) {
-                            _file.add(File(e.path));
-                          }
-                          setState(() {});
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          backgroundColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [Colors.purple, Color(0xFF212121)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height / 20,
-                            width: MediaQuery.of(context).size.width / 2.5,
-                            child: Center(
-                              child: const Text(
-                                'Upload Image',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState != null) {
-                            if (_formKey.currentState!.validate()) {
-                              widget.setShowUploadPage(false);
-                              setState(() {
-                                loading = true;
-                              });
-
-                              try {
-                                await StoreData().savePostImages(
-                                  files: _file,
-                                  title: title,
-                                  body: body,
-                                );
-                                setState(() {
-                                  loading = false;
-                                });
-                              } catch (e) {
-                                setState(() {
-                                  error = "Terjadi kesalahan, coba lagi nanti.";
-                                  loading = false;
-                                });
-                              }
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          backgroundColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [Colors.purple, Color(0xFF212121)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height / 20,
-                            width: MediaQuery.of(context).size.width / 2.5,
-                            child: Center(
-                                child: const Text(
-                              'Kirim',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      error,
-                      style: const TextStyle(color: Colors.red, fontSize: 14.0),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
   }
 }

@@ -198,6 +198,10 @@ class _ExpandPostState extends State<ExpandPost> {
     return loading
         ? Loading()
         : MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              brightness: Brightness.dark,
+            ),
             home: Scaffold(
               appBar: AppBar(
                 title: Text('Expand Post'),
@@ -393,7 +397,7 @@ class _ExpandPostState extends State<ExpandPost> {
                                                 borderRadius:
                                                     BorderRadius.circular(21),
                                                 borderSide: BorderSide(
-                                                  color: Colors.black,
+                                                  color: Colors.white,
                                                   width: 1,
                                                   style: BorderStyle.solid,
                                                 ),
@@ -406,9 +410,9 @@ class _ExpandPostState extends State<ExpandPost> {
                                                     minimumSize: Size(50, 50),
                                                     side: BorderSide.none,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        Colors.transparent,
                                                   ),
-                                                  child: Icon(Icons.send),
+                                                  child: Icon(Icons.send, color: Colors.white, ),
                                                   onPressed: () async {
                                                     if (_formKey.currentState !=
                                                         null) {
@@ -565,12 +569,8 @@ class CommentWidget extends StatelessWidget {
                                     return Text('Error fetching data');
                                   }
 
-                                  var profilePicture = (profilePictureSnapshot
-                                                  .data ==
-                                              'defaultProfilePict'
-                                          ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                          : profilePictureSnapshot.data) ??
-                                      'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                  var profilePicture = profilePictureSnapshot
+                                      .data ?? '';
 
                                   return Row(
                                     children: [
@@ -606,7 +606,7 @@ class CommentWidget extends StatelessWidget {
                               fontSize: 12,
                               fontStyle: FontStyle.italic,
                               fontWeight: FontWeight.w300,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
                         ],

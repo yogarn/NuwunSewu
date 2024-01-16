@@ -46,13 +46,14 @@ class AuthService {
       int gender,
       int tanggalLahir,
       int bulanLahir,
-      int tahunLahir) async {
+      int tahunLahir,
+      String aboutMe) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: pass);
       User? firebaseUser = result.user;
       await DatabaseService().updateUserData(
-          namaLengkap, username, gender, tanggalLahir, bulanLahir, tahunLahir);
+          namaLengkap, username, gender, tanggalLahir, bulanLahir, tahunLahir, aboutMe);
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {
       print(e.toString());

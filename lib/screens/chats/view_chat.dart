@@ -96,7 +96,7 @@ class _ViewChatState extends State<ViewChat> {
               margin: EdgeInsets.all(5),
               padding: EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                color: isUserSender ? Colors.blue : Colors.grey,
+                color: isUserSender ? Colors.purple[200] : Colors.grey,
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Column(

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "572296227153",
-    "project_id": "loremipsum-29e20",
-    "storage_bucket": "loremipsum-29e20.appspot.com"
+    "project_number": "62123434998",
+    "project_id": "hackfest-habis-kuota",
+    "storage_bucket": "hackfest-habis-kuota.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:572296227153:android:ea2d69344a3b66ebcf4b70",
+        "mobilesdk_app_id": "1:62123434998:android:91973dac8623f723935dd7",
         "android_client_info": {
           "package_name": "com.example.nuwunsewu"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBwXjz5W4m5Xrro1YdUufuC-CmM41ElFZo"
+          "current_key": "AIzaSyCxsg5cfLHv1IMyQpazUTmjc63Vio4uQac"
         }
       ],
       "services": {

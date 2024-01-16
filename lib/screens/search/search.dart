@@ -18,183 +18,185 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.purple[100],
-        title: Text('Cari Postingan'),
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
       ),
-      body: Column(
-        children: [
-          Container(
-            height: 48,
-            color: Colors.purple[100],
-            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-            child: Container(
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
-                  hintText: 'Cari...',
-                  border: InputBorder.none,
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () {
-                      _startSearch();
-                    },
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF131313),
+          title: Text('Cari Postingan'),
+        ),
+        body: Column(
+          children: [
+            Container(
+              height: 60,
+              color: Color(0xFF131313),
+              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 20.0),
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: TextField(
+                  style: TextStyle(color: Colors.black),
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
+                    hintText: 'Cari...',
+                    hintStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.search, color: Colors.black,),
+                      onPressed: () {
+                        _startSearch();
+                      },
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: StreamBuilder<List<DocumentSnapshot>>(
-              stream: _searchResults,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // If there is no data or the data is empty, show Trending
-                  return Trending();
-                } else {
-                  List<DocumentSnapshot> results = snapshot.data ?? [];
-                  return ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> resultData =
-                          results[index].data() as Map<String, dynamic>;
+            Expanded(
+              child: StreamBuilder<List<DocumentSnapshot>>(
+                stream: _searchResults,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    // If there is no data or the data is empty, show Trending
+                    return Trending();
+                  } else {
+                    List<DocumentSnapshot> results = snapshot.data ?? [];
+                    return ListView.builder(
+                      itemCount: results.length,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> resultData =
+                            results[index].data() as Map<String, dynamic>;
 
-                      if (resultData.containsKey('title') &&
-                          resultData.containsKey('body')) {
-                        return FutureBuilder<String>(
-                          future: getNamaLengkap(resultData['uidSender']),
-                          builder: (context, namaLengkapSnapshot) {
-                            if (namaLengkapSnapshot.hasError) {
-                              return Text(
-                                  'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
-                            }
+                        if (resultData.containsKey('title') &&
+                            resultData.containsKey('body')) {
+                          return FutureBuilder<String>(
+                            future: getNamaLengkap(resultData['uidSender']),
+                            builder: (context, namaLengkapSnapshot) {
+                              if (namaLengkapSnapshot.hasError) {
+                                return Text(
+                                    'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+                              }
 
-                            var namaLengkap =
-                                namaLengkapSnapshot.data ?? 'null';
+                              var namaLengkap =
+                                  namaLengkapSnapshot.data ?? 'null';
 
-                            return FutureBuilder<String>(
-                              future:
-                                  getProfilePicture(resultData['uidSender']),
-                              builder: (context, profilePictureSnapshot) {
-                                if (profilePictureSnapshot.hasError) {
-                                  return Text(
-                                      'Error fetching profilePicture: ${profilePictureSnapshot.error}');
-                                }
+                              return FutureBuilder<String>(
+                                future:
+                                    getProfilePicture(resultData['uidSender']),
+                                builder: (context, profilePictureSnapshot) {
+                                  if (profilePictureSnapshot.hasError) {
+                                    return Text(
+                                        'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+                                  }
 
-                                var profilePicture = (profilePictureSnapshot
-                                                .data ==
-                                            'defaultProfilePict'
-                                        ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                        : profilePictureSnapshot.data) ??
-                                    'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                  var profilePicture = profilePictureSnapshot
+                                      .data ?? '';
 
-                                return PostWidget(
-                                  title: resultData['title'],
-                                  body: resultData['body'],
-                                  uidSender: resultData['uidSender'],
-                                  dateTime: resultData['dateTime'].toDate(),
-                                  namaLengkap: namaLengkap,
-                                  imagePaths: (resultData['imagePaths']
-                                          as List<dynamic>)
-                                      .cast<String>(),
-                                  profilePicture: profilePicture,
-                                  postID: results[index].id,
-                                );
-                              },
-                            );
-                          },
-                        );
-                      } else if (resultData.containsKey('namaLengkap')) {
-                        var profilePicture = (resultData['profilePicture'] ==
-                                    'defaultProfilePict'
-                                ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                : resultData['profilePicture']) ??
-                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-                        return ListTile(
-                          title: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => results[index].id ==
-                                          FirebaseAuth.instance.currentUser?.uid
-                                      ? Profile(isRedirected: true)
-                                      : OtherProfile(
-                                          uidSender: results[index].id,
-                                        ),
-                                ),
+
+                                  return PostWidget(
+                                    title: resultData['title'],
+                                    body: resultData['body'],
+                                    uidSender: resultData['uidSender'],
+                                    dateTime: resultData['dateTime'].toDate(),
+                                    namaLengkap: namaLengkap,
+                                    imagePaths: (resultData['imagePaths']
+                                            as List<dynamic>)
+                                        .cast<String>(),
+                                    profilePicture: profilePicture,
+                                    postID: results[index].id,
+                                  );
+                                },
                               );
                             },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 10.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.purple[100],
-                              ),
-                              child: Container(
-                                margin: const EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          flex: 1,
-                                          child: CircleAvatar(
-                                            radius: 21,
-                                            backgroundImage:
-                                                NetworkImage(profilePicture),
+                          );
+                        } else if (resultData.containsKey('namaLengkap')) {
+                          var profilePicture = resultData['profilePicture'] ?? '';
+
+                          return ListTile(
+                            title: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => results[index].id ==
+                                            FirebaseAuth.instance.currentUser?.uid
+                                        ? Profile(isRedirected: true)
+                                        : OtherProfile(
+                                            uidSender: results[index].id,
                                           ),
-                                        ),
-                                        Flexible(
-                                          flex: 10,
-                                          child: Container(
-                                            margin:
-                                                const EdgeInsets.only(left: 10),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  resultData['namaLengkap'],
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 10.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.purple[100],
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            flex: 1,
+                                            child: CircleAvatar(
+                                              radius: 21,
+                                              backgroundImage:
+                                                  NetworkImage(profilePicture),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          Flexible(
+                                            flex: 10,
+                                            child: Container(
+                                              margin:
+                                                  const EdgeInsets.only(left: 10),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    resultData['namaLengkap'],
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      } else {
-                        return SizedBox.shrink();
-                      }
-                    },
-                  );
-                }
-              },
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
+                      },
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -265,7 +267,7 @@ class _TrendingState extends State<Trending> {
   Widget build(BuildContext context) {
     return 
     Scaffold(
-      appBar: AppBar(title: Text("On Trending")),
+      appBar: AppBar(title: Text("On Trending"), elevation: 0.0,),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('postingan')
@@ -275,11 +277,11 @@ class _TrendingState extends State<Trending> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           }
-      
+
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
-      
+
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
@@ -292,9 +294,9 @@ class _TrendingState extends State<Trending> {
               var dateTime = post['dateTime'];
               DateTime parsedDateTime =
                   dateTime != null ? dateTime.toDate() : DateTime.now();
-      
+
               var postID = (snapshot.data!.docs[index].id);
-      
+
               return FutureBuilder<String>(
                 future: getNamaLengkap(uidSender),
                 builder: (context, namaLengkapSnapshot) {
@@ -302,9 +304,9 @@ class _TrendingState extends State<Trending> {
                     return Text(
                         'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                   }
-      
+
                   var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-      
+
                   return FutureBuilder<String>(
                     future: getProfilePicture(uidSender),
                     builder: (context, profilePictureSnapshot) {
@@ -312,12 +314,10 @@ class _TrendingState extends State<Trending> {
                         return Text(
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
-      
-                      var profilePicture = (profilePictureSnapshot.data ==
-                                  'defaultProfilePict'
-                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                              : profilePictureSnapshot.data) ??
-                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+
+                      var profilePicture = profilePictureSnapshot
+                          .data ?? '';
+
                       return PostWidget(
                         title: title,
                         body: body,

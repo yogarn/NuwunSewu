@@ -38,7 +38,7 @@ class StoreData {
   }
 
   Future<String> savePostImages(
-      {List<File>? files, required String title, required String body}) async {
+      {List<File>? files, required String title, required String body, required String kategori}) async {
     String resp = 'some error occurred';
     try {
       String docId = _firestore.collection('postingan').doc().id;
@@ -63,6 +63,7 @@ class StoreData {
         'imagePaths': imageUrls,
         'uidSender': FirebaseAuth.instance.currentUser?.uid,
         'dateTime': FieldValue.serverTimestamp(),
+        'kategori': kategori == "" ? "Uncategorized" : kategori,
         'likesCount': 0,
         'dislikesCount': 0,
         'commentsCount': 0,

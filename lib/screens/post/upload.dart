@@ -7,6 +7,8 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
+import '../home/navigation.dart';
+
 class Upload extends StatefulWidget {
   const Upload({Key? key});
 
@@ -22,6 +24,7 @@ class _UploadState extends State<Upload> {
 
   String title = "";
   String body = "";
+  String kategori = "";
 
   String error = "";
 
@@ -40,7 +43,7 @@ class _UploadState extends State<Upload> {
     super.dispose();
   }
 
-    void _onPageChanged(int index) {
+  void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -51,10 +54,14 @@ class _UploadState extends State<Upload> {
     return loading
         ? const Loading()
         : MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              brightness: Brightness.dark,
+            ),
             home: Scaffold(
               appBar: AppBar(
                 title: const Text("Upload postingan"),
-                backgroundColor: Colors.purple[100],
+                backgroundColor: Color(0xFF2e2b2b),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   tooltip: 'Back',
@@ -105,6 +112,19 @@ class _UploadState extends State<Upload> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      TextFormField(
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          hintText: 'Kosongkan untuk tanpa kategori',
+                          label: Text('Kategori'),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            kategori = val;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       _file.isNotEmpty
                           ? Center(
                               child: Column(
@@ -131,30 +151,28 @@ class _UploadState extends State<Upload> {
                                               onPageChanged: (index) {
                                                 _onPageChanged(index);
                                               },
-                                              )
+                                            )
                                           : const Text(''),
                                     ),
                                   ),
                                   _file.length > 1
                                       ? Center(
-                                        child: DotsIndicator(
-                                          dotsCount: _file.length,
-                                          position: _currentIndex,
-                                          decorator: DotsDecorator(
-                                            size: const Size.square(9.0),
-                                            color: Colors.black26,
-                                            activeColor: Colors.black,
-                                            activeSize:
-                                                const Size(18.0, 9.0),
-                                            activeShape:
-                                                RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      5.0),
+                                          child: DotsIndicator(
+                                            dotsCount: _file.length,
+                                            position: _currentIndex,
+                                            decorator: DotsDecorator(
+                                              size: const Size.square(9.0),
+                                              color: Colors.black26,
+                                              activeColor: Colors.black,
+                                              activeSize: const Size(18.0, 9.0),
+                                              activeShape:
+                                                  RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      )
+                                        )
                                       : Text(''),
                                   const SizedBox(height: 5),
                                   ElevatedButton(
@@ -193,20 +211,21 @@ class _UploadState extends State<Upload> {
                                 setState(() {
                                   loading = true;
                                 });
-                        
+
                                 try {
                                   await StoreData().savePostImages(
                                     files: _file,
                                     title: title,
                                     body: body,
+                                    kategori: kategori,
                                   );
                                   setState(() {
-                                    Navigator.pop(context);
                                     loading = false;
                                   });
                                 } catch (e) {
                                   setState(() {
-                                    error = "Terjadi kesalahan, coba lagi nanti.";
+                                    error =
+                                        "Terjadi kesalahan, coba lagi nanti.";
                                     loading = false;
                                   });
                                 }

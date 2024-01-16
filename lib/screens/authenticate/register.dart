@@ -3,11 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:nuwunsewu/services/auth.dart';
 import 'package:nuwunsewu/shared/loading.dart';
 
-List<String> genderList = [
-  "Laki-laki",
-  "Perempuan",
-  "Tidak Memilih"
-  ];
+List<String> genderList = ["Laki-laki", "Perempuan", "Tidak Memilih"];
 
 class Register extends StatefulWidget {
   final Function toggleSignIn;
@@ -28,6 +24,7 @@ class _RegisterState extends State<Register> {
   String username = "";
   String email = "";
   String pass = "";
+  String aboutMe = "";
   int gender = 0;
   int tanggalLahir = 0;
   int bulanLahir = 0;
@@ -44,25 +41,32 @@ class _RegisterState extends State<Register> {
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.purple,
-                brightness: Brightness.light,
+                brightness: Brightness.dark,
               ),
             ),
             home: Scaffold(
               appBar: AppBar(
                 title: const Text('Sign Up'),
-                backgroundColor: Colors.purple[100],
+                backgroundColor: Color(0xFF2e2b2b),
                 actions: [
                   TextButton.icon(
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black,
                       ),
                       onPressed: () => widget.toggleSignIn(),
-                      icon: const Icon(Icons.person),
-                      label: const Text('Sign In'))
+                      icon: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'Sign In',
+                        style: TextStyle(color: Colors.white),
+                      ))
                 ],
               ),
               body: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 50.0),
                 child: Form(
                   key: _formKey,
                   child: ListView(children: [
@@ -135,12 +139,29 @@ class _RegisterState extends State<Register> {
                     const SizedBox(
                       height: 20,
                     ),
+                    TextFormField(
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Ceritakan tentang diri anda',
+                        label: Text('About Me'),
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Ceritakan tentang diri anda!' : null,
+                      onChanged: (val) {
+                        setState(() {
+                          aboutMe = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Tanggal Lahir',
-                          style: TextStyle(color: Colors.black),
+                          style: TextStyle(color: Colors.white),
                         ),
                         Row(
                           children: [
@@ -231,7 +252,7 @@ class _RegisterState extends State<Register> {
                       children: [
                         Text(
                           'Jenis Kelamin',
-                          style: TextStyle(color: Colors.black),
+                          style: TextStyle(color: Colors.white),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -306,7 +327,8 @@ class _RegisterState extends State<Register> {
                                       gender,
                                       tanggalLahir,
                                       bulanLahir,
-                                      tahunLahir);
+                                      tahunLahir,
+                                      aboutMe);
                               if (result == null) {
                                 setState(() {
                                   error =

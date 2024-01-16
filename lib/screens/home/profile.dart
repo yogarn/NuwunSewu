@@ -261,7 +261,7 @@ class _AboutMeWidgetState extends State<AboutMeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return widget.userData['aboutMe'].length > 100 ? Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Column(
@@ -306,6 +306,6 @@ class _AboutMeWidgetState extends State<AboutMeWidget> {
           ],
         ),
       ],
-    );
+    ) : Text(widget.userData['aboutMe']);
   }
 }

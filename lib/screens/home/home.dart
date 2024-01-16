@@ -23,14 +23,13 @@ class Home extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       home: DefaultTabController(
-        length: 3,
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'For You'),
                 Tab(text: 'Following'),
-                Tab(text: 'Your Page'),
               ],
             ),
             title: const Text('NuwunSewu'),
@@ -40,7 +39,6 @@ class Home extends StatelessWidget {
             children: [
               FirstTabHome(),
               SecondTabHome(),
-              ThirdTabHome(),
             ],
           ),
         ),
@@ -105,11 +103,8 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
 
-                      var profilePicture = (profilePictureSnapshot.data ==
-                                  'defaultProfilePict'
-                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                              : profilePictureSnapshot.data) ??
-                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                      var profilePicture = profilePictureSnapshot
+                          .data ?? '';
 
                       return PostWidget(
                         title: title,
@@ -395,11 +390,8 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                   'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                             }
 
-                            var profilePicture = (profilePictureSnapshot.data ==
-                                        'defaultProfilePict'
-                                    ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                    : profilePictureSnapshot.data) ??
-                                'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                            var profilePicture = profilePictureSnapshot
+                                .data ?? '';
 
                             return PostWidget(
                               title: title,
@@ -482,12 +474,8 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
 
-                                  var profilePicture = (profilePictureSnapshot
-                                                  .data ==
-                                              'defaultProfilePict'
-                                          ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                          : profilePictureSnapshot.data) ??
-                                      'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                  var profilePicture = profilePictureSnapshot
+                                      .data ?? '';
 
                                   return FutureBuilder<String>(
                                     future: getNamaLengkap(repostedUid),
@@ -563,180 +551,180 @@ Stream<List<String>> getFollowingListStream(String uidSender) async* {
   }
 }
 
-class ThirdTabHome extends StatefulWidget {
-  const ThirdTabHome({Key? key}) : super(key: key);
-
-  @override
-  _ThirdTabHomeState createState() => _ThirdTabHomeState();
-}
-
-class _ThirdTabHomeState extends State<ThirdTabHome> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-      child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('postingan')
-            .orderBy('dateTime', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container();
-          }
-
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              var post = snapshot.data!.docs[index];
-              var uidSender = post['uidSender'];
-
-              // cek uid pengirim sama dgn uid user
-              if (uidSender == FirebaseAuth.instance.currentUser?.uid) {
-                var title = post['title'];
-                var body = post['body'];
-                List<String>? imagePaths =
-                    (post['imagePaths'] as List<dynamic>).cast<String>();
-                var dateTime = post['dateTime'];
-                DateTime parsedDateTime =
-                    dateTime != null ? dateTime.toDate() : DateTime.now();
-                var postID = (snapshot.data!.docs[index].id);
-
-                return FutureBuilder<String>(
-                  future: getNamaLengkap(uidSender),
-                  builder: (context, namaLengkapSnapshot) {
-                    if (namaLengkapSnapshot.hasError) {
-                      return Text(
-                          'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
-                    }
-
-                    var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-
-                    return FutureBuilder<String>(
-                      future: getProfilePicture(uidSender),
-                      builder: (context, profilePictureSnapshot) {
-                        if (profilePictureSnapshot.hasError) {
-                          return Text(
-                              'Error fetching profilePicture: ${profilePictureSnapshot.error}');
-                        }
-
-                        var profilePicture = (profilePictureSnapshot.data ==
-                                    'defaultProfilePict'
-                                ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                : profilePictureSnapshot.data) ??
-                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-
-                        return PostWidget(
-                          title: title,
-                          body: body,
-                          imagePaths: imagePaths,
-                          uidSender: uidSender,
-                          dateTime: parsedDateTime,
-                          namaLengkap: namaLengkap,
-                          profilePicture: profilePicture,
-                          postID: postID,
-                        );
-                      },
-                    );
-                  },
-                );
-              } else {
-                // If postingan is a repost, check if the current user (your UID) reposted it
-                var repostsCollection = post.reference.collection('reposts');
-                var currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-
-                return FutureBuilder<QuerySnapshot>(
-                  future: repostsCollection.get(),
-                  builder:
-                      (context, AsyncSnapshot<QuerySnapshot> repostsSnapshot) {
-                    if (repostsSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return Container();
-                    }
-
-                    if (repostsSnapshot.hasError) {
-                      return Text('Error: ${repostsSnapshot.error}');
-                    }
-
-                    // Check if the current user's UID has a corresponding document in the reposts subcollection
-                    var currentUserRepost = repostsSnapshot.data!.docs
-                        .any((repostDoc) => repostDoc.id == currentUserUid);
-
-                    // If the current user reposted this post, fetch the reposted post details and display
-                    if (currentUserRepost) {
-                      // Get the ID of the reposted post
-                      // var repostedPostId = repostsSnapshot.data!.docs.first
-                      //     .id; // ini mengembalikan uid, bukan post id
-                      print(post);
-
-                      var title = post['title'];
-                      var body = post['body'];
-                      List<String>? imagePaths =
-                          (post['imagePaths'] as List<dynamic>).cast<String>();
-                      var dateTime = post['dateTime'];
-                      DateTime parsedDateTime =
-                          dateTime != null ? dateTime.toDate() : DateTime.now();
-                      var postID = (snapshot.data!.docs[index].id);
-
-                      return FutureBuilder<String>(
-                        future: getNamaLengkap(uidSender),
-                        builder: (context, namaLengkapSnapshot) {
-                          if (namaLengkapSnapshot.hasError) {
-                            return Text(
-                                'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
-                          }
-
-                          var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-
-                          return FutureBuilder<String>(
-                            future: getProfilePicture(uidSender),
-                            builder: (context, profilePictureSnapshot) {
-                              if (profilePictureSnapshot.hasError) {
-                                return Text(
-                                    'Error fetching profilePicture: ${profilePictureSnapshot.error}');
-                              }
-
-                              var profilePicture = (profilePictureSnapshot
-                                              .data ==
-                                          'defaultProfilePict'
-                                      ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                      : profilePictureSnapshot.data) ??
-                                  'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-
-                              return Column(
-                                children: [
-                                  Text('You Reposted'),
-                                  PostWidget(
-                                    title: title,
-                                    body: body,
-                                    imagePaths: imagePaths,
-                                    uidSender: uidSender,
-                                    dateTime: parsedDateTime,
-                                    namaLengkap: namaLengkap,
-                                    profilePicture: profilePicture,
-                                    postID: postID,
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    } else {
-                      // If the current user did not repost this post, return an empty container
-                      return Container();
-                    }
-                  },
-                );
-              }
-            },
-          );
-        },
-      ),
-    );
-  }
-}
+// class ThirdTabHome extends StatefulWidget {
+//   const ThirdTabHome({Key? key}) : super(key: key);
+//
+//   @override
+//   _ThirdTabHomeState createState() => _ThirdTabHomeState();
+// }
+//
+// class _ThirdTabHomeState extends State<ThirdTabHome> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+//       child: StreamBuilder<QuerySnapshot>(
+//         stream: FirebaseFirestore.instance
+//             .collection('postingan')
+//             .orderBy('dateTime', descending: true)
+//             .snapshots(),
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return Container();
+//           }
+//
+//           if (snapshot.hasError) {
+//             return Text('Error: ${snapshot.error}');
+//           }
+//
+//           return ListView.builder(
+//             itemCount: snapshot.data!.docs.length,
+//             itemBuilder: (context, index) {
+//               var post = snapshot.data!.docs[index];
+//               var uidSender = post['uidSender'];
+//
+//               // cek uid pengirim sama dgn uid user
+//               if (uidSender == FirebaseAuth.instance.currentUser?.uid) {
+//                 var title = post['title'];
+//                 var body = post['body'];
+//                 List<String>? imagePaths =
+//                     (post['imagePaths'] as List<dynamic>).cast<String>();
+//                 var dateTime = post['dateTime'];
+//                 DateTime parsedDateTime =
+//                     dateTime != null ? dateTime.toDate() : DateTime.now();
+//                 var postID = (snapshot.data!.docs[index].id);
+//
+//                 return FutureBuilder<String>(
+//                   future: getNamaLengkap(uidSender),
+//                   builder: (context, namaLengkapSnapshot) {
+//                     if (namaLengkapSnapshot.hasError) {
+//                       return Text(
+//                           'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+//                     }
+//
+//                     var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+//
+//                     return FutureBuilder<String>(
+//                       future: getProfilePicture(uidSender),
+//                       builder: (context, profilePictureSnapshot) {
+//                         if (profilePictureSnapshot.hasError) {
+//                           return Text(
+//                               'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+//                         }
+//
+//                         var profilePicture = (profilePictureSnapshot.data ==
+//                                     'defaultProfilePict'
+//                                 ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+//                                 : profilePictureSnapshot.data) ??
+//                             'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+//
+//                         return PostWidget(
+//                           title: title,
+//                           body: body,
+//                           imagePaths: imagePaths,
+//                           uidSender: uidSender,
+//                           dateTime: parsedDateTime,
+//                           namaLengkap: namaLengkap,
+//                           profilePicture: profilePicture,
+//                           postID: postID,
+//                         );
+//                       },
+//                     );
+//                   },
+//                 );
+//               } else {
+//                 // If postingan is a repost, check if the current user (your UID) reposted it
+//                 var repostsCollection = post.reference.collection('reposts');
+//                 var currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+//
+//                 return FutureBuilder<QuerySnapshot>(
+//                   future: repostsCollection.get(),
+//                   builder:
+//                       (context, AsyncSnapshot<QuerySnapshot> repostsSnapshot) {
+//                     if (repostsSnapshot.connectionState ==
+//                         ConnectionState.waiting) {
+//                       return Container();
+//                     }
+//
+//                     if (repostsSnapshot.hasError) {
+//                       return Text('Error: ${repostsSnapshot.error}');
+//                     }
+//
+//                     // Check if the current user's UID has a corresponding document in the reposts subcollection
+//                     var currentUserRepost = repostsSnapshot.data!.docs
+//                         .any((repostDoc) => repostDoc.id == currentUserUid);
+//
+//                     // If the current user reposted this post, fetch the reposted post details and display
+//                     if (currentUserRepost) {
+//                       // Get the ID of the reposted post
+//                       // var repostedPostId = repostsSnapshot.data!.docs.first
+//                       //     .id; // ini mengembalikan uid, bukan post id
+//                       print(post);
+//
+//                       var title = post['title'];
+//                       var body = post['body'];
+//                       List<String>? imagePaths =
+//                           (post['imagePaths'] as List<dynamic>).cast<String>();
+//                       var dateTime = post['dateTime'];
+//                       DateTime parsedDateTime =
+//                           dateTime != null ? dateTime.toDate() : DateTime.now();
+//                       var postID = (snapshot.data!.docs[index].id);
+//
+//                       return FutureBuilder<String>(
+//                         future: getNamaLengkap(uidSender),
+//                         builder: (context, namaLengkapSnapshot) {
+//                           if (namaLengkapSnapshot.hasError) {
+//                             return Text(
+//                                 'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
+//                           }
+//
+//                           var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+//
+//                           return FutureBuilder<String>(
+//                             future: getProfilePicture(uidSender),
+//                             builder: (context, profilePictureSnapshot) {
+//                               if (profilePictureSnapshot.hasError) {
+//                                 return Text(
+//                                     'Error fetching profilePicture: ${profilePictureSnapshot.error}');
+//                               }
+//
+//                               var profilePicture = (profilePictureSnapshot
+//                                               .data ==
+//                                           'defaultProfilePict'
+//                                       ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
+//                                       : profilePictureSnapshot.data) ??
+//                                   'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+//
+//                               return Column(
+//                                 children: [
+//                                   Text('You Reposted'),
+//                                   PostWidget(
+//                                     title: title,
+//                                     body: body,
+//                                     imagePaths: imagePaths,
+//                                     uidSender: uidSender,
+//                                     dateTime: parsedDateTime,
+//                                     namaLengkap: namaLengkap,
+//                                     profilePicture: profilePicture,
+//                                     postID: postID,
+//                                   ),
+//                                 ],
+//                               );
+//                             },
+//                           );
+//                         },
+//                       );
+//                     } else {
+//                       // If the current user did not repost this post, return an empty container
+//                       return Container();
+//                     }
+//                   },
+//                 );
+//               }
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }

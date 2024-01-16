@@ -181,9 +181,7 @@ class _OtherProfileState extends State<OtherProfile> {
                                             Flexible(
                                               flex: 1,
                                               child: Column(
-                                                children: [
-                                                  
-                                                ],
+                                                children: [],
                                               ),
                                             )
                                           ],
@@ -218,18 +216,19 @@ class _OtherProfileState extends State<OtherProfile> {
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    ViewChat(
-                                                                      chatID: generateChatID(
-                                                                          currentUserID,
-                                                                          otherUserID),
-                                                                      senderID:
-                                                                          currentUserID,
-                                                                      targetUserID:
-                                                                          otherUserID,
-                                                                    )),
+                                                          builder: (context) =>
+                                                              ViewChat(
+                                                            chatID: generateChatID(
+                                                                currentUserID,
+                                                                otherUserID),
+                                                            senderID:
+                                                                currentUserID,
+                                                            targetUserID:
+                                                                otherUserID,
+                                                          ),
+                                                        ),
                                                       );
+                                                      ;
                                                     },
                                                   ),
                                                 ],
@@ -248,7 +247,8 @@ class _OtherProfileState extends State<OtherProfile> {
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
-                                                  Text(followerCount.toString()),
+                                                  Text(
+                                                      followerCount.toString()),
                                                   ElevatedButton(
                                                       onPressed:
                                                           _toggleFollowAccount,
@@ -442,11 +442,8 @@ class _AllWorksState extends State<AllWorks> {
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
 
-                      var profilePicture = (profilePictureSnapshot.data ==
-                                  'defaultProfilePict'
-                              ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                              : profilePictureSnapshot.data) ??
-                          'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                      var profilePicture = profilePictureSnapshot
+                          .data ?? '';
 
                       return PostWidget(
                         title: title,
@@ -630,11 +627,8 @@ class _RepostWorksState extends State<RepostWorks> {
                                 'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                           }
 
-                          var profilePicture = (profilePictureSnapshot.data ==
-                                      'defaultProfilePict'
-                                  ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                  : profilePictureSnapshot.data) ??
-                              'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                          var profilePicture = profilePictureSnapshot
+                              .data ?? '';
 
                           return Column(
                             children: [

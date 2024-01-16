@@ -32,6 +32,10 @@ class _ExpandCommentState extends State<ExpandComment> {
     return loading
         ? Loading()
         : MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              brightness: Brightness.dark,
+            ),
             home: Scaffold(
               appBar: AppBar(
                 title: Text('View Comments'),
@@ -48,13 +52,11 @@ class _ExpandCommentState extends State<ExpandComment> {
                 margin: EdgeInsets.all(20),
                 child: ListView(
                   children: [
-                    Text(widget.commentID),
                     StreamBuilder<DocumentSnapshot>(
                       stream: widget.postCollection
                           .doc(widget.postID)
                           .collection('comments')
-                          .doc(widget
-                              .commentID)
+                          .doc(widget.commentID)
                           .snapshots(),
                       builder: (context, commentSnapshot) {
                         if (commentSnapshot.connectionState ==
@@ -110,13 +112,8 @@ class _ExpandCommentState extends State<ExpandComment> {
                                                           'Error fetching data');
                                                     }
 
-                                                    var profilePicture = (profilePictureSnapshot
-                                                                    .data ==
-                                                                'defaultProfilePict'
-                                                            ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
-                                                            : profilePictureSnapshot
-                                                                .data) ??
-                                                        'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                                                    var profilePicture = profilePictureSnapshot
+                                                        .data ?? '';
 
                                                     return Row(
                                                       children: [
@@ -154,7 +151,7 @@ class _ExpandCommentState extends State<ExpandComment> {
                                                 fontSize: 12,
                                                 fontStyle: FontStyle.italic,
                                                 fontWeight: FontWeight.w300,
-                                                color: Colors.black,
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ],
@@ -186,7 +183,7 @@ class _ExpandCommentState extends State<ExpandComment> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(21),
                                 borderSide: BorderSide(
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   width: 1,
                                   style: BorderStyle.solid,
                                 ),
@@ -197,9 +194,9 @@ class _ExpandCommentState extends State<ExpandComment> {
                                   style: ElevatedButton.styleFrom(
                                     minimumSize: Size(50, 50),
                                     side: BorderSide.none,
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: Colors.transparent,
                                   ),
-                                  child: Icon(Icons.send),
+                                  child: Icon(Icons.send, color: Colors.white,),
                                   onPressed: () async {
                                     if (_formKey.currentState != null) {
                                       if (_formKey.currentState!.validate()) {
@@ -352,7 +349,7 @@ class ExpandCommentWidget extends StatelessWidget {
                                     fontSize: 12,
                                     fontStyle: FontStyle.italic,
                                     fontWeight: FontWeight.w300,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
