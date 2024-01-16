@@ -35,6 +35,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
         ),
         home: Scaffold(
             appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
               backgroundColor: Color(0xFF2e2b2b),
               title: Text('Upload foto profil'),
               leading: IconButton(
@@ -65,9 +66,11 @@ class _ProfilePictureState extends State<ProfilePicture> {
                                     ConnectionState.waiting) {
                                   return CircularProgressIndicator();
                                 } else {
-                                  if (snapshot.hasData && snapshot.data!.exists) {
-                                    Map<String, dynamic> userData = snapshot.data!
-                                        .data() as Map<String, dynamic>;
+                                  if (snapshot.hasData &&
+                                      snapshot.data!.exists) {
+                                    Map<String, dynamic> userData =
+                                        snapshot.data!.data()
+                                            as Map<String, dynamic>;
 
                                     if (userData['profilePicture'] != null) {
                                       return CircleAvatar(
@@ -96,7 +99,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
                             Uint8List? img = await selectImage();
                             setState(() {
                               _image = img;
-                                isSelected = true;
+                              isSelected = true;
                             });
                           },
                           icon: Icon(Icons.add_a_photo),

@@ -15,6 +15,7 @@ class Navigasi extends StatefulWidget {
 
   @override
   _NavigasiState createState() => _NavigasiState();
+
 }
 
 class _NavigasiState extends State<Navigasi> {
@@ -29,7 +30,7 @@ class _NavigasiState extends State<Navigasi> {
   final List _pages = [
     const Home(),
     Search(),
-    Upload(),
+    const Upload(),
     Chats(),
     Profile(isRedirected: false),
   ];

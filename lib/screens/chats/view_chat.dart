@@ -126,6 +126,7 @@ class _ViewChatState extends State<ViewChat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         title: Text(targetUserName),
       ),
       body: Padding(

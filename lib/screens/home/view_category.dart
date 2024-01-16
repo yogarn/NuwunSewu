@@ -17,6 +17,7 @@ class _ViewCategoryState extends State<ViewCategory> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           backgroundColor: Color(0xFF131313),
           title: Text('${widget.kategori}'),
           leading: IconButton(
@@ -37,18 +38,18 @@ class _ViewCategoryState extends State<ViewCategory> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Container();
               }
-          
+
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
-          
+
               return ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   var post = snapshot.data!.docs[index];
                   var uidSender = post['uidSender'];
                   var kategoriTarget = post['kategori'];
-          
+
                   // cek uid pengirim sama dgn uid user
                   if (uidSender == widget.uidTarget &&
                       kategoriTarget == widget.kategori) {
@@ -58,7 +59,7 @@ class _ViewCategoryState extends State<ViewCategory> {
                     DateTime parsedDateTime =
                         dateTime != null ? dateTime.toDate() : DateTime.now();
                     var postID = (snapshot.data!.docs[index].id);
-          
+
                     return FutureBuilder<String>(
                       future: getNamaLengkap(uidSender),
                       builder: (context, namaLengkapSnapshot) {
@@ -66,9 +67,9 @@ class _ViewCategoryState extends State<ViewCategory> {
                           return Text(
                               'Error fetching namaLengkap: ${namaLengkapSnapshot.error}');
                         }
-          
+
                         var namaLengkap = namaLengkapSnapshot.data ?? 'null';
-          
+
                         return FutureBuilder<String>(
                           future: getProfilePicture(uidSender),
                           builder: (context, profilePictureSnapshot) {
@@ -76,13 +77,13 @@ class _ViewCategoryState extends State<ViewCategory> {
                               return Text(
                                   'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                             }
-          
+
                             var profilePicture = (profilePictureSnapshot.data ==
                                         'defaultProfilePict'
                                     ? 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain'
                                     : profilePictureSnapshot.data) ??
                                 'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
-          
+
                             return PostWidget(
                               title: title,
                               body: body,

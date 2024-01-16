@@ -22,98 +22,108 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return loading ? Loading() : MaterialApp(
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          brightness: Brightness.dark,
-        ),
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Login Page"),
-          backgroundColor: Color(0xFF2e2b2b),
-          actions: [
-            TextButton.icon(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () => widget.toggleSignIn(),
-                icon: Icon(Icons.person, color: Colors.white),
-                label: Text('Register', style: TextStyle(color: Colors.white),))
-          ],
-        ),
-        body: Container(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-          child: Form(
-            key: _formKey,
-            child: ListView(children: [
-              SizedBox(
-                height: 20,
+    return loading
+        ? Loading()
+        : MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.purple,
+                brightness: Brightness.dark,
               ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'example@hackfest.id',
-                  label: Text('Email Address'),
-                ),
-                validator: (val) => val!.isEmpty ? 'Masukkan email!' : null,
-                onChanged: (val) {
-                  setState(() {
-                    email = val;
-                  });
-                },
+            ),
+            home: Scaffold(
+              appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
+                title: Text("Login Page"),
+                backgroundColor: Color(0xFF2e2b2b),
+                actions: [
+                  TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () => widget.toggleSignIn(),
+                      icon: Icon(Icons.person, color: Colors.white),
+                      label: Text(
+                        'Register',
+                        style: TextStyle(color: Colors.white),
+                      ))
+                ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Minimal 8 karakter',
-                  label: Text('Password'),
-                ),
-                validator: (val) =>
-                    val!.length < 8 ? 'Minimal password 8 karakter!' : null,
-                obscureText: true,
-                onChanged: (val) {
-                  setState(() {
-                    pass = val;
-                  });
-                },
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState != null) {
-                      if (_formKey.currentState!.validate()) {
+              body: Container(
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'example@hackfest.id',
+                        label: Text('Email Address'),
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Masukkan email!' : null,
+                      onChanged: (val) {
                         setState(() {
-                          loading = true;
+                          email = val;
                         });
-                        dynamic result =
-                            await _auth.SignInWithEmailAndPassword(email, pass);
-                        if (result == null) {
-                          setState(() {
-                            error = "Mohon maaf, periksa lagi kredensial anda!";
-                            loading = false;
-                          });
-                        }
-                      }
-                    }
-                  },
-                  child: Text('Sign In')),
-              SizedBox(
-                height: 20,
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Minimal 8 karakter',
+                        label: Text('Password'),
+                      ),
+                      validator: (val) => val!.length < 8
+                          ? 'Minimal password 8 karakter!'
+                          : null,
+                      obscureText: true,
+                      onChanged: (val) {
+                        setState(() {
+                          pass = val;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState != null) {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                loading = true;
+                              });
+                              dynamic result =
+                                  await _auth.SignInWithEmailAndPassword(
+                                      email, pass);
+                              if (result == null) {
+                                setState(() {
+                                  error =
+                                      "Mohon maaf, periksa lagi kredensial anda!";
+                                  loading = false;
+                                });
+                              }
+                            }
+                          }
+                        },
+                        child: Text('Sign In')),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      error,
+                      style: TextStyle(color: Colors.red, fontSize: 14.0),
+                    )
+                  ]),
+                ),
               ),
-              Text(
-                error,
-                style: TextStyle(color: Colors.red, fontSize: 14.0),
-              )
-            ]),
-          ),
-        ),
-      ),
-    );
+            ),
+          );
   }
 }

@@ -62,6 +62,7 @@ class _ChatsState extends State<Chats> {
       ),
       home: Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           backgroundColor: Color(0xFF2e2b2b),
           title: Text('Cari Chat'),
         ),
@@ -86,7 +87,10 @@ class _ChatsState extends State<Chats> {
                     hintStyle: TextStyle(color: Colors.black),
                     border: InputBorder.none,
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.search, color: Colors.black,),
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.black,
+                      ),
                       onPressed: () {
                         _startSearch();
                       },
@@ -194,7 +198,8 @@ class _ChatsState extends State<Chats> {
                                 child: Container(
                                   margin: const EdgeInsets.all(15),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -209,8 +214,8 @@ class _ChatsState extends State<Chats> {
                                           Flexible(
                                             flex: 10,
                                             child: Container(
-                                              margin:
-                                                  const EdgeInsets.only(left: 10),
+                                              margin: const EdgeInsets.only(
+                                                  left: 10),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -264,6 +269,7 @@ class _RecentChatsState extends State<RecentChats> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         title: const Text('Recent Chats'),
       ),
       body: Column(

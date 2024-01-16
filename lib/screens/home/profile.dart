@@ -60,6 +60,7 @@ class _ProfileState extends State<Profile> {
             home: Scaffold(
               backgroundColor: Color(0xFF2e2b2b),
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 leading: widget.isRedirected
                     ? IconButton(
                         icon: Icon(Icons.arrow_back),
@@ -261,51 +262,56 @@ class _AboutMeWidgetState extends State<AboutMeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.userData['aboutMe'].length > 100 ? Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isExpanded
-                  ? widget.userData['aboutMe']
-                  : widget.userData['aboutMe'].substring(0, 100),
-              maxLines: isExpanded ? null : 2,
-              overflow:
-                  isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            ),
-            if (!isExpanded)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isExpanded = true;
-                  });
-                },
-                child: Text(
-                  'View more...',
-                  style: TextStyle(
-                    color: Colors.purple[100], // Ganti warna sesuai kebutuhan
+    return widget.userData['aboutMe'].length > 100
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isExpanded
+                        ? widget.userData['aboutMe']
+                        : widget.userData['aboutMe'].substring(0, 100),
+                    maxLines: isExpanded ? null : 2,
+                    overflow: isExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
                   ),
-                ),
+                  if (!isExpanded)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isExpanded = true;
+                        });
+                      },
+                      child: Text(
+                        'View more...',
+                        style: TextStyle(
+                          color: Colors
+                              .purple[100], // Ganti warna sesuai kebutuhan
+                        ),
+                      ),
+                    ),
+                  if (isExpanded)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isExpanded = false;
+                        });
+                      },
+                      child: Text(
+                        'Hide',
+                        style: TextStyle(
+                          color: Colors
+                              .purple[100], // Ganti warna sesuai kebutuhan
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            if (isExpanded)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isExpanded = false;
-                  });
-                },
-                child: Text(
-                  'Hide',
-                  style: TextStyle(
-                    color: Colors.purple[100], // Ganti warna sesuai kebutuhan
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ],
-    ) : Text(widget.userData['aboutMe']);
+            ],
+          )
+        : Text(widget.userData['aboutMe']);
   }
 }

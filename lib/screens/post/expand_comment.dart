@@ -38,6 +38,7 @@ class _ExpandCommentState extends State<ExpandComment> {
             ),
             home: Scaffold(
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 title: Text('View Comments'),
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -112,8 +113,10 @@ class _ExpandCommentState extends State<ExpandComment> {
                                                           'Error fetching data');
                                                     }
 
-                                                    var profilePicture = profilePictureSnapshot
-                                                        .data ?? '';
+                                                    var profilePicture =
+                                                        profilePictureSnapshot
+                                                                .data ??
+                                                            '';
 
                                                     return Row(
                                                       children: [
@@ -196,7 +199,10 @@ class _ExpandCommentState extends State<ExpandComment> {
                                     side: BorderSide.none,
                                     backgroundColor: Colors.transparent,
                                   ),
-                                  child: Icon(Icons.send, color: Colors.white,),
+                                  child: Icon(
+                                    Icons.send,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () async {
                                     if (_formKey.currentState != null) {
                                       if (_formKey.currentState!.validate()) {

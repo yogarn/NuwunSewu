@@ -204,6 +204,7 @@ class _ExpandPostState extends State<ExpandPost> {
             ),
             home: Scaffold(
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 title: Text('Expand Post'),
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -412,7 +413,10 @@ class _ExpandPostState extends State<ExpandPost> {
                                                     backgroundColor:
                                                         Colors.transparent,
                                                   ),
-                                                  child: Icon(Icons.send, color: Colors.white, ),
+                                                  child: Icon(
+                                                    Icons.send,
+                                                    color: Colors.white,
+                                                  ),
                                                   onPressed: () async {
                                                     if (_formKey.currentState !=
                                                         null) {
@@ -569,8 +573,8 @@ class CommentWidget extends StatelessWidget {
                                     return Text('Error fetching data');
                                   }
 
-                                  var profilePicture = profilePictureSnapshot
-                                      .data ?? '';
+                                  var profilePicture =
+                                      profilePictureSnapshot.data ?? '';
 
                                   return Row(
                                     children: [

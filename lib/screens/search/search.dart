@@ -25,6 +25,7 @@ class _SearchState extends State<Search> {
       ),
       home: Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           backgroundColor: Color(0xFF131313),
           title: Text('Cari Postingan'),
         ),
@@ -49,7 +50,10 @@ class _SearchState extends State<Search> {
                     hintStyle: TextStyle(color: Colors.black),
                     border: InputBorder.none,
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.search, color: Colors.black,),
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.black,
+                      ),
                       onPressed: () {
                         _startSearch();
                       },
@@ -99,9 +103,8 @@ class _SearchState extends State<Search> {
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
 
-                                  var profilePicture = profilePictureSnapshot
-                                      .data ?? '';
-
+                                  var profilePicture =
+                                      profilePictureSnapshot.data ?? '';
 
                                   return PostWidget(
                                     title: resultData['title'],
@@ -120,7 +123,8 @@ class _SearchState extends State<Search> {
                             },
                           );
                         } else if (resultData.containsKey('namaLengkap')) {
-                          var profilePicture = resultData['profilePicture'] ?? '';
+                          var profilePicture =
+                              resultData['profilePicture'] ?? '';
 
                           return ListTile(
                             title: InkWell(
@@ -129,7 +133,8 @@ class _SearchState extends State<Search> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => results[index].id ==
-                                            FirebaseAuth.instance.currentUser?.uid
+                                            FirebaseAuth
+                                                .instance.currentUser?.uid
                                         ? Profile(isRedirected: true)
                                         : OtherProfile(
                                             uidSender: results[index].id,
@@ -147,7 +152,8 @@ class _SearchState extends State<Search> {
                                 child: Container(
                                   margin: const EdgeInsets.all(15),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -162,8 +168,8 @@ class _SearchState extends State<Search> {
                                           Flexible(
                                             flex: 10,
                                             child: Container(
-                                              margin:
-                                                  const EdgeInsets.only(left: 10),
+                                              margin: const EdgeInsets.only(
+                                                  left: 10),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -265,9 +271,12 @@ class Trending extends StatefulWidget {
 class _TrendingState extends State<Trending> {
   @override
   Widget build(BuildContext context) {
-    return 
-    Scaffold(
-      appBar: AppBar(title: Text("On Trending"), elevation: 0.0,),
+    return Scaffold(
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        title: Text("On Trending"),
+        elevation: 0.0,
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('postingan')
@@ -315,8 +324,7 @@ class _TrendingState extends State<Trending> {
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
 
-                      var profilePicture = profilePictureSnapshot
-                          .data ?? '';
+                      var profilePicture = profilePictureSnapshot.data ?? '';
 
                       return PostWidget(
                         title: title,

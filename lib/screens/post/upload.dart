@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 
+import 'package:nuwunsewu/screens/home/navigation.dart';
 import 'package:nuwunsewu/services/add_data.dart';
 import 'package:nuwunsewu/shared/loading.dart';
-
-import '../home/navigation.dart';
 
 class Upload extends StatefulWidget {
   const Upload({Key? key});
@@ -60,15 +59,9 @@ class _UploadState extends State<Upload> {
             ),
             home: Scaffold(
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 title: const Text("Upload postingan"),
                 backgroundColor: Color(0xFF2e2b2b),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  tooltip: 'Back',
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
               ),
               body: Container(
                 padding: const EdgeInsets.symmetric(
@@ -162,8 +155,7 @@ class _UploadState extends State<Upload> {
                                             position: _currentIndex,
                                             decorator: DotsDecorator(
                                               size: const Size.square(9.0),
-                                              color: Colors.black26,
-                                              activeColor: Colors.black,
+                                              activeColor: Colors.white,
                                               activeSize: const Size(18.0, 9.0),
                                               activeShape:
                                                   RoundedRectangleBorder(
@@ -221,6 +213,11 @@ class _UploadState extends State<Upload> {
                                   );
                                   setState(() {
                                     loading = false;
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Navigasi()));
                                   });
                                 } catch (e) {
                                   setState(() {

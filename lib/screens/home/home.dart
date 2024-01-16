@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,6 +25,7 @@ class Home extends StatelessWidget {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
+            surfaceTintColor: Colors.transparent,
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'For You'),
@@ -103,8 +103,7 @@ class _FirstTabHomeState extends State<FirstTabHome> {
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
 
-                      var profilePicture = profilePictureSnapshot
-                          .data ?? '';
+                      var profilePicture = profilePictureSnapshot.data ?? '';
 
                       return PostWidget(
                         title: title,
@@ -390,8 +389,8 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                   'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                             }
 
-                            var profilePicture = profilePictureSnapshot
-                                .data ?? '';
+                            var profilePicture =
+                                profilePictureSnapshot.data ?? '';
 
                             return PostWidget(
                               title: title,
@@ -474,8 +473,8 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                                         'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                                   }
 
-                                  var profilePicture = profilePictureSnapshot
-                                      .data ?? '';
+                                  var profilePicture =
+                                      profilePictureSnapshot.data ?? '';
 
                                   return FutureBuilder<String>(
                                     future: getNamaLengkap(repostedUid),

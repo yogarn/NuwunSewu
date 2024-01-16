@@ -46,6 +46,7 @@ class _RegisterState extends State<Register> {
             ),
             home: Scaffold(
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 title: const Text('Sign Up'),
                 backgroundColor: Color(0xFF2e2b2b),
                 actions: [

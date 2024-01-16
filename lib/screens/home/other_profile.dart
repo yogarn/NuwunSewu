@@ -98,6 +98,7 @@ class _OtherProfileState extends State<OtherProfile> {
             home: Scaffold(
               backgroundColor: Color(0xFF2e2b2b),
               appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back),
                   tooltip: 'Back',
@@ -442,8 +443,7 @@ class _AllWorksState extends State<AllWorks> {
                             'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                       }
 
-                      var profilePicture = profilePictureSnapshot
-                          .data ?? '';
+                      var profilePicture = profilePictureSnapshot.data ?? '';
 
                       return PostWidget(
                         title: title,
@@ -627,8 +627,8 @@ class _RepostWorksState extends State<RepostWorks> {
                                 'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                           }
 
-                          var profilePicture = profilePictureSnapshot
-                              .data ?? '';
+                          var profilePicture =
+                              profilePictureSnapshot.data ?? '';
 
                           return Column(
                             children: [
