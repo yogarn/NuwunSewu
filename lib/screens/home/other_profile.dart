@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -131,7 +132,7 @@ class _OtherProfileState extends State<OtherProfile> {
                                     flex: 1,
                                     child: CircleAvatar(
                                       radius: 72,
-                                      backgroundImage: NetworkImage(
+                                      backgroundImage: CachedNetworkImageProvider(
                                         userData['profilePicture'],
                                       ),
                                     ),

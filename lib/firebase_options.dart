@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDj9QYBLy5kUQNqS89Min0Gdw8znwgI_F0',
-    appId: '1:62123434998:web:a2ea51fb487818d3935dd7',
-    messagingSenderId: '62123434998',
-    projectId: 'hackfest-habis-kuota',
-    authDomain: 'hackfest-habis-kuota.firebaseapp.com',
-    storageBucket: 'hackfest-habis-kuota.appspot.com',
+    apiKey: 'AIzaSyCdW8o-tU71-qcsw7ME9TIKjRV849Rdotg',
+    appId: '1:572296227153:web:2e73677c023a0932cf4b70',
+    messagingSenderId: '572296227153',
+    projectId: 'loremipsum-29e20',
+    authDomain: 'loremipsum-29e20.firebaseapp.com',
+    storageBucket: 'loremipsum-29e20.appspot.com',
+    measurementId: 'G-QCGL7ZJSMH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCxsg5cfLHv1IMyQpazUTmjc63Vio4uQac',
-    appId: '1:62123434998:android:91973dac8623f723935dd7',
-    messagingSenderId: '62123434998',
-    projectId: 'hackfest-habis-kuota',
-    storageBucket: 'hackfest-habis-kuota.appspot.com',
+    apiKey: 'AIzaSyBwXjz5W4m5Xrro1YdUufuC-CmM41ElFZo',
+    appId: '1:572296227153:android:ea2d69344a3b66ebcf4b70',
+    messagingSenderId: '572296227153',
+    projectId: 'loremipsum-29e20',
+    storageBucket: 'loremipsum-29e20.appspot.com',
   );
 }

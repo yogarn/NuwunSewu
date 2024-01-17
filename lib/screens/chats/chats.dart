@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -200,7 +201,7 @@ class _ChatsState extends State<Chats> {
                                             child: CircleAvatar(
                                               radius: 21,
                                               backgroundImage:
-                                                  NetworkImage(profilePicture),
+                                                  CachedNetworkImageProvider(profilePicture),
                                             ),
                                           ),
                                           Flexible(
@@ -387,7 +388,7 @@ class _RecentChatsState extends State<RecentChats> {
             },
             leading: CircleAvatar(
               radius: 21,
-              backgroundImage: NetworkImage(
+              backgroundImage: CachedNetworkImageProvider(
                 chatInfo.profilePict,
               ),
             ),

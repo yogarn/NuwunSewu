@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter/material.dart';
 import 'package:nuwunsewu/screens/home/other_profile.dart';
 import 'package:nuwunsewu/screens/home/profile.dart';
@@ -19,13 +17,15 @@ class Home extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.dark,
+        ),
       ),
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            surfaceTintColor: Colors.transparent,
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'For You'),
@@ -127,25 +127,6 @@ class _FirstTabHomeState extends State<FirstTabHome> {
   }
 }
 
-Future<Uint8List> compressImage(String imageUrl) async {
-  // Download the image
-  final response = await http.get(Uri.parse(imageUrl));
-
-  if (response.statusCode == 200) {
-    final bytes = Uint8List.fromList(response.bodyBytes);
-    // Compress the image
-    final result = await FlutterImageCompress.compressWithList(
-      bytes,
-      minHeight: 640,
-      minWidth: 360,
-      quality: 6,
-    );
-    return result;
-  } else {
-    throw Exception('Failed to load image');
-  }
-}
-
 class PostWidget extends StatefulWidget {
   PostWidget({
     required this.title,
@@ -196,33 +177,21 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: widget.imagePaths != null &&
-                        widget.imagePaths!.isNotEmpty
-                    ? FutureBuilder<Uint8List>(
-                        future: compressImage(widget.imagePaths![0]),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (snapshot.hasData) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.memory(
-                                    snapshot.data!,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Text('No data');
-                            }
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        },
-                      )
-                    : Container(),
+                child:
+                    widget.imagePaths != null && widget.imagePaths!.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: CachedNetworkImage(
+                                imageUrl: widget.imagePaths![0],
+                                fit: BoxFit.fill,
+                                placeholder: (context, url) => CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(Icons.error),
+                              ),
+                            ),
+                          )
+                        : Container(),
               ),
               Row(
                 children: [
@@ -244,7 +213,7 @@ class _PostWidgetState extends State<PostWidget> {
                       },
                       child: CircleAvatar(
                         radius: 21,
-                        backgroundImage: NetworkImage(widget.profilePicture),
+                        backgroundImage: CachedNetworkImageProvider(widget.profilePicture),
                       ),
                     ),
                   ),
@@ -407,8 +376,7 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                       },
                     );
                   } else {
-                    var repostsCollection =
-                        post.reference.collection('reposts');
+                    var repostsCollection = post.reference.collection('reposts');
                     var currentUserUid = FirebaseAuth.instance.currentUser?.uid;
 
                     return FutureBuilder<QuerySnapshot>(
@@ -429,8 +397,7 @@ class _SecondTabHomeState extends State<SecondTabHome> {
                             .any((repostDoc) => repostDoc.id == currentUserUid);
 
                         var followingReposts = repostsSnapshot.data!.docs.any(
-                            (repostDoc) =>
-                                followingList.contains(repostDoc.id));
+                            (repostDoc) => followingList.contains(repostDoc.id));
 
                         if (currentUserRepost || followingReposts) {
                           var title = post['title'];

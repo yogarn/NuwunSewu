@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +193,8 @@ class _ExpandPostState extends State<ExpandPost> {
       }
     });
   }
-    String _formatTimeDifference(DateTime postDateTime) {
+
+  String _formatTimeDifference(DateTime postDateTime) {
     Duration difference = DateTime.now().difference(postDateTime);
     int daysDifference = difference.inDays;
     int hoursDifference = difference.inHours;
@@ -278,7 +280,8 @@ class _ExpandPostState extends State<ExpandPost> {
                                           fontWeight: FontWeight.w400),
                                     ),
                                     Text(
-                                      _formatTimeDifference(postingan['dateTime'].toDate()),
+                                      _formatTimeDifference(
+                                          postingan['dateTime'].toDate()),
                                       style: TextStyle(
                                           fontSize: 16.0,
                                           fontStyle: FontStyle.italic,
@@ -301,8 +304,8 @@ class _ExpandPostState extends State<ExpandPost> {
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(20),
-                                                  child: Image.network(
-                                                    imagePath,
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: imagePath,
                                                     fit: BoxFit.fill,
                                                   ),
                                                 ),
@@ -548,7 +551,7 @@ class CommentWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> commentData =
-                document.data() as Map<String, dynamic>;
+            document.data() as Map<String, dynamic>;
 
             String commentText = commentData['text'] ?? '';
             var commentID = document.id;
@@ -559,13 +562,12 @@ class CommentWidget extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => ExpandComment(
-                            commentID: commentID,
-                            postID: postId,
-                          )),
+                        commentID: commentID,
+                        postID: postId,
+                      )),
                 );
               },
-              child: Row(
-                children: [
+              child:
                   Expanded(
                     child: Container(
                       margin: EdgeInsets.all(8.0),
@@ -602,20 +604,20 @@ class CommentWidget extends StatelessWidget {
                                       CircleAvatar(
                                         radius: 21,
                                         backgroundImage:
-                                            NetworkImage(profilePicture),
+                                        CachedNetworkImageProvider(profilePicture),
                                       ),
-                                      Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20.0),
-                                            child: Text(namaLengkap),
-                                          ),
-                                          Text(
-                                            commentText,
-                                            style: TextStyle(fontSize: 12.0),
-                                          ),
-                                        ],
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(10,  0, 10, 0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(namaLengkap),
+                                            Text(
+                                              commentText,
+                                              style: TextStyle(fontSize: 12.0),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   );
@@ -640,8 +642,6 @@ class CommentWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-              ),
             );
           }).toList(),
         );
