@@ -576,69 +576,72 @@ class CommentWidget extends StatelessWidget {
                         color: Colors.grey[800],
                         borderRadius: BorderRadius.circular(20.0),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FutureBuilder<String>(
-                            future: getNamaLengkap(commentData['user']),
-                            builder: (context, namaLengkapSnapshot) {
-                              if (namaLengkapSnapshot.hasError) {
-                                return Text('Error fetching data');
-                              }
-
-                              var namaLengkap =
-                                  namaLengkapSnapshot.data ?? 'null';
-
-                              return FutureBuilder<String>(
-                                future: getProfilePicture(commentData['user']),
-                                builder: (context, profilePictureSnapshot) {
-                                  if (profilePictureSnapshot.hasError) {
-                                    return Text('Error fetching data');
-                                  }
-
-                                  var profilePicture =
-                                      profilePictureSnapshot.data ?? '';
-
-                                  return Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 21,
-                                        backgroundImage:
-                                        CachedNetworkImageProvider(profilePicture),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.fromLTRB(10,  0, 10, 0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(namaLengkap),
-                                            Text(
-                                              commentText,
-                                              style: TextStyle(fontSize: 12.0),
-                                            ),
-                                          ],
+                      child: SizedBox(
+                        width: 10.0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FutureBuilder<String>(
+                              future: getNamaLengkap(commentData['user']),
+                              builder: (context, namaLengkapSnapshot) {
+                                if (namaLengkapSnapshot.hasError) {
+                                  return Text('Error fetching data');
+                                }
+                        
+                                var namaLengkap =
+                                    namaLengkapSnapshot.data ?? 'null';
+                        
+                                return FutureBuilder<String>(
+                                  future: getProfilePicture(commentData['user']),
+                                  builder: (context, profilePictureSnapshot) {
+                                    if (profilePictureSnapshot.hasError) {
+                                      return Text('Error fetching data');
+                                    }
+                        
+                                    var profilePicture =
+                                        profilePictureSnapshot.data ?? '';
+                        
+                                    return Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 21,
+                                          backgroundImage:
+                                          CachedNetworkImageProvider(profilePicture),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            _formatTimeDifference(
-                                commentData['timestamp'].toDate()),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white,
+                                        Container(
+                                          margin: EdgeInsets.fromLTRB(10,  0, 10, 0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(namaLengkap),
+                                              Text(
+                                                commentText,
+                                                style: TextStyle(fontSize: 12.0),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              _formatTimeDifference(
+                                  commentData['timestamp'].toDate()),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
