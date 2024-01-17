@@ -32,7 +32,7 @@ password: `admin123`<br>
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Upload_Post.jpg" width="50%" height="50%" />
 
 ### View Post Page
-<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_View_Post.jpg" width="50%" height="50%" />
+<img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Expand_Post.jpg" width="50%" height="50%" />
 
 ### Reply Comment Page
 <img src="https://github.com/yogarn/NuwunSewu/blob/main/image%20of%20screenshot/Screenshot_Reply_Comment.jpg" width="50%" height="50%" />
