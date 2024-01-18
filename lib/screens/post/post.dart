@@ -554,83 +554,87 @@ class CommentWidget extends StatelessWidget {
                 document.data() as Map<String, dynamic>;
 
             String commentText = commentData['text'] ?? '';
+            var commentID = document.id;
 
-            return Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.all(8.0),
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FutureBuilder<String>(
-                          future: getNamaLengkap(commentData['user']),
-                          builder: (context, namaLengkapSnapshot) {
-                            if (namaLengkapSnapshot.hasError) {
+            return Container(
+              margin: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExpandComment(
+                              commentID: commentID,
+                              postID: postId,
+                            )),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FutureBuilder<String>(
+                      future: getNamaLengkap(commentData['user']),
+                      builder: (context, namaLengkapSnapshot) {
+                        if (namaLengkapSnapshot.hasError) {
+                          return Text('Error fetching data');
+                        }
+
+                        var namaLengkap = namaLengkapSnapshot.data ?? 'null';
+
+                        return FutureBuilder<String>(
+                          future: getProfilePicture(commentData['user']),
+                          builder: (context, profilePictureSnapshot) {
+                            if (profilePictureSnapshot.hasError) {
                               return Text('Error fetching data');
                             }
 
-                            var namaLengkap =
-                                namaLengkapSnapshot.data ?? 'null';
+                            var profilePicture =
+                                profilePictureSnapshot.data ?? '';
 
-                            return FutureBuilder<String>(
-                              future: getProfilePicture(commentData['user']),
-                              builder: (context, profilePictureSnapshot) {
-                                if (profilePictureSnapshot.hasError) {
-                                  return Text('Error fetching data');
-                                }
-
-                                var profilePicture = profilePictureSnapshot
-                                        .data ??
-                                    '';
-
-                                return Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 21,
-                                      backgroundImage:
-                                          CachedNetworkImageProvider(profilePicture),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(namaLengkap),
-                                  ],
-                                );
-                              },
+                            return Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 21,
+                                  backgroundImage: CachedNetworkImageProvider(
+                                      profilePicture),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(namaLengkap),
+                              ],
                             );
                           },
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          commentText,
-                          style: TextStyle(fontSize: 12.0),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          _formatTimeDifference(
-                              commentData['timestamp'].toDate()),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      commentText,
+                      style: TextStyle(fontSize: 12.0),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      _formatTimeDifference(commentData['timestamp'].toDate()),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           }).toList(),
         );

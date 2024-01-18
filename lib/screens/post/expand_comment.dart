@@ -76,11 +76,11 @@ class _ExpandCommentState extends State<ExpandComment> {
                                   children: [
                                     Expanded(
                                       child: Container(
-                                        margin: EdgeInsets.all(8.0),
-                                        padding: EdgeInsets.all(8.0),
+                                        // margin: EdgeInsets.all(8.0),
+                                        // padding: EdgeInsets.all(8.0),
                                         decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.grey),
+                                          // border:
+                                          //     Border.all(color: Colors.grey),
                                           borderRadius:
                                               BorderRadius.circular(8.0),
                                         ),
@@ -119,44 +119,112 @@ class _ExpandCommentState extends State<ExpandComment> {
                                                                 .data ??
                                                             '';
 
-                                                    return Row(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          radius: 21,
-                                                          backgroundImage:
-                                                              CachedNetworkImageProvider(
-                                                                  profilePicture),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 10,
-                                                        ),
-                                                        Text(namaLengkap),
-                                                      ],
+                                                    return Container(
+                                                      margin:
+                                                          EdgeInsets.all(8.0),
+                                                      padding:
+                                                          EdgeInsets.all(8.0),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[800],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          FutureBuilder<String>(
+                                                            future:
+                                                                getNamaLengkap(
+                                                                    commentData[
+                                                                        'user']),
+                                                            builder: (context,
+                                                                namaLengkapSnapshot) {
+                                                              if (namaLengkapSnapshot
+                                                                  .hasError) {
+                                                                return Text(
+                                                                    'Error fetching data');
+                                                              }
+
+                                                              var namaLengkap =
+                                                                  namaLengkapSnapshot
+                                                                          .data ??
+                                                                      'null';
+
+                                                              return FutureBuilder<
+                                                                  String>(
+                                                                future: getProfilePicture(
+                                                                    commentData[
+                                                                        'user']),
+                                                                builder: (context,
+                                                                    profilePictureSnapshot) {
+                                                                  if (profilePictureSnapshot
+                                                                      .hasError) {
+                                                                    return Text(
+                                                                        'Error fetching data');
+                                                                  }
+
+                                                                  var profilePicture =
+                                                                      profilePictureSnapshot
+                                                                              .data ??
+                                                                          '';
+
+                                                                  return Row(
+                                                                    children: [
+                                                                      CircleAvatar(
+                                                                        radius:
+                                                                            21,
+                                                                        backgroundImage:
+                                                                            CachedNetworkImageProvider(profilePicture),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                          namaLengkap),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+                                                            },
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            commentData['text'],
+                                                            style: TextStyle(
+                                                                fontSize: 12.0),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            formatTimeDifference(
+                                                                commentData[
+                                                                        'timestamp']
+                                                                    .toDate()),
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w300,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     );
                                                   },
                                                 );
                                               },
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              commentData['text'],
-                                              style: TextStyle(fontSize: 12.0),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              formatTimeDifference(
-                                                  commentData['timestamp']
-                                                      .toDate()),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontStyle: FontStyle.italic,
-                                                fontWeight: FontWeight.w300,
-                                                color: Colors.white,
-                                              ),
                                             ),
                                           ],
                                         ),
@@ -283,89 +351,74 @@ class ExpandCommentWidget extends StatelessWidget {
                 Map<String, dynamic> replyCommentData =
                     replyComment.data() as Map<String, dynamic>;
 
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.all(8.0),
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                FutureBuilder<String>(
-                                  future:
-                                      getNamaLengkap(replyCommentData['user']),
-                                  builder: (context, namaLengkapSnapshot) {
-                                    if (namaLengkapSnapshot.hasError) {
-                                      return Text('Error fetching data');
-                                    }
+                return Container(
+                  margin: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FutureBuilder<String>(
+                        future: getNamaLengkap(replyComment['user']),
+                        builder: (context, namaLengkapSnapshot) {
+                          if (namaLengkapSnapshot.hasError) {
+                            return Text('Error fetching data');
+                          }
 
-                                    var namaLengkap =
-                                        namaLengkapSnapshot.data ?? 'null';
+                          var namaLengkap = namaLengkapSnapshot.data ?? 'null';
 
-                                    return FutureBuilder<String>(
-                                      future: getProfilePicture(
-                                          replyCommentData['user']),
-                                      builder:
-                                          (context, profilePictureSnapshot) {
-                                        if (profilePictureSnapshot.hasError) {
-                                          return Text('Error fetching data');
-                                        }
+                          return FutureBuilder<String>(
+                            future: getProfilePicture(replyComment['user']),
+                            builder: (context, profilePictureSnapshot) {
+                              if (profilePictureSnapshot.hasError) {
+                                return Text('Error fetching data');
+                              }
 
-                                        var profilePicture = profilePictureSnapshot
-                                                .data ??
-                                            'https://th.bing.com/th/id/OIP.AYNjdJj4wFz8070PQVh1hAHaHw?rs=1&pid=ImgDetMain';
+                              var profilePicture =
+                                  profilePictureSnapshot.data ?? '';
 
-                                        return Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 21,
-                                              backgroundImage:
-                                                  CachedNetworkImageProvider(profilePicture),
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(namaLengkap),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  replyCommentData['text'],
-                                  style: TextStyle(fontSize: 12.0),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  formatTimeDifference(
-                                      replyCommentData['timestamp'].toDate()),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.white,
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 21,
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        profilePicture),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(namaLengkap),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        replyComment['text'],
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        formatTimeDifference(
+                            replyComment['timestamp'].toDate()),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 );
               }).toList(),
             );
