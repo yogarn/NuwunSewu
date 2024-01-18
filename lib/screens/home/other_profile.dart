@@ -449,7 +449,8 @@ class _AllWorksState extends State<AllWorks> {
                       return PostWidget(
                         title: title,
                         body: body,
-                        imagePaths: [],
+                        imagePaths: (post['imagePaths'] as List<dynamic>)
+                                  .cast<String>(),
                         uidSender: uidSender,
                         dateTime: parsedDateTime,
                         namaLengkap: namaLengkap,
@@ -602,7 +603,6 @@ class _RepostWorksState extends State<RepostWorks> {
                 if (currentUserRepost) {
                   var title = post['title'];
                   var body = post['body'];
-                  List<String>? imagePaths = [];
                   var dateTime = post['dateTime'];
                   DateTime parsedDateTime =
                       dateTime != null ? dateTime.toDate() : DateTime.now();
@@ -634,7 +634,8 @@ class _RepostWorksState extends State<RepostWorks> {
                               PostWidget(
                                 title: title,
                                 body: body,
-                                imagePaths: imagePaths,
+                                imagePaths: (post['imagePaths'] as List<dynamic>)
+                                  .cast<String>(),
                                 uidSender: uidSender,
                                 dateTime: parsedDateTime,
                                 namaLengkap: namaLengkap,

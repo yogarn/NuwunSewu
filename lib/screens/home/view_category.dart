@@ -78,13 +78,14 @@ class _ViewCategoryState extends State<ViewCategory> {
                                   'Error fetching profilePicture: ${profilePictureSnapshot.error}');
                             }
 
-                            var profilePicture = profilePictureSnapshot.data ??
-                                '';
+                            var profilePicture =
+                                profilePictureSnapshot.data ?? '';
 
                             return PostWidget(
                               title: title,
                               body: body,
-                              imagePaths: [],
+                              imagePaths: (post['imagePaths'] as List<dynamic>)
+                                  .cast<String>(),
                               uidSender: uidSender,
                               dateTime: parsedDateTime,
                               namaLengkap: namaLengkap,
